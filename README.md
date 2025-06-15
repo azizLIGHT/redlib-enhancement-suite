@@ -80,6 +80,44 @@ Access the settings panel via the ⚙️ icon in the top-right corner:
 - **CSP compliance** - Works within Content Security Policy restrictions
 - **Mobile responsive** - Adapts to smaller screens
 
+## 🖼️ Screenshots
+Settings
+
+![Settings](https://github.com/user-attachments/assets/9fb04b80-99b9-4b59-9ea7-cd7d109e8ea8)
+
+Subreddit Hover Info
+
+![Subreddit Hover Info](https://github.com/user-attachments/assets/9500f8b1-8cdf-4bbc-9d37-bda21ea0b27a)
+
+User Hover Info
+
+![User Hover Info](https://github.com/user-attachments/assets/03ff091d-6528-4a54-9929-c37ad6f4e827)
+
+Hidden post with state preservation
+
+![Hiden post](https://github.com/user-attachments/assets/9bd741f9-b048-45c1-acc6-e0324b1b8e2a)
+
+Comments Preview
+
+![Comments Preview](https://github.com/user-attachments/assets/62bfd2fc-d048-42d5-8afe-80fc75112542)
+
+Comments Preview
+
+![Comments Preview](https://github.com/user-attachments/assets/3c655e22-7838-4f7b-a38a-4a651bcd1ae7)
+
+Sticky post at the top
+
+![Sticky post at the top](https://github.com/user-attachments/assets/df77442b-ec36-4625-99c8-27d6028fbfb1)
+
+Hover sticky post for preview
+
+![Hover sticky post for preview](https://github.com/user-attachments/assets/64150ad4-74b1-4312-a269-78be2c146a27)
+
+Floating video player, resizable and movable
+
+![Floating video player, resizable and movable](https://github.com/user-attachments/assets/003646c6-b5c0-486c-b826-0be041dd17eb)
+
+
 ## 📱 Browser Compatibility
 
 - ✅ **Chrome** 88+
