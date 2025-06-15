@@ -141,7 +141,7 @@ Floating video player, resizable and movable
    - [Violentmonkey](https://violentmonkey.github.io/) (Chrome, Firefox, Edge)
 
 2. **Install the script:**
-   - Click [here to install](link-to-your-userscript) or copy the script content
+   - Click [here to install](https://github.com/azizLIGHT/redlib-enhancement-suite/raw/refs/heads/main/redlib-enhancement-suite.user.js) or copy the script content
    - Your userscript manager will prompt you to install
    - Refresh any open Redlib pages
 
@@ -163,7 +163,7 @@ Works on all major Redlib instances including:
 
 Found a bug or have a feature request?
 
-1. **Issues** - Report bugs or request features on the [Issues page](link-to-issues)
+1. **Issues** - Report bugs or request features on the [Issues page](https://github.com/azizLIGHT/redlib-enhancement-suite/issues)
 2. **Pull Requests** - Submit improvements via pull requests
 3. **Testing** - Help test new features across different Redlib instances
 
