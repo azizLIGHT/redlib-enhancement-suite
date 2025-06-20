@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Redlib Enhancement Suite
 // @namespace    https://github.com/azizLIGHT/redlib-enhancement-suite
-// @version      1.1.1
+// @version      1.1.2
 // @description  A comprehensive userscript that supercharges your Redlib experience with RES-style features, smooth animations, and powerful customization options.
 // @author       azizLIGHT
 // @match        https://redlib.catsarch.com/*
@@ -201,7 +201,7 @@
                 border-radius: 3px !important;
                 min-width: 28px !important;
                 line-height: 1 !important;
-                z-index: 10 !important;
+                z-index: 1 !important;
                 transition: all 0.2s ease !important;
             }
 
@@ -686,217 +686,313 @@
                 display: none !important;
             }
 
-            /* ========== HOVER COMMENTS STYLES ========== */
+/* ========== HOVER COMMENTS STYLES ========== */
 
-            ._redlib_popup {
-                position: absolute;
-                background: var(--color-bg, #1a1a1b);
-                border: 1px solid var(--color-border, #343536);
-                border-radius: 4px;
-                padding: 0;
-                z-index: 9999;
-                max-width: 600px;
-                max-height: 500px;
-                overflow-y: auto;
-                overflow-x: hidden;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                font-size: 12px;
-                line-height: 1.3;
-                display: none;
-                color: var(--color-text, #d7dadc);
-                box-sizing: border-box;
-            }
+._redlib_popup {
+    position: absolute;
+    background: var(--color-bg, #1a1a1b);
+    border: 1px solid var(--color-border, #343536);
+    border-radius: 8px;
+    padding: 0;
+    z-index: 999;
+    width: 500px !important;
+    min-width: 500px !important;
+    max-width: 500px !important;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    font-size: 13px;
+    line-height: 1.3;
+    display: none;
+    color: var(--color-text, #d7dadc);
+    box-sizing: border-box;
+}
 
-            ._redlib_popup .comment {
-                margin-bottom: 8px;
-                padding: 6px;
-                border-left: 2px solid var(--accent, #0079d3);
-                background: var(--color-comment-bg, rgba(255,255,255,0.05));
-                border-radius: 4px;
-                display: block;
-                width: 100%;
-                box-sizing: border-box;
-            }
+/* Reset all comment backgrounds - consistent spacing */
+._redlib_popup .comment,
+._redlib_popup .reply {
+    background-color: transparent !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 8px !important;
+    border-radius: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    display: block;
+    width: 100% !important;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
 
-            ._redlib_popup .comment_header {
-                margin-bottom: 4px;
-                font-size: 11px;
-                color: var(--color-text-muted, #818384);
-                line-height: 1.2;
-                display: flex;
-                align-items: baseline;
-                flex-wrap: nowrap;
-                gap: 0;
-                width: 100%;
-            }
+._redlib_popup .comment:last-child,
+._redlib_popup .reply:last-child {
+    border-bottom: none !important;
+}
 
-            ._redlib_popup .comment_author {
-                color: var(--accent, #0079d3);
-                font-weight: normal;
-                text-decoration: none;
-                white-space: nowrap;
-            }
+/* Replies containers - consistent 12px indentation per level, NO VERTICAL LINES */
+._redlib_popup .replies {
+    margin-left: 16px !important;
+    margin-top: 0 !important;
+    border-left: none !important;
+    padding-left: 8px !important;
+}
 
-            ._redlib_popup .comment_author:hover {
-                text-decoration: underline;
-            }
+/* ALTERNATING BACKGROUND COLORS BY DEPTH */
 
-            ._redlib_popup .comment_meta_separator {
-                margin: 0 4px;
-                color: var(--color-text-muted, #818384);
-            }
+/* Top level comments - GRAY */
+._redlib_popup > .comment:not(.reply) {
+    background-color: #161616 !important;
+}
 
-            ._redlib_popup .comment_points {
-                white-space: nowrap;
-            }
+/* Level 1 children - BLACK */
+._redlib_popup .replies > .reply {
+    background-color: #1f1f1f !important;
+}
 
-            ._redlib_popup .comment_time {
-                white-space: nowrap;
-            }
+/* Level 2 children - GRAY */
+._redlib_popup .replies .replies > .reply {
+    background-color: #161616 !important;
+}
 
-            ._redlib_popup .comment_body {
-                font-size: 12px;
-                line-height: 1.4;
-                color: var(--color-text, #d7dadc);
-                max-height: 300px;
-                overflow-y: auto;
-                overflow-x: hidden;
-                word-wrap: break-word;
-                word-break: break-word;
-                overflow-wrap: break-word;
-                display: block;
-                width: 100%;
-                clear: both;
-                box-sizing: border-box;
-            }
+/* Level 3 children - BLACK */
+._redlib_popup .replies .replies .replies > .reply {
+    background-color: #1f1f1f !important;
+}
 
-            ._redlib_popup .comment_body p {
-                margin: 0 0 0.75em 0;
-            }
+/* Level 4 children - GRAY */
+._redlib_popup .replies .replies .replies .replies > .reply {
+    background-color: #161616 !important;
+}
 
-            ._redlib_popup .comment_body p:last-child {
-                margin-bottom: 0;
-            }
+/* Level 5 children - BLACK */
+._redlib_popup .replies .replies .replies .replies .replies > .reply {
+    background-color: #1f1f1f !important;
+}
 
-            ._redlib_popup .comment_body blockquote {
-                margin: 0.5em 0;
-                padding-left: 1em;
-                border-left: 3px solid var(--color-border, #343536);
-                color: var(--color-text-muted, #818384);
-            }
+/* Level 6 children - GRAY */
+._redlib_popup .replies .replies .replies .replies .replies .replies > .reply {
+    background-color: #161616 !important;
+}
 
-            ._redlib_popup .comment_body code {
-                background: var(--color-code-bg, rgba(255,255,255,0.1));
-                padding: 2px 4px;
-                border-radius: 3px;
-                font-size: 0.9em;
-            }
+/* Level 7 children - BLACK */
+._redlib_popup .replies .replies .replies .replies .replies .replies .replies > .reply {
+    background-color: #1f1f1f !important;
+}
 
-            ._redlib_popup .comment_body pre {
-                background: var(--color-code-bg, rgba(255,255,255,0.1));
-                padding: 8px;
-                border-radius: 4px;
-                overflow-x: auto;
-                margin: 0.5em 0;
-                word-wrap: break-word;
-                white-space: pre-wrap;
-            }
+/* Level 8 children - GRAY */
+._redlib_popup .replies .replies .replies .replies .replies .replies .replies .replies > .reply {
+    background-color: #161616 !important;
+}
 
-            ._redlib_popup .comment_body a {
-                word-break: break-all;
-                overflow-wrap: break-word;
-            }
+/* Level 9 children - BLACK */
+._redlib_popup .replies .replies .replies .replies .replies .replies .replies .replies .replies > .reply {
+    background-color: #1f1f1f !important;
+}
 
-            ._redlib_popup .comment_body * {
-                max-width: 100%;
-                box-sizing: border-box;
-            }
+/* Level 10 children - GRAY */
+._redlib_popup .replies .replies .replies .replies .replies .replies .replies .replies .replies .replies > .reply {
+    background-color: #161616 !important;
+}
 
-            ._redlib_popup .replies {
-                margin-left: 16px;
-                margin-top: 6px;
-                border-left: 1px solid var(--color-border, #343536);
-                padding-left: 8px;
-            }
+._redlib_popup .comment_header {
+    margin-bottom: 3px;
+    font-size: 12px;
+    color: var(--color-text-muted, #818384);
+    line-height: 1.2;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
 
-            ._redlib_popup .reply {
-                margin-bottom: 6px;
-                padding: 4px;
-                background: var(--color-reply-bg, rgba(255,255,255,0.02));
-                border-radius: 3px;
-                font-size: 11px;
-            }
+._redlib_popup .comment_author {
+    color: var(--accent, #0079d3);
+    font-weight: normal;
+    text-decoration: none;
+    white-space: nowrap;
+}
 
-            ._redlib_popup .reply .comment_header {
-                margin-bottom: 3px;
-                font-size: 10px;
-            }
+._redlib_popup .comment_author:hover {
+    text-decoration: underline;
+}
 
-            ._redlib_popup .reply .comment_body {
-                font-size: 11px;
-                max-height: 200px;
-            }
+._redlib_popup .comment_meta_separator {
+    margin: 0 2px;
+    color: var(--color-text-muted, #818384);
+}
 
-            ._redlib_popup .next_reply {
-                color: var(--accent, #0079d3);
-                cursor: pointer;
-                font-size: 10px;
-                margin-top: 4px;
-                padding: 3px 6px;
-                border-radius: 3px;
-                background: var(--color-toggle-bg, rgba(255,255,255,0.05));
-                display: inline-block;
-                user-select: none;
-                border: 1px solid transparent;
-            }
+._redlib_popup .comment_points {
+    white-space: nowrap;
+}
 
-            ._redlib_popup .next_reply:hover {
-                background: var(--color-toggle-hover, rgba(255,255,255,0.1));
-                border-color: var(--accent, #0079d3);
-            }
+._redlib_popup .comment_time {
+    white-space: nowrap;
+}
 
-            ._redlib_popup .loading {
-                text-align: center;
-                padding: 8px 12px;
-                color: var(--color-text-muted, #818384);
-                font-size: 11px;
-                line-height: 1.3;
-                font-style: normal;
-                background: var(--color-comment-bg, rgba(255,255,255,0.05));
-                border-radius: 4px;
-                margin: 4px;
-            }
+._redlib_popup .comment_body {
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--color-text, #d7dadc);
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    display: block;
+    width: 100%;
+    clear: both;
+    box-sizing: border-box;
+}
 
-            ._redlib_popup .loading::before {
-                content: "⏳ ";
-                margin-right: 4px;
-            }
+._redlib_popup .comment_body p {
+    margin: 0 0 0.5em 0;
+}
 
-            ._redlib_popup .error {
-                color: var(--color-error, #ea0027);
-                text-align: center;
-                padding: 20px;
-            }
+._redlib_popup .comment_body p:last-child {
+    margin-bottom: 0;
+}
 
-            ._redlib_popup .next_comment {
-                text-align: center;
-                padding: 6px;
-                cursor: pointer;
-                color: var(--accent, #0079d3);
-                border-bottom: 1px solid var(--color-border, #343536);
-                margin: 0 0 6px 0;
-                user-select: none;
-                position: sticky;
-                top: 0;
-                background: var(--color-bg, #1a1a1b);
-                z-index: 1;
-                font-size: 11px;
-            }
+._redlib_popup .comment_body blockquote {
+    margin: 0.3em 0;
+    padding-left: 0.8em;
+    border-left: 2px solid var(--color-border, #343536);
+    color: var(--color-text-muted, #818384);
+}
 
-            ._redlib_popup .next_comment:hover {
-                background: var(--color-hover-bg, #2a2a2b);
-                color: var(--accent, #0079d3);
-            }
+._redlib_popup .comment_body code {
+    background: var(--color-code-bg, rgba(255,255,255,0.1));
+    padding: 1px 3px;
+    border-radius: 2px;
+    font-size: 0.9em;
+}
+
+._redlib_popup .comment_body pre {
+    background: var(--color-code-bg, rgba(255,255,255,0.1));
+    padding: 6px;
+    border-radius: 3px;
+    overflow-x: auto;
+    margin: 0.3em 0;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+._redlib_popup .comment_body a {
+    word-break: break-all;
+    overflow-wrap: break-word;
+}
+
+._redlib_popup .comment_body * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+._redlib_popup .next_reply {
+    color: var(--accent, #0079d3);
+    cursor: pointer;
+    font-size: 11px;
+    margin-top: 4px;
+    padding: 3px 5px;
+    border-radius: 3px;
+    background: var(--color-toggle-bg, rgba(255,255,255,0.05));
+    display: inline-block;
+    user-select: none;
+    border: 1px solid transparent;
+}
+
+._redlib_popup .next_reply:hover {
+    background: var(--color-toggle-hover, rgba(255,255,255,0.1));
+    border-color: var(--accent, #0079d3);
+}
+
+._redlib_popup .loading {
+    text-align: center;
+    padding: 8px 10px;
+    color: var(--color-text-muted, #818384);
+    font-size: 12px;
+    line-height: 1.3;
+    font-style: normal;
+    background: var(--color-comment-bg, rgba(255,255,255,0.05));
+    border-radius: 4px;
+    margin: 4px;
+}
+
+._redlib_popup .loading::before {
+    content: "⏳ ";
+    margin-right: 4px;
+}
+
+._redlib_popup .error {
+    color: var(--color-error, #ea0027);
+    text-align: center;
+    padding: 16px;
+    font-size: 13px;
+}
+
+._redlib_popup .next_comment {
+    text-align: center;
+    padding: 5px;
+    cursor: pointer;
+    color: var(--accent, #0079d3);
+    border-bottom: 1px solid var(--color-border, #343536);
+    margin: 0;
+    user-select: none;
+    position: sticky;
+    top: 0;
+    background: var(--color-bg, #1a1a1b) !important;
+    z-index: 1;
+    font-size: 12px;
+    opacity: 1 !important;
+}
+
+._redlib_popup .next_comment:hover {
+    background: var(--color-hover-bg, #2a2a2b) !important;
+    color: var(--accent, #0079d3);
+}
+
+._redlib_popup .next_comment.loaded {
+    cursor: default !important;
+    pointer-events: none;
+    opacity: 1 !important;
+    background: var(--color-bg, #1a1a1b) !important;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    color: var(--color-text-muted, #818384) !important;
+}
+
+._redlib_popup .next_comment.loaded:hover {
+    background: var(--color-bg, #1a1a1b) !important;
+    color: var(--color-text-muted, #818384) !important;
+}
+
+._redlib_popup .popup-close {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    background: var(--highlighted, #333);
+    color: var(--text, #d7dadc);
+    border: 1px solid var(--accent, #d54455);
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1003;
+    pointer-events: auto;
+    will-change: transform;
+}
+
+._redlib_popup .popup-close:hover {
+    background: var(--accent, #d54455);
+    color: var(--foreground, #222);
+}
+
+/* ========== COMMENT COLLAPSER STYLES ========== */
 
             /* ========== COMMENT COLLAPSER STYLES ========== */
             /* Comment collapser styles are now applied conditionally in a separate function */
@@ -1468,148 +1564,148 @@
             }
         `;
 
-        // Apply comment collapser styles only if enabled
-        if (SettingsManager.getSetting('commentCollapser', 'enabled')) {
-            style.textContent += `
-                /* ========== COMMENT COLLAPSER STYLES ========== */
+if (SettingsManager.getSetting('commentStyling', 'enabled')) {
+    style.textContent += `
+        /* ========== COMMENT STYLING STYLES ========== */
 
-                /* Hide ALL comment_left content except thread lines and score box */
-                .comment_left > *:not(.line):not(.comment_score) {
-                    display: none !important;
-                }
-
-                /* Ensure thread lines and score box remain visible */
-                .comment_left .line,
-                .comment_left .comment_score {
-                    display: block !important;
-                }
-
-                /* Custom expand/collapse button */
-                .expand-children {
-                    color: #666;
-                    text-decoration: none;
-                    font-family: monospace;
-                    font-size: 11px;
-                    cursor: pointer;
-                    margin-right: 5px;
-                    display: inline-block;
-                }
-                .expand-children:hover {
-                    color: #000;
-                }
-
-                /* AJAX loading states */
-                .ajax-loading {
-                    opacity: 0.6;
-                    pointer-events: none;
-                }
-                .ajax-loading::after {
-                    content: " (Loading...)";
-                    color: #666;
-                    font-style: italic;
-                }
-                .ajax-error {
-                    color: #ff4444;
-                    font-style: italic;
-                    text-decoration: none !important;
-                }
-                /* Ensure smooth transitions don't interfere with other animations */
-.post.redlib-transitioning .redlib-expand-btn,
-.post.redlib-transitioning .redlib-collapse-btn {
-    pointer-events: none;
-}
-
-.post.redlib-transitioning:hover {
-    transform: none !important;
-}
-
-/* Prevent layout shifts during transitions */
-.post.redlib-transitioning .post_media_content,
-.post.redlib-transitioning .post_body {
-    transition: none;
-}
-            `;
+        /* ULTRA compact comment layout */
+        .comment {
+            margin-bottom: 0px !important;
+            padding: 2px !important;
+            padding-bottom: 0 !important;
         }
 
-        // Apply comment styling only if enabled
-        if (SettingsManager.getSetting('commentStyling', 'enabled')) {
-            style.textContent += `
-                /* ========== COMMENT STYLING STYLES ========== */
-
-                /* Much more compact comment layout */
-                .comment {
-                    margin-bottom: 1px !important;
-                    padding-bottom: 0 !important;
-                }
-
-                .comment_body {
-                    margin-bottom: 2px !important;
-                    padding-bottom: 2px !important;
-                }
-
-                .comment_data {
-                    margin-bottom: 1px !important;
-                    padding-bottom: 0 !important;
-                }
-
-                /* Reduce spacing in reply chains */
-                .replies {
-                    margin-top: 1px !important;
-                    padding-top: 0 !important;
-                }
-
-                /* Make the thread lines more compact */
-                .comment_left .line {
-                    margin-top: 0 !important;
-                }
-
-                /* Reduce overall thread spacing */
-                .thread {
-                    margin-bottom: 3px !important;
-                }
-
-                /* Tighter blockquote replies */
-                blockquote.replies {
-                    margin-top: 1px !important;
-                    margin-bottom: 1px !important;
-                }
-
-                /* Alternating background colors for nesting levels like old Reddit - shifted up one level */
-                .comment {
-                    background-color: transparent !important;
-                }
-
-                /* Level 0 - Top level comments (now get level 1 background) */
-                .thread > .comment {
-                    background-color: rgba(255, 255, 255, 0.02) !important;
-                }
-
-                /* Level 1 - Direct replies to top level (now get level 2 background) */
-                .thread > .comment .replies > .comment {
-                    background-color: rgba(255, 255, 255, 0.04) !important;
-                }
-
-                /* Level 2 - Replies to level 1 (now get level 3 background) */
-                .thread > .comment .replies > .comment .replies > .comment {
-                    background-color: rgba(255, 255, 255, 0.06) !important;
-                }
-
-                /* Level 3 - Replies to level 2 (now get level 4 background) */
-                .thread > .comment .replies > .comment .replies > .comment .replies > .comment {
-                    background-color: rgba(255, 255, 255, 0.08) !important;
-                }
-
-                /* Level 4 - Replies to level 3 (now get level 5 background) */
-                .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-                    background-color: rgba(255, 255, 255, 0.10) !important;
-                }
-
-                /* Level 5 and beyond - Replies to level 4+ (now get level 6 background) */
-                .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-                    background-color: rgba(255, 255, 255, 0.12) !important;
-                }
-            `;
+        .comment_body {
+            margin: 0px !important;
+            padding: 2px 5px !important;
+            padding-bottom: 0 !important;
         }
+
+        .comment_data {
+            margin: 0px !important;
+            padding: 1px 0 !important;
+            line-height: 1.2 !important;
+        }
+
+        .comment_right {
+            padding: 2px 0 2px 5px !important;
+        }
+
+        .comment_left {
+            padding: 2px 0 !important;
+        }
+
+        /* Reduce spacing in reply chains */
+        .replies {
+            margin: 0px !important;
+            padding: 0px !important;
+        }
+
+        /* Make the thread lines more compact */
+        .comment_left .line {
+            margin: 0 !important;
+        }
+
+        /* Reduce overall thread spacing */
+        .thread {
+            margin-bottom: 1px !important;
+        }
+
+        /* Tighter blockquote replies */
+        blockquote.replies {
+            margin: 0px !important;
+            padding: 0px !important;
+        }
+
+        /* Compact score display */
+        .comment_score {
+            padding: 2px 0 !important;
+            margin: 0 !important;
+        }
+
+        /* TRUE ALTERNATING PATTERN - Extended to Level 15 */
+
+        /* Level 0: Top level comments - GRAY */
+        .thread > .comment {
+            background-color: #161616 !important;
+        }
+
+        /* Level 1: First children - BLACK */
+        .thread > .comment .replies > .comment {
+            background-color: #1f1f1f !important;
+        }
+
+        /* Level 2: Grandchildren - GRAY */
+        .thread > .comment .replies > .comment .replies > .comment {
+            background-color: #161616 !important;
+        }
+
+        /* Level 3: Great grandchildren - BLACK */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #1f1f1f !important;
+        }
+
+        /* Level 4: GRAY */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #161616 !important;
+        }
+
+        /* Level 5: BLACK */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #1f1f1f !important;
+        }
+
+        /* Level 6: GRAY */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #161616 !important;
+        }
+
+        /* Level 7: BLACK */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #1f1f1f !important;
+        }
+
+        /* Level 8: GRAY */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #161616 !important;
+        }
+
+        /* Level 9: BLACK */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #1f1f1f !important;
+        }
+
+        /* Level 10: GRAY */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #161616 !important;
+        }
+
+        /* Level 11: BLACK */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #1f1f1f !important;
+        }
+
+        /* Level 12: GRAY */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #161616 !important;
+        }
+
+        /* Level 13: BLACK */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #1f1f1f !important;
+        }
+
+        /* Level 14: GRAY */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #161616 !important;
+        }
+
+        /* Level 15: BLACK */
+        .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
+            background-color: #1f1f1f !important;
+        }
+    `;
+}
         document.head.appendChild(style);
     }
 
@@ -3283,6 +3379,29 @@
                 this.popup = document.createElement('div');
                 this.popup.className = '_redlib_popup';
                 document.body.appendChild(this.popup);
+
+                // Prevent scroll events in username/subreddit popups from affecting comment popup close button
+                const self = this;
+                document.addEventListener('scroll', (e) => {
+                    const usernamePopup = document.querySelector('._redlib_username_popup');
+                    const subredditPopup = document.querySelector('._redlib_subreddit_popup');
+
+                    if ((usernamePopup && usernamePopup.contains(e.target)) ||
+                        (subredditPopup && subredditPopup.contains(e.target))) {
+                        // Don't reposition comment popup close button for scrolls in other popups
+                        return;
+                    }
+
+                    // Only reposition if the scroll is related to the comment popup
+                    if (self.popup && self.popup.style.display === 'block') {
+                        const closeBtn = self.popup.querySelector('.popup-close');
+                        if (closeBtn) {
+                            const rect = self.popup.getBoundingClientRect();
+                            closeBtn.style.top = (rect.top + 8) + 'px';
+                            closeBtn.style.right = (window.innerWidth - rect.right + 8) + 'px';
+                        }
+                    }
+                }, true);
             }
 
             bindEvents() {
@@ -3353,6 +3472,19 @@
                     this.displayComments();
                     this.positionPopup(link.getBoundingClientRect());
                     this.popup.style.display = 'block';
+
+                    // Ensure close button is functional even with cached data
+                    const closeBtn = this.popup.querySelector('.popup-close');
+                    if (closeBtn) {
+                        closeBtn.addEventListener('click', () => {
+                            this.hidePopup();
+                        });
+
+                        // Position close button relative to popup
+                        const rect = this.popup.getBoundingClientRect();
+                        closeBtn.style.top = (rect.top + 8) + 'px';
+                        closeBtn.style.right = (window.innerWidth - rect.right + 8) + 'px';
+                    }
                     return;
                 }
 
@@ -3385,7 +3517,7 @@
             hidePopupDelayed() {
                 this.hideTimeoutId = setTimeout(() => {
                     this.hidePopup();
-                }, 300);
+                }, 500);
             }
 
             async fetchAndShowPreview(link) {
@@ -3602,13 +3734,17 @@
 
                 let html = '';
 
+                // Add close button
+                html += '<button class="popup-close">×</button>';
+
+
                 if (this.comments.length > 1) {
                     if (hasMore) {
                         const remaining = this.comments.length - this.currentCommentIndex - 1;
                         html += '<div class="next_comment">▼ Show next (' + remaining + ' more top-level comments)</div>';
                     } else {
                         const totalShown = this.currentCommentIndex + 1;
-                        html += '<div class="next_comment">Showing all ' + totalShown + ' top-level comments</div>';
+                        html += '<div class="next_comment loaded">Loaded all ' + totalShown + ' top-level comments</div>';
                     }
                 }
 
@@ -3619,6 +3755,22 @@
                 }
 
                 this.popup.innerHTML = html;
+                // Add close button functionality
+                const closeBtn = this.popup.querySelector('.popup-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        this.hidePopup();
+                    });
+
+                    // Position close button relative to popup and prevent interference from other popups
+                    const rect = this.popup.getBoundingClientRect();
+                    closeBtn.style.top = (rect.top + 8) + 'px';
+                    closeBtn.style.right = (window.innerWidth - rect.right + 8) + 'px';
+
+                    // Prevent repositioning from scroll events in child elements
+                    closeBtn.style.position = 'fixed';
+                    closeBtn.style.zIndex = '1003';
+                }
             }
 
             renderComment(comment) {
@@ -3806,7 +3958,18 @@
             }
 
             hidePopup() {
-                this.popup.style.display = 'none';
+                // Don't hide if mouse is over a username/subreddit popup
+                const usernamePopup = document.querySelector('._redlib_username_popup');
+                const subredditPopup = document.querySelector('._redlib_subreddit_popup');
+
+                if ((usernamePopup && usernamePopup.style.display === 'block') ||
+                    (subredditPopup && subredditPopup.style.display === 'block')) {
+                    return;
+                }
+
+                if (this.popup) {
+                    this.popup.style.display = 'none';
+                }
                 this.currentLink = null;
             }
         }
@@ -3847,8 +4010,6 @@
                     initializedComments.add(comment);
                 }
             });
-
-            attachMoreRepliesListeners();
         }
 
         function addCustomExpandButton(comment) {
@@ -3859,7 +4020,7 @@
 
             const expandButton = document.createElement('span');
             expandButton.className = 'expand-children';
-            expandButton.textContent = '[+++]';
+            expandButton.textContent = '[±]';
             expandButton.setAttribute('data-expanded', 'false');
 
             expandButton.addEventListener('click', function(e) {
@@ -3869,15 +4030,6 @@
             });
 
             summary.insertBefore(expandButton, summary.firstChild);
-
-            // RE-ENABLE NATIVE MARKERS: Remove the click prevention and allow native behavior
-            summary.addEventListener('click', function(e) {
-                // Only prevent if the click was specifically on our custom button
-                if (e.target === expandButton) {
-                    return; // Let our custom handler run
-                }
-                // For all other clicks (including native marker), allow native behavior
-            });
         }
 
         function handleCustomToggle(comment, button) {
@@ -3885,11 +4037,11 @@
 
             if (isExpanded) {
                 collapseDirectChildren(comment);
-                button.textContent = '[+++]';
+                button.textContent = '[+]';
                 button.setAttribute('data-expanded', 'false');
             } else {
                 expandDirectChildrenOnly(comment);
-                button.textContent = '[---]';
+                button.textContent = '[−]';
                 button.setAttribute('data-expanded', 'true');
             }
         }
@@ -3912,7 +4064,7 @@
 
                     const grandchildButton = grandchild.querySelector('.expand-children');
                     if (grandchildButton) {
-                        grandchildButton.textContent = '[+++]';
+                        grandchildButton.textContent = '[+]';
                         grandchildButton.setAttribute('data-expanded', 'false');
                     }
                 });
@@ -3930,7 +4082,7 @@
 
                 const childButton = child.querySelector('.expand-children');
                 if (childButton) {
-                    childButton.textContent = '[+++]';
+                    childButton.textContent = '[+]';
                     childButton.setAttribute('data-expanded', 'false');
                 }
 
@@ -3941,10 +4093,100 @@
 
                 const descendantButtons = child.querySelectorAll('.expand-children');
                 descendantButtons.forEach(btn => {
-                    btn.textContent = '[+++]';
+                    btn.textContent = '[+]';
                     btn.setAttribute('data-expanded', 'false');
                 });
             });
+        }
+
+        function collapseCommentAndDescendants(comment) {
+            const details = comment.querySelector(':scope > .comment_right');
+            if (details && details.hasAttribute('open')) {
+                details.removeAttribute('open');
+            }
+
+            const button = comment.querySelector(':scope > .comment_right > summary > .expand-children');
+            if (button) {
+                button.textContent = '[+]';
+                button.setAttribute('data-expanded', 'false');
+            }
+
+            const descendants = comment.querySelectorAll('.comment_right');
+            descendants.forEach(desc => {
+                desc.removeAttribute('open');
+            });
+
+            const descendantButtons = comment.querySelectorAll('.expand-children');
+            descendantButtons.forEach(btn => {
+                btn.textContent = '[+]';
+                btn.setAttribute('data-expanded', 'false');
+            });
+        }
+
+        function initializeNewComment(comment) {
+            if (!initializedComments.has(comment)) {
+                collapseCommentAndDescendants(comment);
+                addCustomExpandButton(comment);
+                initializedComments.add(comment);
+
+                const childComments = comment.querySelectorAll('.comment');
+                childComments.forEach(childComment => {
+                    if (!initializedComments.has(childComment)) {
+                        collapseCommentAndDescendants(childComment);
+                        addCustomExpandButton(childComment);
+                        initializedComments.add(childComment);
+                    }
+                });
+            }
+        }
+
+        function init() {
+            if (!window.location.pathname.includes('/comments/')) {
+                return;
+            }
+
+            initializeComments();
+
+            setTimeout(initializeComments, 1000);
+
+            window.redlibEnhanced = {
+                initializeNewComment: initializeNewComment,
+                addCustomExpandButton: addCustomExpandButton
+            };
+
+            console.log('[Redlib Enhancement Suite] Comment Collapser initialized');
+        }
+
+        return {
+            init: init
+        };
+    })();
+
+    // ============================================================================
+    // AJAX COMMENT LOADER MODULE
+    // ============================================================================
+    const AjaxCommentLoader = (function() {
+
+        function isBotProtectionPage(html) {
+            return html.includes('<title>Just a moment...</title>') ||
+                html.includes('redlib.nohost.network needs to review the security of your connection');
+        }
+
+        function extractCommentId(url) {
+            const patterns = [
+                /\/([a-z0-9]+)(?:\/?\?|$)/,
+                /\/([a-z0-9]+)(?:\/?#|$)/,
+                /\/comments\/[^\/]+\/[^\/]+\/([a-z0-9]+)/,
+                /\/([a-z0-9]+)$/
+            ];
+
+            for (let pattern of patterns) {
+                const match = url.match(pattern);
+                if (match) {
+                    return match[1];
+                }
+            }
+            return null;
         }
 
         function removeDuplicateComments(parentContainer) {
@@ -3961,11 +4203,6 @@
                     }
                 }
             });
-        }
-
-        function isBotProtectionPage(html) {
-            return html.includes('<title>Just a moment...</title>') ||
-                html.includes('redlib.nohost.network needs to review the security of your connection');
         }
 
         function loadMoreComments(link) {
@@ -4056,61 +4293,10 @@
         }
 
         function initializeNewComment(comment) {
-            if (!initializedComments.has(comment)) {
-                collapseCommentAndDescendants(comment);
-                addCustomExpandButton(comment);
-                initializedComments.add(comment);
-
-                const childComments = comment.querySelectorAll('.comment');
-                childComments.forEach(childComment => {
-                    if (!initializedComments.has(childComment)) {
-                        collapseCommentAndDescendants(childComment);
-                        addCustomExpandButton(childComment);
-                        initializedComments.add(childComment);
-                    }
-                });
+            // Check if CommentCollapser is enabled and initialize accordingly
+            if (SettingsManager.getSetting('commentCollapser', 'enabled') && window.redlibEnhanced) {
+                window.redlibEnhanced.initializeNewComment(comment);
             }
-        }
-
-        function collapseCommentAndDescendants(comment) {
-            const details = comment.querySelector(':scope > .comment_right');
-            if (details && details.hasAttribute('open')) {
-                details.removeAttribute('open');
-            }
-
-            const button = comment.querySelector(':scope > .comment_right > summary > .expand-children');
-            if (button) {
-                button.textContent = '[+++]';
-                button.setAttribute('data-expanded', 'false');
-            }
-
-            const descendants = comment.querySelectorAll('.comment_right');
-            descendants.forEach(desc => {
-                desc.removeAttribute('open');
-            });
-
-            const descendantButtons = comment.querySelectorAll('.expand-children');
-            descendantButtons.forEach(btn => {
-                btn.textContent = '[+++]';
-                btn.setAttribute('data-expanded', 'false');
-            });
-        }
-
-        function extractCommentId(url) {
-            const patterns = [
-                /\/([a-z0-9]+)(?:\/?\?|$)/,
-                /\/([a-z0-9]+)(?:\/?#|$)/,
-                /\/comments\/[^\/]+\/[^\/]+\/([a-z0-9]+)/,
-                /\/([a-z0-9]+)$/
-            ];
-
-            for (let pattern of patterns) {
-                const match = url.match(pattern);
-                if (match) {
-                    return match[1];
-                }
-            }
-            return null;
         }
 
         function attachMoreRepliesListener(link) {
@@ -4130,22 +4316,15 @@
                 return;
             }
 
-            initializeComments();
+            attachMoreRepliesListeners();
 
-            setTimeout(initializeComments, 1000);
-
-            window.redlibEnhanced = {
-                initializeNewComment,
-                addCustomExpandButton,
-                attachMoreRepliesListeners,
-                removeDuplicateComments
-            };
-
-            console.log('[Redlib Enhancement Suite] Comment Collapser initialized - Native markers re-enabled');
+            console.log('[Redlib Enhancement Suite] AJAX Comment Loader initialized');
         }
 
         return {
-            init: init
+            init: init,
+            attachMoreRepliesListeners: attachMoreRepliesListeners,
+            initializeNewComment: initializeNewComment
         };
     })();
 
@@ -4346,22 +4525,34 @@
         line-height: 1.4;
         overflow: hidden;
     `;
-    document.body.appendChild(popup);
+            document.body.appendChild(popup);
 
-    // Add event listeners to popup
-    popup.addEventListener('mouseenter', clearHideTimeout);
-    popup.addEventListener('mouseleave', hidePopupDelayed);
-}
+            // Add event listeners to popup
+            popup.addEventListener('mouseenter', clearHideTimeout);
+            popup.addEventListener('mouseleave', hidePopupDelayed);
+        }
 
         // Add CSS styles for the popup
         function addStyles() {
             const style = document.createElement('style');
             style.textContent = `
-            ._redlib_subreddit_popup {
-                background: var(--background, #0f0f0f) !important;
-                border: 1px solid var(--highlighted, #333) !important;
-                color: var(--text, #d7dadc) !important;
-            }
+._redlib_subreddit_popup {
+    position: absolute;
+    background: var(--background, #0f0f0f);
+    border: 1px solid var(--highlighted, #333);
+    border-radius: 8px;
+    padding: 0;
+    z-index: 999;
+    max-width: 320px;
+    min-width: 280px;
+    width: 320px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    color: var(--text, #d7dadc);
+    font-size: 14px;
+    line-height: 1.4;
+    overflow: hidden;
+}
 
             ._redlib_subreddit_popup .popup-header {
                 background: var(--post, #161616);
@@ -4489,6 +4680,32 @@
                 color: var(--accent, #d54455);
                 font-size: 13px;
             }
+
+._redlib_subreddit_popup .popup-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--highlighted, #333);
+    color: var(--text, #d7dadc);
+    border: 1px solid var(--accent, #d54455);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+}
+
+
+._redlib_subreddit_popup .popup-close:hover {
+    background: var(--accent, #d54455);
+    color: var(--foreground, #222);
+}
+
         `;
             document.head.appendChild(style);
         }
@@ -4627,35 +4844,36 @@
             const filterButtonClass = data.isFiltered ? 'filtered' : '';
 
             popup.innerHTML = `
-            <div class="popup-header">
-                ${data.icon ? `<img class="popup-icon" src="${data.icon}" alt="r/${data.subreddit}">` : ''}
-                <div class="popup-info">
-                    <h3>${data.title}</h3>
-                    <p class="subreddit-name">${data.name}</p>
+        <div class="popup-header">
+            ${data.icon ? `<img class="popup-icon" src="${data.icon}" alt="r/${data.subreddit}">` : ''}
+            <div class="popup-info">
+                <h3>${data.title}</h3>
+                <p class="subreddit-name">${data.name}</p>
+            </div>
+        </div>
+        <button class="popup-close">×</button>
+        <div class="popup-body">
+            ${data.description ? `<p class="popup-description">${data.description}</p>` : ''}
+            <div class="popup-stats">
+                <div class="popup-stat">
+                    <span class="popup-stat-value">${data.members}</span>
+                    <span class="popup-stat-label">Members</span>
+                </div>
+                <div class="popup-stat">
+                    <span class="popup-stat-value">${data.active}</span>
+                    <span class="popup-stat-label">Active</span>
                 </div>
             </div>
-            <div class="popup-body">
-                ${data.description ? `<p class="popup-description">${data.description}</p>` : ''}
-                <div class="popup-stats">
-                    <div class="popup-stat">
-                        <span class="popup-stat-value">${data.members}</span>
-                        <span class="popup-stat-label">Members</span>
-                    </div>
-                    <div class="popup-stat">
-                        <span class="popup-stat-value">${data.active}</span>
-                        <span class="popup-stat-label">Active</span>
-                    </div>
-                </div>
-                <div class="popup-actions">
-                    <button class="popup-btn ${subscribeButtonClass}" data-action="subscribe" data-subreddit="${data.subreddit}">
-                        ${subscribeButtonText}
-                    </button>
-                    <button class="popup-btn ${filterButtonClass}" data-action="filter" data-subreddit="${data.subreddit}">
-                        ${filterButtonText}
-                    </button>
-                </div>
+            <div class="popup-actions">
+                <button class="popup-btn ${subscribeButtonClass}" data-action="subscribe" data-subreddit="${data.subreddit}">
+                    ${subscribeButtonText}
+                </button>
+                <button class="popup-btn ${filterButtonClass}" data-action="filter" data-subreddit="${data.subreddit}">
+                    ${filterButtonText}
+                </button>
             </div>
-        `;
+        </div>
+    `;
 
             // Add click handlers to buttons
             const subscribeBtn = popup.querySelector('[data-action="subscribe"]');
@@ -4666,6 +4884,14 @@
             }
             if (filterBtn) {
                 filterBtn.addEventListener('click', () => handleAction('filter', data));
+            }
+
+            // Add close button functionality
+            const closeBtn = popup.querySelector('.popup-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    hidePopup();
+                });
             }
         }
 
@@ -4739,17 +4965,11 @@
             const scrollTop = window.pageYOffset;
             const scrollLeft = window.pageXOffset;
 
-            let top = rect.bottom + scrollTop + 8;
+            let top = rect.bottom + scrollTop + 2;
             let left = rect.left + scrollLeft;
 
-            // Adjust if popup would go off-screen
-            const popupRect = popup.getBoundingClientRect();
-            if (left + 320 > window.innerWidth) {
-                left = Math.max(10, window.innerWidth - 330);
-            }
-
-            if (top + popupRect.height > window.innerHeight + scrollTop) {
-                top = rect.top + scrollTop - popupRect.height - 8;
+            if (left + 600 > window.innerWidth) {
+                left = Math.max(10, window.innerWidth - 620);
             }
 
             popup.style.top = top + 'px';
@@ -4783,6 +5003,20 @@
 
         // Hide popup
         function hidePopup() {
+            // Don't hide if comments popup is still active
+            const commentsPopup = document.querySelector('._redlib_popup');
+            if (commentsPopup && commentsPopup.style.display === 'block') {
+                const commentsRect = commentsPopup.getBoundingClientRect();
+                const mouseX = event?.clientX || 0;
+                const mouseY = event?.clientY || 0;
+
+                // If mouse is near comments popup, delay hiding longer
+                if (mouseX >= commentsRect.left - 20 && mouseX <= commentsRect.right + 20 &&
+                    mouseY >= commentsRect.top - 20 && mouseY <= commentsRect.bottom + 20) {
+                    this.hideTimeoutId = setTimeout(() => this.hidePopup(), 1000);
+                    return;
+                }
+            }
             if (popup) {
                 popup.style.display = 'none';
             }
@@ -4800,7 +5034,7 @@
 
         // Hide popup with delay
         function hidePopupDelayed() {
-            hideTimeoutId = setTimeout(hidePopup, 300);
+            hideTimeoutId = setTimeout(hidePopup, 500);
         }
 
         // Handle mouse enter on subreddit link
@@ -4837,6 +5071,7 @@
             // Use event delegation for better performance
             document.addEventListener('mouseover', (event) => {
                 if (isSubredditLink(event.target)) {
+                    console.log('Subreddit link detected:', event.target.href);
                     handleMouseEnter(event);
                 }
             });
@@ -4949,7 +5184,7 @@
     border: 1px solid var(--highlighted, #333);
     border-radius: 8px;
     padding: 0;
-    z-index: 9999;
+    z-index: 999;
     max-width: 320px;
     min-width: 280px;
     width: 320px;
@@ -4993,7 +5228,6 @@
 
 ._redlib_username_popup .popup-body {
     padding: 12px 16px;
-    min-height: 120px;
 }
 
 ._redlib_username_popup .popup-description {
@@ -5001,11 +5235,15 @@
     font-size: 13px;
     line-height: 1.4;
     color: var(--text-muted, #818384);
-    min-height: 40px;
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+}
+
+._redlib_username_popup .popup-description:empty {
+    display: none;
+    margin: 0;
 }
 
         ._redlib_username_popup .popup-stats {
@@ -5088,6 +5326,32 @@
             color: var(--accent, #d54455);
             font-size: 13px;
         }
+
+._redlib_username_popup .popup-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--highlighted, #333);
+    color: var(--text, #d7dadc);
+    border: 1px solid var(--accent, #d54455);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+}
+
+._redlib_username_popup .popup-close:hover {
+    background: var(--accent, #d54455);
+    color: var(--foreground, #222);
+}
+
+
     `;
             document.head.appendChild(style);
         }
@@ -5189,6 +5453,8 @@
                     <h3>${data.title}</h3>
                     <p class="username-name">${data.name}</p>
                 </div>
+                                <button class="popup-close">×</button>
+
             </div>
             <div class="popup-body">
                 ${data.description ? `<p class="popup-description">${data.description}</p>` : ''}
@@ -5223,6 +5489,15 @@
             if (filterBtn) {
                 filterBtn.addEventListener('click', () => handleAction('filter', data));
             }
+
+            // Add close button functionality
+            const closeBtn = popup.querySelector('.popup-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    hidePopup();
+                });
+            }
+
         }
 
         // Handle follow/filter actions
@@ -5337,6 +5612,20 @@
 
         // Hide popup
         function hidePopup() {
+            // Don't hide if comments popup is still active
+            const commentsPopup = document.querySelector('._redlib_popup');
+            if (commentsPopup && commentsPopup.style.display === 'block') {
+                const commentsRect = commentsPopup.getBoundingClientRect();
+                const mouseX = event?.clientX || 0;
+                const mouseY = event?.clientY || 0;
+
+                // If mouse is near comments popup, delay hiding longer
+                if (mouseX >= commentsRect.left - 20 && mouseX <= commentsRect.right + 20 &&
+                    mouseY >= commentsRect.top - 20 && mouseY <= commentsRect.bottom + 20) {
+                    this.hideTimeoutId = setTimeout(() => this.hidePopup(), 1000);
+                    return;
+                }
+            }
             if (popup) {
                 popup.style.display = 'none';
             }
@@ -5354,7 +5643,7 @@
 
         // Hide popup with delay
         function hidePopupDelayed() {
-            hideTimeoutId = setTimeout(hidePopup, 300);
+            hideTimeoutId = setTimeout(hidePopup, 500);
         }
 
         // Handle mouse enter on username link
@@ -5430,6 +5719,9 @@
                 enabled: false
             },
             commentCollapser: {
+                enabled: true
+            },
+            ajaxCommentLoading: {
                 enabled: true
             },
             commentStyling: {
@@ -5598,7 +5890,7 @@
                         <div class="redlib-settings-option">
                             <div class="redlib-settings-option-info">
                                 <div class="redlib-settings-option-title">Username Hover Info</div>
-                                <div class="redlib-settings-option-description">Show user info popup when hovering over usernames (in development)</div>
+                                <div class="redlib-settings-option-description">Show user info popup when hovering over usernames</div>
                             </div>
                             <label class="redlib-settings-toggle">
                                 <input type="checkbox" data-module="usernameHover" data-setting="enabled">
@@ -5637,7 +5929,7 @@
     <div class="redlib-settings-option">
         <div class="redlib-settings-option-info">
             <div class="redlib-settings-option-title">Post Hider</div>
-            <div class="redlib-settings-option-description">Hide/show posts with click and remember state across sessions</div>
+            <div class="redlib-settings-option-description">Hide/show posts and remember state across sessions</div>
         </div>
         <label class="redlib-settings-toggle">
             <input type="checkbox" data-module="postCollapser" data-setting="enabled">
@@ -5648,7 +5940,7 @@
     <div class="redlib-settings-option">
         <div class="redlib-settings-option-info">
             <div class="redlib-settings-option-title">Post Expand Buttons</div>
-            <div class="redlib-settings-option-description">Buttons to expand/minimize post text content</div>
+            <div class="redlib-settings-option-description">Expand/minimize post text content</div>
         </div>
         <label class="redlib-settings-toggle">
             <input type="checkbox" data-module="postCollapser" data-setting="expandButtons">
@@ -5687,7 +5979,7 @@
     <div class="redlib-settings-option">
         <div class="redlib-settings-option-info">
             <div class="redlib-settings-option-title">Sticky Post Mode</div>
-            <div class="redlib-settings-option-description">Post header sticks to top when scrolling on comment pages</div>
+            <div class="redlib-settings-option-description">Post header sticks to top when scrolling on comment pages, expands preview on mouseover</div>
         </div>
         <label class="redlib-settings-toggle">
             <input type="checkbox" data-module="postCollapser" data-setting="stickyMode">
@@ -5698,7 +5990,7 @@
     <div class="redlib-settings-option">
         <div class="redlib-settings-option-info">
             <div class="redlib-settings-option-title">Floating Video Player</div>
-            <div class="redlib-settings-option-description">Videos float when post is collapsed, with resize and drag support</div>
+            <div class="redlib-settings-option-description">Videos float when scrolling down, with resize and drag support</div>
         </div>
         <label class="redlib-settings-toggle">
             <input type="checkbox" data-module="postCollapser" data-setting="floatingVideo">
@@ -5706,16 +5998,27 @@
         </label>
     </div>
 
-    <div class="redlib-settings-option">
-        <div class="redlib-settings-option-info">
-            <div class="redlib-settings-option-title">Comment Collapser</div>
-            <div class="redlib-settings-option-description">Collapse comments by default with custom expand buttons and AJAX loading</div>
-        </div>
-        <label class="redlib-settings-toggle">
-            <input type="checkbox" data-module="commentCollapser" data-setting="enabled">
-            <span class="redlib-settings-slider"></span>
-        </label>
+<div class="redlib-settings-option">
+    <div class="redlib-settings-option-info">
+        <div class="redlib-settings-option-title">AJAX Load More Comments</div>
+        <div class="redlib-settings-option-description">Load more comment replies in-place instead of navigating to new page</div>
     </div>
+    <label class="redlib-settings-toggle">
+        <input type="checkbox" data-module="ajaxCommentLoading" data-setting="enabled">
+        <span class="redlib-settings-slider"></span>
+    </label>
+</div>
+
+<div class="redlib-settings-option">
+    <div class="redlib-settings-option-info">
+        <div class="redlib-settings-option-title">Child Comments Collapser</div>
+        <div class="redlib-settings-option-description">Show top level comments, but collapse their children. Expand all children with one click</div>
+    </div>
+    <label class="redlib-settings-toggle">
+        <input type="checkbox" data-module="commentCollapser" data-setting="enabled">
+        <span class="redlib-settings-slider"></span>
+    </label>
+</div>
 
     <div class="redlib-settings-option">
         <div class="redlib-settings-option-info">
@@ -5730,7 +6033,7 @@
 </div>
                 </div>
 <div class="redlib-settings-footer">
-    <div class="redlib-settings-version">Redlib Enhancement Suite v1.1.0</div>
+    <div class="redlib-settings-version">Redlib Enhancement Suite v1.1.2</div>
     <div class="redlib-settings-footer-actions">
         <button class="redlib-settings-reset">Reset to Defaults</button>
         <button class="redlib-settings-apply" disabled>Apply</button>
@@ -5939,6 +6242,10 @@
 
         if (isCommentPage && SettingsManager.getSetting('commentCollapser', 'enabled')) {
             CommentCollapser.init();
+        }
+
+        if (isCommentPage && SettingsManager.getSetting('ajaxCommentLoading', 'enabled')) {
+            AjaxCommentLoader.init();
         }
 
         if (SettingsManager.getSetting('sidebarToggle', 'enabled')) {
