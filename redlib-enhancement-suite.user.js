@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Redlib Enhancement Suite
 // @namespace    https://github.com/azizLIGHT/redlib-enhancement-suite
-// @version      1.1.3
+// @version      1.1.4
 // @description  A comprehensive userscript that supercharges your Redlib experience with RES-style features, smooth animations, and powerful customization options.
 // @author       azizLIGHT
 // @match        https://redlib.catsarch.com/*
@@ -53,7 +53,7 @@
     'use strict';
 
     // Script version - update this when you change @version above
-    const SCRIPT_VERSION = '1.1.3';
+    const SCRIPT_VERSION = '1.1.4';
 
 
     // ============================================================================
@@ -120,9 +120,10 @@
                 display: none !important;
             }
 
-            .redlib-expand-btn:hover {
-                background: var(--color-hover-bg, #2a2a2b);
-            }
+.redlib-expand-btn:hover {
+    background: var(--accent, #d54455);
+    color: var(--foreground, #222);
+}
 
             .redlib-expand-btn:active {
                 transform: scale(0.95);
@@ -209,10 +210,11 @@
                 transition: all 0.2s ease !important;
             }
 
-            .redlib-collapse-btn:hover {
-                background: var(--color-hover-bg, #2a2a2b) !important;
-                transform: scale(1.05) !important;
-            }
+.redlib-collapse-btn:hover {
+    background: var(--accent, #d54455) !important;
+    color: var(--foreground, #222) !important;
+    transform: scale(1.05) !important;
+}
 
             .redlib-collapse-btn:active {
                 transform: scale(0.95) !important;
@@ -690,6 +692,14 @@
                 display: none !important;
             }
 
+            /* Force collapsed appearance immediately after clicking hide, even on hover */
+.redlib-just-collapsed:not(.highlighted) {
+    opacity: 0.3 !important;
+    filter: grayscale(0.4) blur(0.5px) !important;
+    transform: scale(0.98) !important;
+    transition: all 0.3s ease !important;
+}
+
 /* ========== HOVER COMMENTS STYLES ========== */
 
 ._redlib_popup {
@@ -975,7 +985,7 @@
     background: var(--highlighted, #333);
     color: var(--text, #d7dadc);
     border: 1px solid var(--accent, #d54455);
-    border-radius: 50%;
+    border-radius: 3px;
     width: 22px;
     height: 22px;
     cursor: pointer;
@@ -1047,18 +1057,24 @@
 
 /* Smooth transition for layout changes */
 main, #column_one {
-    transition: max-width 0.3s ease;
+    transition: max-width 0.3s ease !important;
 }
 
 aside {
-    transition: all 0.3s ease;
+    transition: all 0.3s ease !important;
 }
 
 /* Ensure posts animate width changes */
 .post {
-    transition: max-width 0.3s ease;
+    transition: max-width 0.3s ease !important;
 }
-
+/* Transition state for smooth sidebar animations */
+.redlib-sidebar-transitioning main,
+.redlib-sidebar-transitioning #column_one,
+.redlib-sidebar-transitioning .post,
+.redlib-sidebar-transitioning aside {
+    transition: all 0.3s ease !important;
+}
             /* Adjust toggle button position when sidebar is hidden */
             .redlib-sidebar-hidden .redlib-sidebar-toggle {
                 right: 20px;
@@ -1117,6 +1133,17 @@ aside {
             }
 
             /* Mobile responsive adjustments */
+
+            /* Force sidebar transitions at all viewport sizes */
+@media screen and (max-width: 1200px) {
+    .redlib-sidebar-hidden main,
+    body:not(.redlib-sidebar-hidden) main,
+    .redlib-sidebar-hidden #column_one,
+    body:not(.redlib-sidebar-hidden) #column_one {
+        transition: max-width 0.3s ease !important;
+    }
+}
+
             @media screen and (max-width: 800px) {
                 :root {
                     --nav-height: 100px;
@@ -1163,6 +1190,22 @@ aside {
                 .redlib-sidebar-toggle {
                     display: none !important;
                 }
+
+                @media screen and (max-width: 800px) {
+    /* Force transitions on mobile */
+    main, #column_one, .post, aside {
+        transition: all 0.3s ease !important;
+    }
+
+    /* Ensure sidebar transitions work on mobile */
+    .redlib-sidebar-transitioning main,
+    .redlib-sidebar-transitioning #column_one,
+    .redlib-sidebar-transitioning .post,
+    .redlib-sidebar-transitioning aside {
+        transition: all 0.3s ease !important;
+    }
+}
+
             }
 
             @media screen and (max-width: 480px) {
@@ -1711,8 +1754,35 @@ aside {
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
             background-color: #1f1f1f !important;
         }
-    `;
+
+/* Custom expand/collapse button styling - unified with other buttons */
+.expand-children {
+    background: var(--color-bg, #1a1a1b) !important;
+    border: 1px solid var(--color-border, #343536) !important;
+    color: var(--color-text, #d7dadc) !important;
+    cursor: pointer !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    margin-right: 8px !important;
+    padding: 2px 6px !important;
+    border-radius: 3px !important;
+    min-width: 24px !important;
+    line-height: 1 !important;
+    transition: all 0.2s ease !important;
 }
+
+.expand-children:hover {
+    background: var(--accent, #d54455) !important;
+    color: var(--foreground, #222) !important;
+    text-decoration: none !important;
+}
+
+.expand-children:active {
+    transform: scale(0.95) !important;
+}
+
+    `;
+        }
         document.head.appendChild(style);
     }
 
@@ -2170,6 +2240,14 @@ aside {
                 });
 
             } else {
+                // Add immediate visual feedback class to override hover effects
+                postElement.classList.add('redlib-just-collapsed');
+
+                // Remove the override class after animation completes so normal hover works
+                setTimeout(() => {
+                    postElement.classList.remove('redlib-just-collapsed');
+                }, 500);
+
                 // First, hide the expand button immediately
                 const expandButton = postElement.querySelector('.redlib-expand-btn');
                 if (expandButton) {
@@ -2240,6 +2318,44 @@ aside {
 
             saveCollapsedPosts(collapsedPosts);
         }
+
+        // Add hover effects to collapsed posts
+function addHoverEffectsToCollapsedPost(postElement) {
+    let hasLeftPost = false;
+
+    const hoverIn = () => {
+        if (!hasLeftPost) return; // Don't allow hover until mouse has left
+
+        if (postElement.classList.contains('redlib-post-collapsed') && !postElement.classList.contains('highlighted')) {
+            postElement.style.transition = 'all 0.3s ease';
+            postElement.style.opacity = '0.6';
+            postElement.style.filter = 'grayscale(0.2) blur(0.2px)';
+            postElement.style.transform = 'scale(0.995)';
+        }
+    };
+
+    const hoverOut = () => {
+        if (postElement.classList.contains('redlib-post-collapsed') && !postElement.classList.contains('highlighted')) {
+            postElement.style.transition = 'all 0.3s ease';
+            postElement.style.opacity = '0.3';
+            postElement.style.filter = 'grayscale(0.4) blur(0.5px)';
+            postElement.style.transform = 'scale(0.98)';
+        }
+    };
+
+    const trackMouseLeave = () => {
+        hasLeftPost = true;
+        postElement.removeEventListener('mouseleave', trackMouseLeave);
+        hoverOut(); // Apply the collapsed styling when mouse leaves
+    };
+
+    // Initially, track when mouse leaves for the first time
+    postElement.addEventListener('mouseleave', trackMouseLeave);
+
+    // Add normal hover effects that only work after mouse has left once
+    postElement.addEventListener('mouseenter', hoverIn);
+    postElement.addEventListener('mouseleave', hoverOut);
+}
 
         function animatePostCollapse(postElement, callback) {
             // Get current height
@@ -3147,11 +3263,13 @@ aside {
                 'line-height: 1;';
 
             button.addEventListener('mouseenter', () => {
-                button.style.backgroundColor = 'var(--color-hover-bg, #2a2a2b)';
+                button.style.backgroundColor = 'var(--accent, #d54455)';
+                button.style.color = 'var(--foreground, #222)';
             });
 
             button.addEventListener('mouseleave', () => {
                 button.style.backgroundColor = 'var(--color-bg, #1a1a1b)';
+                button.style.color = 'var(--color-text, #d7dadc)';
             });
 
             button.addEventListener('click', (e) => {
@@ -4034,6 +4152,7 @@ aside {
             expandButton.className = 'expand-children';
             expandButton.textContent = '[±]';
             expandButton.setAttribute('data-expanded', 'false');
+            expandButton.title = 'Expand direct replies';
 
             expandButton.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -4051,10 +4170,12 @@ aside {
                 collapseDirectChildren(comment);
                 button.textContent = '[+]';
                 button.setAttribute('data-expanded', 'false');
+                button.title = 'Expand direct replies';
             } else {
                 expandDirectChildrenOnly(comment);
                 button.textContent = '[−]';
                 button.setAttribute('data-expanded', 'true');
+                button.title = 'Collapse direct replies';
             }
         }
 
@@ -4372,6 +4493,9 @@ aside {
             const isCurrentlyHidden = document.body.classList.contains('redlib-sidebar-hidden');
             const newHiddenState = !isCurrentlyHidden;
 
+            // Add transition class to trigger smooth animations
+            document.body.classList.add('redlib-sidebar-transitioning');
+
             if (newHiddenState) {
                 document.body.classList.add('redlib-sidebar-hidden');
             } else {
@@ -4390,6 +4514,11 @@ aside {
             // Force layout recalculation for smooth transition
             requestAnimationFrame(() => {
                 document.body.offsetHeight;
+
+                // Remove transition class after animation completes
+                setTimeout(() => {
+                    document.body.classList.remove('redlib-sidebar-transitioning');
+                }, 300);
             });
         }
 
@@ -4505,6 +4634,18 @@ aside {
         // Check if a link is a username link
         function isSubredditLink(element) {
             if (element.tagName !== 'A' || !element.href) return false;
+
+            // Skip navigation buttons (PREV/NEXT)
+            const text = element.textContent.trim().toLowerCase();
+            if (text === 'prev' || text === 'next' || text === '‹ prev' || text === 'next ›') {
+                return false;
+            }
+
+            // Skip if element has navigation-related classes or IDs
+            if (element.classList.contains('nav') || element.classList.contains('pagination') ||
+                element.id.includes('nav') || element.id.includes('pagination')) {
+                return false;
+            }
 
             const subreddit = getSubredditFromUrl(element.href);
 
@@ -4700,7 +4841,7 @@ aside {
     background: var(--highlighted, #333);
     color: var(--text, #d7dadc);
     border: 1px solid var(--accent, #d54455);
-    border-radius: 50%;
+    border-radius: 3px;
     width: 24px;
     height: 24px;
     cursor: pointer;
@@ -5346,7 +5487,7 @@ aside {
     background: var(--highlighted, #333);
     color: var(--text, #d7dadc);
     border: 1px solid var(--accent, #d54455);
-    border-radius: 50%;
+    border-radius: 3px;
     width: 24px;
     height: 24px;
     cursor: pointer;
@@ -5502,13 +5643,15 @@ aside {
                 filterBtn.addEventListener('click', () => handleAction('filter', data));
             }
 
-            // Add close button functionality
-            const closeBtn = popup.querySelector('.popup-close');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', () => {
-                    hidePopup();
-                });
-            }
+// Add close button functionality
+const closeBtn = popup.querySelector('.popup-close');
+if (closeBtn) {
+    closeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        hidePopupImmediate();
+    });
+}
 
         }
 
@@ -5634,7 +5777,7 @@ aside {
                 // If mouse is near comments popup, delay hiding longer
                 if (mouseX >= commentsRect.left - 20 && mouseX <= commentsRect.right + 20 &&
                     mouseY >= commentsRect.top - 20 && mouseY <= commentsRect.bottom + 20) {
-                    this.hideTimeoutId = setTimeout(() => this.hidePopup(), 1000);
+                    hideTimeoutId = setTimeout(() => hidePopup(), 1000);
                     return;
                 }
             }
@@ -5644,6 +5787,20 @@ aside {
             currentLink = null;
             currentUsername = null;
         }
+
+// Hide popup immediately (for close button clicks)
+function hidePopupImmediate() {
+    if (popup) {
+        popup.style.display = 'none';
+    }
+    currentLink = null;
+    currentUsername = null;
+    // Clear any pending timeouts
+    if (hideTimeoutId) {
+        clearTimeout(hideTimeoutId);
+        hideTimeoutId = null;
+    }
+}
 
         // Clear hide timeout
         function clearHideTimeout() {
