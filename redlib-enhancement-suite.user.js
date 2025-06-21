@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Redlib Enhancement Suite
 // @namespace    https://github.com/azizLIGHT/redlib-enhancement-suite
-// @version      1.1.2
+// @version      1.1.3
 // @description  A comprehensive userscript that supercharges your Redlib experience with RES-style features, smooth animations, and powerful customization options.
 // @author       azizLIGHT
 // @match        https://redlib.catsarch.com/*
@@ -51,6 +51,10 @@
 
 (function() {
     'use strict';
+
+    // Script version - update this when you change @version above
+    const SCRIPT_VERSION = '1.1.3';
+
 
     // ============================================================================
     // COMBINED CSS STYLES
@@ -692,17 +696,15 @@
     position: absolute;
     background: var(--color-bg, #1a1a1b);
     border: 1px solid var(--color-border, #343536);
-    border-radius: 8px;
+    border-radius: 4px;
     padding: 0;
-    z-index: 999;
-    width: 500px !important;
-    min-width: 500px !important;
-    max-width: 500px !important;
-    max-height: 400px;
+    z-index: 9999;
+    max-width: 600px;
+    max-height: 500px;
     overflow-y: auto;
     overflow-x: hidden;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    font-size: 12px;
     line-height: 1.3;
     display: none;
     color: var(--color-text, #d7dadc);
@@ -1000,28 +1002,28 @@
             /* ========== SIDEBAR TOGGLE STYLES ========== */
 
             /* Sidebar Toggle Styles */
-            .redlib-sidebar-toggle {
-                position: fixed;
-                top: 50%;
-                right: 20px;
-                transform: translateY(-50%);
-                background: var(--accent, #d54455);
-                color: var(--foreground, #222);
-                border: none;
-                border-radius: 50%;
-                width: 48px;
-                height: 48px;
-                cursor: pointer;
-                z-index: 1001;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-                transition: all 0.3s ease;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 18px;
-                font-weight: bold;
-                user-select: none;
-            }
+.redlib-sidebar-toggle {
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    background: var(--accent, #d54455);
+    color: var(--foreground, #222);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    user-select: none;
+}
 
             .redlib-sidebar-toggle:hover {
                 background: var(--highlighted, #333);
@@ -1043,14 +1045,19 @@
                 max-width: 100% !important;
             }
 
-            /* Smooth transition for layout changes */
-            main, #column_one {
-                transition: max-width 0.3s ease;
-            }
+/* Smooth transition for layout changes */
+main, #column_one {
+    transition: max-width 0.3s ease;
+}
 
-            aside {
-                transition: opacity 0.3s ease;
-            }
+aside {
+    transition: all 0.3s ease;
+}
+
+/* Ensure posts animate width changes */
+.post {
+    transition: max-width 0.3s ease;
+}
 
             /* Adjust toggle button position when sidebar is hidden */
             .redlib-sidebar-hidden .redlib-sidebar-toggle {
@@ -1564,8 +1571,8 @@
             }
         `;
 
-if (SettingsManager.getSetting('commentStyling', 'enabled')) {
-    style.textContent += `
+        if (SettingsManager.getSetting('commentStyling', 'enabled')) {
+            style.textContent += `
         /* ========== COMMENT STYLING STYLES ========== */
 
         /* ULTRA compact comment layout */
@@ -3964,6 +3971,11 @@ if (SettingsManager.getSetting('commentStyling', 'enabled')) {
 
                 if ((usernamePopup && usernamePopup.style.display === 'block') ||
                     (subredditPopup && subredditPopup.style.display === 'block')) {
+                    // Set up a delayed check to hide when other popups are gone
+                    this.clearHideTimeout();
+                    this.hideTimeoutId = setTimeout(() => {
+                        this.hidePopup(); // Re-check after delay
+                    }, 300);
                     return;
                 }
 
@@ -6033,7 +6045,7 @@ if (SettingsManager.getSetting('commentStyling', 'enabled')) {
 </div>
                 </div>
 <div class="redlib-settings-footer">
-    <div class="redlib-settings-version">Redlib Enhancement Suite v1.1.2</div>
+    <div class="redlib-settings-version">Redlib Enhancement Suite v${SCRIPT_VERSION}</div>
     <div class="redlib-settings-footer-actions">
         <button class="redlib-settings-reset">Reset to Defaults</button>
         <button class="redlib-settings-apply" disabled>Apply</button>
@@ -6041,6 +6053,17 @@ if (SettingsManager.getSetting('commentStyling', 'enabled')) {
 </div>
             </div>
         `;
+
+            // Auto-update version number from script metadata
+            const versionSpan = overlay.querySelector('#redlib-version-number');
+            if (versionSpan) {
+                // Extract version from script metadata comment at top of file
+                const scriptText = document.documentElement.outerHTML;
+                const versionMatch = scriptText.match(/@version\s+([^\n\r]+)/);
+                if (versionMatch) {
+                    versionSpan.textContent = versionMatch[1].trim();
+                }
+            }
 
             // Add event listeners
             const closeBtn = overlay.querySelector('.redlib-settings-close');
