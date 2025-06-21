@@ -169,14 +169,17 @@ Found a bug or have a feature request?
 
 ## 📝 Version History
 
-### v1.1.3 - Current
+### v1.1.4 - Current
+- Unify button appearances
+
+### v1.1.3 - Previous
 - 🐛 **Mobile Fix** - Fixed hover comments popup width on mobile (prevents horizontal scrolling)
 - 🎨 **UI Consistency** - Made sidebar toggle button same size as settings button (40px)
 - ✨ **Smooth Animations** - Added shrinking animation when showing sidebar (matches existing expand animation)
 - 🔧 **Version Sync** - Settings dialog now automatically reflects script version number
 - 🐛 **Popup Interactions** - Fixed issue where comments popup wouldn't hide after username popup closes
 
-### v1.1.2 - Previous
+### v1.1.2
 🆕 **New Features**
 - **AJAX Comment Loader Module** - Extracted comment loading functionality into a separate module for better organization
 - **Close Buttons** - Added close buttons (×) to Subreddit Hover and Username Hover popups for better UX
