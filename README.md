@@ -169,7 +169,42 @@ Found a bug or have a feature request?
 
 ## 📝 Version History
 
-### v1.1.0 - Latest
+### v1.1.3 - Current
+- 🐛 **Mobile Fix** - Fixed hover comments popup width on mobile (prevents horizontal scrolling)
+- 🎨 **UI Consistency** - Made sidebar toggle button same size as settings button (40px)
+- ✨ **Smooth Animations** - Added shrinking animation when showing sidebar (matches existing expand animation)
+- 🔧 **Version Sync** - Settings dialog now automatically reflects script version number
+- 🐛 **Popup Interactions** - Fixed issue where comments popup wouldn't hide after username popup closes
+
+### v1.1.2 - Previous
+🆕 **New Features**
+- **AJAX Comment Loader Module** - Extracted comment loading functionality into a separate module for better organization
+- **Close Buttons** - Added close buttons (×) to Subreddit Hover and Username Hover popups for better UX
+- **Enhanced Comment Preview** - Hover Comments now has a dedicated close button and improved interaction handling
+
+🔧 **Improvements**
+- **Hover Comments Module**
+  - Fixed Width - Comment popups now have a consistent 500px width for better readability
+  - Enhanced Styling - Complete overhaul of nested comment backgrounds with true alternating pattern (gray/black) extending to 10+ nesting levels
+  - Improved Close Button - Added floating close button with better positioning and scroll-aware behavior
+  - Better Interaction - Improved popup hiding logic to work seamlessly with other hover popups
+
+- **Comment System Overhaul**
+  - Modular Architecture - Split comment functionality into separate modules (CommentCollapser, AjaxCommentLoader)
+  - Simplified UI - Comment expand buttons now use simpler [+]/[−] instead of [+++]/[---]
+  - Ultra-Compact Styling - More aggressive spacing reduction with alternating backgrounds extended to Level 15
+
+- **Settings & Configuration**
+  - New Setting - Added "AJAX Load More Comments" toggle in settings panel
+  - Better Organization - Reorganized comment-related settings for clarity
+
+🐛 **Bug Fixes**
+- Fixed popup positioning conflicts when multiple hover systems are active
+- Resolved issues with comment loading state management
+- Improved scroll handling for floating close buttons
+- Better error handling in AJAX comment loading
+
+### v1.1.1
 - ✨ Complete settings management system
 - ✨ Username hover info with follow/filter actions
 - ✨ Smooth slide transitions for all interactions
@@ -177,64 +212,6 @@ Found a bug or have a feature request?
 - ✨ Floating video player with drag/resize
 - 🐛 Fixed popup sizing consistency
 - 🐛 Improved mobile responsiveness
-
-### v1.1.1 → v1.1.2
-🆕 New Features
-
-AJAX Comment Loader Module: Extracted comment loading functionality into a separate module for better organization
-Close Buttons: Added close buttons (×) to Subreddit Hover and Username Hover popups for better UX
-Enhanced Comment Preview: Hover Comments now has a dedicated close button and improved interaction handling
-
-🔧 Improvements
-Hover Comments Module
-
-Fixed Width: Comment popups now have a consistent 500px width for better readability
-Enhanced Styling: Complete overhaul of nested comment backgrounds with true alternating pattern (gray/black) extending to 10+ nesting levels
-Improved Close Button: Added floating close button with better positioning and scroll-aware behavior
-Better Interaction: Improved popup hiding logic to work seamlessly with other hover popups
-
-Comment System Overhaul
-
-Modular Architecture: Split comment functionality into separate modules:
-
-CommentCollapser: Handles comment expand/collapse UI
-AjaxCommentLoader: Handles "Load More" functionality
-
-
-Simplified UI: Comment expand buttons now use simpler [+]/[−] instead of [+++]/[---]
-Ultra-Compact Styling: More aggressive spacing reduction with alternating backgrounds extended to Level 15
-
-Settings & Configuration
-
-New Setting: Added "AJAX Load More Comments" toggle in settings panel
-Better Organization: Reorganized comment-related settings for clarity
-Updated Version: Settings footer now shows v1.1.2
-
-Popup System Enhancements
-
-Cross-Popup Compatibility: Improved interaction between different popup types (comments, subreddit, username)
-Better Positioning: Enhanced popup positioning to prevent overlaps and off-screen rendering
-Improved Hover Logic: More sophisticated mouse tracking to prevent premature popup hiding
-
-🐛 Bug Fixes
-
-Fixed popup positioning conflicts when multiple hover systems are active
-Resolved issues with comment loading state management
-Improved scroll handling for floating close buttons
-Better error handling in AJAX comment loading
-
-🎨 Visual Polish
-
-More consistent spacing in ultra-compact comment layout
-Better visual hierarchy with improved alternating backgrounds
-Cleaner close button styling across all popups
-Enhanced hover states and transitions
-
-🔧 Technical Improvements
-
-Code Organization: Better separation of concerns with modular architecture
-Performance: More efficient event handling and DOM manipulation
-Maintainability: Cleaner code structure with dedicated modules for specific functionality
 
 ## 📄 License
 
