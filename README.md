@@ -6,7 +6,8 @@ A comprehensive userscript that supercharges your Redlib experience with RES-sty
 
 Transform your Redlib browsing with modern enhancements that make the interface more intuitive, efficient, and visually appealing. From collapsible posts with floating video players to hover previews and customizable layouts, this suite brings the best of Reddit Enhancement Suite to Redlib.
 
-## 🎯 Feature Breakdown
+<details>
+<summary><h2>🎯 Feature Breakdown</h2></summary>
 
 ### 🏠 General Features
 - **⚙️ Settings Manager** - Comprehensive settings overlay with organized toggles and descriptions
@@ -35,7 +36,10 @@ Transform your Redlib browsing with modern enhancements that make the interface 
 - **🗂️ Comment Collapser** - Comments collapsed by default with custom expand buttons
 - **🎨 Comment Styling** - Compact layout with alternating background colors and improved visual hierarchy
 
-## ⚡ Smooth Animations
+</details>
+
+<details>
+<summary><h2>⚡ Smooth Animations</h2></summary>
 
 All interactions feature carefully crafted transitions:
 - **Slide animations** for hiding/showing posts
@@ -43,7 +47,10 @@ All interactions feature carefully crafted transitions:
 - **Fade effects** for UI elements
 - **Easing curves** for natural, polished feel
 
-## 🛠️ Settings & Customization
+</details>
+
+<details>
+<summary><h2>🛠️ Settings & Customization</h2></summary>
 
 Access the settings panel via the ⚙️ icon in the top-right corner:
 
@@ -65,22 +72,42 @@ Access the settings panel via the ⚙️ icon in the top-right corner:
 - ✅ Comment Collapser
 - ✅ Comment Styling
 
-## 🎨 Visual Design
+</details>
 
+<details>
+<summary><h2>🎨 Visual Design & Technical Features</h2></summary>
+
+### Visual Design
 - **Dark theme optimized** with proper contrast and readability
 - **Consistent sizing** - all popups and UI elements use standardized dimensions
 - **Smooth transitions** - 400ms slide animations with cubic-bezier easing
 - **Non-intrusive** - enhancements feel native to Redlib's design language
 
-## 🔧 Technical Features
-
+### Technical Features
 - **Intelligent caching** - Reduces API calls for better performance
 - **Memory management** - Automatic cleanup of old data
 - **Error handling** - Graceful fallbacks for network issues
 - **CSP compliance** - Works within Content Security Policy restrictions
 - **Mobile responsive** - Adapts to smaller screens
 
-## 🖼️ Screenshots
+### Browser Compatibility
+- ✅ **Chrome** 88+
+- ✅ **Firefox** 85+
+- ✅ **Safari** 14+
+- ✅ **Edge** 88+
+- ✅ **Mobile browsers** (with touch adaptations)
+
+### Performance
+- **Lazy loading** - Features only initialize when needed
+- **Event delegation** - Efficient event handling for dynamic content
+- **Debounced interactions** - Prevents excessive API calls
+- **Minimal footprint** - Clean code with no memory leaks
+
+</details>
+
+<details>
+<summary><h2>🖼️ Screenshots</h2></summary>
+
 Settings
 
 ![Settings](https://github.com/user-attachments/assets/9fb04b80-99b9-4b59-9ea7-cd7d109e8ea8)
@@ -117,21 +144,7 @@ Floating video player, resizable and movable
 
 ![Floating video player, resizable and movable](https://github.com/user-attachments/assets/003646c6-b5c0-486c-b826-0be041dd17eb)
 
-
-## 📱 Browser Compatibility
-
-- ✅ **Chrome** 88+
-- ✅ **Firefox** 85+
-- ✅ **Safari** 14+
-- ✅ **Edge** 88+
-- ✅ **Mobile browsers** (with touch adaptations)
-
-## 🚦 Performance
-
-- **Lazy loading** - Features only initialize when needed
-- **Event delegation** - Efficient event handling for dynamic content
-- **Debounced interactions** - Prevents excessive API calls
-- **Minimal footprint** - Clean code with no memory leaks
+</details>
 
 ## 🚀 Installation
 
@@ -150,7 +163,8 @@ Floating video player, resizable and movable
    - Customize features to your preference
    - Changes apply immediately after clicking "Apply"
 
-## 📋 Supported Instances
+<details>
+<summary><h2>📋 Supported Instances</h2></summary>
 
 Works on all major Redlib instances including:
 - redlib.freedit.eu
@@ -159,7 +173,10 @@ Works on all major Redlib instances including:
 - redlib.ducks.party
 - And many more...
 
-## 🤝 Contributing
+</details>
+
+<details>
+<summary><h2>🤝 Contributing</h2></summary>
 
 Found a bug or have a feature request?
 
@@ -167,7 +184,10 @@ Found a bug or have a feature request?
 2. **Pull Requests** - Submit improvements via pull requests
 3. **Testing** - Help test new features across different Redlib instances
 
-## 📝 Version History
+</details>
+
+<details>
+<summary><h2>📝 Version History</h2></summary>
 
 ### v1.1.4 - Current
 - Unify button appearances
@@ -215,6 +235,8 @@ Found a bug or have a feature request?
 - ✨ Floating video player with drag/resize
 - 🐛 Fixed popup sizing consistency
 - 🐛 Improved mobile responsiveness
+
+</details>
 
 ## 📄 License
 
