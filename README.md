@@ -189,10 +189,64 @@ Found a bug or have a feature request?
 <details>
 <summary><h2>📝 Version History</h2></summary>
 
-### v1.1.4 - Current
+### v1.91 - Current
+🔄 **Sync System Enhancements**
+- **Auto-Refresh Settings Panel** - Settings overlay automatically refreshes after sync operations
+- **Enhanced Merge Operations** - Improved mergeAndPushToInstance() with better error handling and timing
+- **Real-time Updates** - Live refresh of sync status, comparison tables, and merge previews
+- **Comprehensive Refresh Function** - New refreshSettingsOverlay() manages all settings panel updates
+
+🎨 **UI/UX Improvements**
+- **Z-index Fix** - Resolved conflicts between settings overlay and hover popups with proper layering
+- **Enhanced Merge Dialogs** - Confirmation dialogs now show detailed merge preview text before action
+- **Improved Visual Hierarchy** - Better organization and display of sync interface components
+- **Dynamic Popup Handling** - Mutation observer ensures proper z-index for dynamically created popups
+
+⚡ **Performance & Reliability**
+- **Better Error Handling** - Enhanced error recovery in merge operations and settings refresh
+- **Improved Timing Control** - Proper delays and sequencing for post-merge operations
+- **Function Scoping** - Better integration between sync components and settings manager
+- **Event Listener Management** - More robust event handling for sync system interactions
+
+🐛 **Bug Fixes**
+- Fixed popup display issues when settings overlay is open
+- Resolved timing conflicts between merge operations and UI updates
+- Improved stability of sync status monitoring and refresh cycles
+
+### v1.52 - Previous
+🆕 **Major New Feature**
+- **🔄 Cross-Instance Settings Synchronization** - Complete multi-instance settings sync system
+  - **Authoritative Source Management** - Designate one Redlib instance as the master source for all settings
+  - **Real-time Sync Status** - Live monitoring of sync status with detailed difference tracking
+  - **Side-by-Side Comparison** - Visual comparison tables showing Instance vs Authority settings
+  - **Intelligent Merge Preview** - See exactly what changes will be made before applying
+  - **Selective Synchronization** - Choose which settings to inherit from instance vs push from authority
+  - **Timestamp Tracking** - Automatic conflict detection based on last update times
+  - **Smart Conflict Resolution** - Handles scenarios like cookie size limits with alternative sync methods
+
+🔧 **Sync System Details**
+- **Settings Comparison Interface** - Three-column table (Setting | Instance | Authority) with clickable headers
+- **Merge Operations** - "Inherit from Instance" and "Push to Instance" buttons for bulk operations  
+- **Detailed Differences View** - Expandable preview showing exactly what subscriptions/filters will be added
+- **Refresh Status** - Manual sync status refresh with detailed change summaries
+- **Error Handling** - Graceful handling of network issues and API limitations
+
+🎨 **UI Enhancements**
+- **Enhanced Settings Modal** - New "Cross-Instance Sync" section in settings panel
+- **Monospace Status Display** - Technical sync information displayed in easy-to-read format
+- **Mobile Responsive** - Sync interface adapts to smaller screens with appropriate font sizing
+- **Visual Status Indicators** - Clear ✅/❌ status with color-coded difference highlights
+
+⚡ **Performance & Reliability**
+- **Caching System** - Reduces redundant API calls during sync operations
+- **Background Processing** - Sync initialization happens after DOM stabilization
+- **Memory Management** - Proper cleanup of cached sync data
+- **Error Recovery** - Fallback mechanisms for failed sync operations
+
+### v1.1.4 - Previous
 - Unify button appearances
 
-### v1.1.3 - Previous
+### v1.1.3
 - 🐛 **Mobile Fix** - Fixed hover comments popup width on mobile (prevents horizontal scrolling)
 - 🎨 **UI Consistency** - Made sidebar toggle button same size as settings button (40px)
 - ✨ **Smooth Animations** - Added shrinking animation when showing sidebar (matches existing expand animation)
