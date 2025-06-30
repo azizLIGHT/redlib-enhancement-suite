@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Redlib Enhancement Suite
 // @namespace    https://github.com/azizLIGHT/redlib-enhancement-suite
-// @version      1.52
+// @version      1.91
 // @description  A comprehensive userscript that supercharges your Redlib experience with RES-style features, smooth animations, and powerful customization options.
 // @author       azizLIGHT
 // @match        https://redlib.catsarch.com/*
@@ -57,7 +57,7 @@
     'use strict';
 
     // Script version - update this when you change @version above
-    const SCRIPT_VERSION = '1.52';
+    const SCRIPT_VERSION = '1.91';
 
 // ============================================================================
 // PAGE VALIDATION - Must be first
@@ -159,9 +159,9 @@ if (!isValidRedlibPage()) {
 
             /* Expand button styling */
             .redlib-expand-btn {
-                background: var(--color-bg, #1a1a1b);
-                border: 1px solid var(--color-border, #343536);
-                color: var(--color-text, #d7dadc);
+                background: var(--background);
+                border: 1px solid var(--highlighted);
+                color: var(--text);
                 cursor: pointer;
                 font-size: 12px;
                 font-weight: bold;
@@ -178,8 +178,8 @@ if (!isValidRedlibPage()) {
             }
 
 .redlib-expand-btn:hover {
-    background: var(--accent, #d54455);
-    color: var(--foreground, #222);
+    background: var(--accent);
+    color: var(--foreground);
 }
 
             .redlib-expand-btn:active {
@@ -253,9 +253,9 @@ if (!isValidRedlibPage()) {
                 position: absolute !important;
                 top: 8px !important;
                 right: 8px !important;
-                background: var(--color-bg, #1a1a1b) !important;
-                border: 1px solid var(--color-border, #343536) !important;
-                color: var(--color-text, #d7dadc) !important;
+                background: var(--background) !important;
+                border: 1px solid var(--highlighted) !important;
+                color: var(--text) !important;
                 cursor: pointer !important;
                 font-size: 14px !important;
                 font-weight: bold !important;
@@ -268,8 +268,8 @@ if (!isValidRedlibPage()) {
             }
 
 .redlib-collapse-btn:hover {
-    background: var(--accent, #d54455) !important;
-    color: var(--foreground, #222) !important;
+    background: var(--accent) !important;
+    color: var(--foreground) !important;
     transform: scale(1.05) !important;
 }
 
@@ -358,7 +358,7 @@ if (!isValidRedlibPage()) {
                 bottom: 20px;
                 right: 20px;
                 background: black;
-                border: 2px solid var(--highlighted, #333);
+                border: 2px solid var(--highlighted);
                 border-radius: 8px;
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
                 z-index: 10000;
@@ -431,8 +431,8 @@ if (!isValidRedlibPage()) {
                 transform: none !important;
                 position: fixed !important;
                 z-index: 10001 !important;
-                background: var(--foreground, #222) !important;
-                border: 1px solid var(--highlighted, #333) !important;
+                background: var(--foreground) !important;
+                border: 1px solid var(--highlighted) !important;
                 border-bottom: none !important;
                 border-radius: 4px 4px 0 0 !important;
                 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3) !important;
@@ -471,14 +471,14 @@ if (!isValidRedlibPage()) {
             }
 
             .redlib-floating-video-header {
-                background: var(--foreground, #222);
+                background: var(--foreground);
                 padding: 8px 12px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 cursor: grab;
                 user-select: none;
-                border-bottom: 1px solid var(--highlighted, #333);
+                border-bottom: 1px solid var(--highlighted);
                 flex-shrink: 0;
                 height: 40px;
                 box-sizing: border-box;
@@ -489,7 +489,7 @@ if (!isValidRedlibPage()) {
             }
 
             .redlib-floating-video-title {
-                color: var(--text, #d7dadc);
+                color: var(--text);
                 font-size: 14px;
                 font-weight: bold;
                 overflow: hidden;
@@ -505,9 +505,9 @@ if (!isValidRedlibPage()) {
 
             .redlib-floating-video-minimize,
             .redlib-floating-video-close {
-                background: var(--highlighted, #333);
-                border: 1px solid var(--accent, #d54455);
-                color: var(--text, #d7dadc);
+                background: var(--highlighted);
+                border: 1px solid var(--accent);
+                color: var(--text);
                 width: 24px;
                 height: 24px;
                 border-radius: 4px;
@@ -523,8 +523,8 @@ if (!isValidRedlibPage()) {
 
             .redlib-floating-video-minimize:hover,
             .redlib-floating-video-close:hover {
-                background: var(--accent, #d54455);
-                color: var(--foreground, #222);
+                background: var(--accent);
+                color: var(--foreground);
             }
 
             .redlib-floating-video-content {
@@ -550,8 +550,8 @@ if (!isValidRedlibPage()) {
 
             /* FIXED: Basic post styling - NO automatic sticky positioning */
             body:has(.post.highlighted) .post.highlighted {
-                background: var(--post, #161616) !important;
-                border-bottom: 1px solid var(--highlighted, #333) !important;
+                background: var(--post) !important;
+                border-bottom: 1px solid var(--highlighted) !important;
                 margin-bottom: 16px !important;
                 padding-bottom: 12px !important;
             }
@@ -563,14 +563,14 @@ if (!isValidRedlibPage()) {
                 /* Width, left, and transform will be set by JavaScript */
                 margin: 0 !important;
                 padding: 4px 16px !important;
-                border-bottom: 2px solid var(--highlighted, #333) !important;
+                border-bottom: 2px solid var(--highlighted) !important;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
-                background: var(--post, #161616) !important;
+                background: var(--post) !important;
                 cursor: pointer !important;
                 z-index: 1000 !important;
 
                 /* Ensure completely opaque background */
-                background-color: #161616 !important;
+                background-color: var(--post) !important;
                 opacity: 1 !important;
             }
 
@@ -580,6 +580,23 @@ if (!isValidRedlibPage()) {
                 line-height: 1.2 !important;
                 font-size: 13px !important;
             }
+/* Truncate post title to one line in sticky mode */
+body:has(.post.highlighted) .post.highlighted.redlib-sticky-mode .post_title {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin: 2px 12px 2px 12px !important;
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+}
+
+/* Expand title on hover */
+body:has(.post.highlighted) .post.highlighted.redlib-sticky-mode:hover .post_title {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    max-height: none !important;
+}
 
             /* Compact score in sticky mode */
             body:has(.post.highlighted) .post.highlighted.redlib-sticky-mode .post_score {
@@ -596,7 +613,7 @@ if (!isValidRedlibPage()) {
             /* Hover effect for sticky mode */
             body:has(.post.highlighted) .post.highlighted.redlib-sticky-mode:hover {
                 box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
-                border-bottom-color: var(--accent, #d54455) !important;
+                border-bottom-color: var(--accent) !important;
             }
 
             /* Hide footer links when in sticky mode */
@@ -630,7 +647,7 @@ if (!isValidRedlibPage()) {
                 line-height: 1.4 !important;
                 padding: 8px !important;
                 margin: 4px 0 !important;
-                border: 1px solid var(--highlighted, #333) !important;
+                border: 1px solid var(--highlighted) !important;
                 border-radius: 4px !important;
             }
 
@@ -640,17 +657,17 @@ if (!isValidRedlibPage()) {
             }
 
             body:has(.post.highlighted) .post.highlighted.redlib-sticky-mode .post_body::-webkit-scrollbar-track {
-                background: var(--background, #0f0f0f) !important;
+                background: var(--background) !important;
                 border-radius: 3px !important;
             }
 
             body:has(.post.highlighted) .post.highlighted.redlib-sticky-mode .post_body::-webkit-scrollbar-thumb {
-                background: var(--accent, #d54455) !important;
+                background: var(--accent) !important;
                 border-radius: 3px !important;
             }
 
             body:has(.post.highlighted) .post.highlighted.redlib-sticky-mode .post_body::-webkit-scrollbar-thumb:hover {
-                background: var(--highlighted, #333) !important;
+                background: var(--highlighted) !important;
             }
 
             /* ONLY compact gallery when in sticky mode */
@@ -761,8 +778,8 @@ if (!isValidRedlibPage()) {
 
 ._redlib_popup {
     position: absolute;
-    background: var(--color-bg, #1a1a1b);
-    border: 1px solid var(--color-border, #343536);
+    background: var(--background);
+    border: 1px solid var(--highlighted);
     border-radius: 4px;
     padding: 0;
     z-index: 9999;
@@ -774,7 +791,7 @@ if (!isValidRedlibPage()) {
     font-size: 12px;
     line-height: 1.3;
     display: none;
-    color: var(--color-text, #d7dadc);
+    color: var(--text);
     box-sizing: border-box;
 }
 
@@ -811,63 +828,63 @@ if (!isValidRedlibPage()) {
 
 /* Top level comments - GRAY */
 ._redlib_popup > .comment:not(.reply) {
-    background-color: #161616 !important;
+    background-color: var(--post) !important;
 }
 
 /* Level 1 children - BLACK */
 ._redlib_popup .replies > .reply {
-    background-color: #1f1f1f !important;
+    background-color: var(--foreground) !important;
 }
 
 /* Level 2 children - GRAY */
 ._redlib_popup .replies .replies > .reply {
-    background-color: #161616 !important;
+    background-color: var(--post) !important;
 }
 
 /* Level 3 children - BLACK */
 ._redlib_popup .replies .replies .replies > .reply {
-    background-color: #1f1f1f !important;
+    background-color: var(--foreground) !important;
 }
 
 /* Level 4 children - GRAY */
 ._redlib_popup .replies .replies .replies .replies > .reply {
-    background-color: #161616 !important;
+    background-color: var(--post) !important;
 }
 
 /* Level 5 children - BLACK */
 ._redlib_popup .replies .replies .replies .replies .replies > .reply {
-    background-color: #1f1f1f !important;
+    background-color: var(--foreground) !important;
 }
 
 /* Level 6 children - GRAY */
 ._redlib_popup .replies .replies .replies .replies .replies .replies > .reply {
-    background-color: #161616 !important;
+    background-color: var(--post) !important;
 }
 
 /* Level 7 children - BLACK */
 ._redlib_popup .replies .replies .replies .replies .replies .replies .replies > .reply {
-    background-color: #1f1f1f !important;
+    background-color: var(--foreground) !important;
 }
 
 /* Level 8 children - GRAY */
 ._redlib_popup .replies .replies .replies .replies .replies .replies .replies .replies > .reply {
-    background-color: #161616 !important;
+    background-color: var(--post) !important;
 }
 
 /* Level 9 children - BLACK */
 ._redlib_popup .replies .replies .replies .replies .replies .replies .replies .replies .replies > .reply {
-    background-color: #1f1f1f !important;
+    background-color: var(--foreground) !important;
 }
 
 /* Level 10 children - GRAY */
 ._redlib_popup .replies .replies .replies .replies .replies .replies .replies .replies .replies .replies > .reply {
-    background-color: #161616 !important;
+    background-color: var(--post) !important;
 }
 
 ._redlib_popup .comment_header {
     margin-bottom: 3px;
     font-size: 12px;
-    color: var(--color-text-muted, #818384);
+    color: var(--visited);
     line-height: 1.2;
     display: flex;
     align-items: baseline;
@@ -875,7 +892,7 @@ if (!isValidRedlibPage()) {
 }
 
 ._redlib_popup .comment_author {
-    color: var(--accent, #0079d3);
+    color: var(--accent);
     font-weight: normal;
     text-decoration: none;
     white-space: nowrap;
@@ -887,7 +904,7 @@ if (!isValidRedlibPage()) {
 
 ._redlib_popup .comment_meta_separator {
     margin: 0 2px;
-    color: var(--color-text-muted, #818384);
+    color: var(--visited);
 }
 
 ._redlib_popup .comment_points {
@@ -901,7 +918,7 @@ if (!isValidRedlibPage()) {
 ._redlib_popup .comment_body {
     font-size: 13px;
     line-height: 1.4;
-    color: var(--color-text, #d7dadc);
+    color: var(--text);
     max-height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -925,19 +942,19 @@ if (!isValidRedlibPage()) {
 ._redlib_popup .comment_body blockquote {
     margin: 0.3em 0;
     padding-left: 0.8em;
-    border-left: 2px solid var(--color-border, #343536);
-    color: var(--color-text-muted, #818384);
+    border-left: 2px solid var(--highlighted);
+    color: var(--visited);
 }
 
 ._redlib_popup .comment_body code {
-    background: var(--color-code-bg, rgba(255,255,255,0.1));
+    background: var(--highlighted);
     padding: 1px 3px;
     border-radius: 2px;
     font-size: 0.9em;
 }
 
 ._redlib_popup .comment_body pre {
-    background: var(--color-code-bg, rgba(255,255,255,0.1));
+    background: var(--highlighted);
     padding: 6px;
     border-radius: 3px;
     overflow-x: auto;
@@ -957,31 +974,31 @@ if (!isValidRedlibPage()) {
 }
 
 ._redlib_popup .next_reply {
-    color: var(--accent, #0079d3);
+    color: var(--accent);
     cursor: pointer;
     font-size: 11px;
     margin-top: 4px;
     padding: 3px 5px;
     border-radius: 3px;
-    background: var(--color-toggle-bg, rgba(255,255,255,0.05));
+    background: var(--highlighted);
     display: inline-block;
     user-select: none;
     border: 1px solid transparent;
 }
 
 ._redlib_popup .next_reply:hover {
-    background: var(--color-toggle-hover, rgba(255,255,255,0.1));
-    border-color: var(--accent, #0079d3);
+    background: var(--foreground);
+    border-color: var(--accent);
 }
 
 ._redlib_popup .loading {
     text-align: center;
     padding: 8px 10px;
-    color: var(--color-text-muted, #818384);
+    color: var(--visited);
     font-size: 12px;
     line-height: 1.3;
     font-style: normal;
-    background: var(--color-comment-bg, rgba(255,255,255,0.05));
+    background: var(--highlighted);
     border-radius: 4px;
     margin: 4px;
 }
@@ -992,7 +1009,7 @@ if (!isValidRedlibPage()) {
 }
 
 ._redlib_popup .error {
-    color: var(--color-error, #ea0027);
+    color: var(--accent);
     text-align: center;
     padding: 16px;
     font-size: 13px;
@@ -1002,46 +1019,46 @@ if (!isValidRedlibPage()) {
     text-align: center;
     padding: 5px;
     cursor: pointer;
-    color: var(--accent, #0079d3);
-    border-bottom: 1px solid var(--color-border, #343536);
+    color: var(--accent);
+    border-bottom: 1px solid var(--highlighted);
     margin: 0;
     user-select: none;
     position: sticky;
     top: 0;
-    background: var(--color-bg, #1a1a1b) !important;
+    background: var(--background) !important;
     z-index: 1;
     font-size: 12px;
     opacity: 1 !important;
 }
 
 ._redlib_popup .next_comment:hover {
-    background: var(--color-hover-bg, #2a2a2b) !important;
-    color: var(--accent, #0079d3);
+    background: var(--foreground) !important;
+    color: var(--accent);
 }
 
 ._redlib_popup .next_comment.loaded {
     cursor: default !important;
     pointer-events: none;
     opacity: 1 !important;
-    background: var(--color-bg, #1a1a1b) !important;
+    background: var(--background) !important;
     position: sticky;
     top: 0;
     z-index: 1;
-    color: var(--color-text-muted, #818384) !important;
+    color: var(--visited) !important;
 }
 
 ._redlib_popup .next_comment.loaded:hover {
-    background: var(--color-bg, #1a1a1b) !important;
-    color: var(--color-text-muted, #818384) !important;
+    background: var(--background) !important;
+    color: var(--visited) !important;
 }
 
 ._redlib_popup .popup-close {
     position: fixed;
     top: 8px;
     right: 8px;
-    background: var(--highlighted, #333);
-    color: var(--text, #d7dadc);
-    border: 1px solid var(--accent, #d54455);
+    background: var(--highlighted);
+    color: var(--text);
+    border: 1px solid var(--accent);
     border-radius: 3px;
     width: 22px;
     height: 22px;
@@ -1057,8 +1074,8 @@ if (!isValidRedlibPage()) {
 }
 
 ._redlib_popup .popup-close:hover {
-    background: var(--accent, #d54455);
-    color: var(--foreground, #222);
+    background: var(--accent);
+    color: var(--foreground);
 }
 
 /* ========== COMMENT COLLAPSER STYLES ========== */
@@ -1074,8 +1091,8 @@ if (!isValidRedlibPage()) {
     top: 50%;
     right: 20px;
     transform: translateY(-50%);
-    background: var(--accent, #d54455);
-    color: var(--foreground, #222);
+    background: var(--accent);
+    color: var(--foreground);
     border: none;
     border-radius: 50%;
     width: 40px;
@@ -1093,8 +1110,8 @@ if (!isValidRedlibPage()) {
 }
 
             .redlib-sidebar-toggle:hover {
-                background: var(--highlighted, #333);
-                color: var(--text, #d7dadc);
+                background: var(--highlighted);
+                color: var(--text);
                 transform: translateY(-50%) scale(1.1);
             }
 
@@ -1149,8 +1166,8 @@ aside {
                 right: 60px;
                 top: 50%;
                 transform: translateY(-50%);
-                background: var(--background, #0f0f0f);
-                color: var(--text, #d7dadc);
+                background: var(--background);
+                color: var(--text);
                 padding: 8px 12px;
                 border-radius: 4px;
                 font-size: 14px;
@@ -1159,7 +1176,7 @@ aside {
                 opacity: 0;
                 visibility: hidden;
                 transition: all 0.3s ease;
-                border: 1px solid var(--highlighted, #333);
+                border: 1px solid var(--highlighted);
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
                 z-index: 1002;
             }
@@ -1177,7 +1194,7 @@ aside {
                 top: 50%;
                 transform: translateY(-50%);
                 border: 6px solid transparent;
-                border-left-color: var(--highlighted, #333);
+                border-left-color: var(--highlighted);
                 opacity: 0;
                 visibility: hidden;
                 transition: all 0.3s ease;
@@ -1301,24 +1318,24 @@ aside {
 /* Settings page feed collapsers */
 .settings-feeds-collapsible {
     margin: 16px 0;
-    border: 1px solid var(--highlighted, #333);
+    border: 1px solid var(--highlighted);
     border-radius: 6px;
-    background: var(--post, #161616);
+    background: var(--post);
 }
 
 .settings-feeds-summary {
     padding: 12px 16px;
     font-weight: bold;
     font-size: 14px;
-    color: var(--accent, #d54455);
+    color: var(--accent);
     cursor: pointer;
     user-select: none;
-    border-bottom: 1px solid var(--highlighted, #333);
+    border-bottom: 1px solid var(--highlighted);
     transition: background-color 0.2s ease;
 }
 
 .settings-feeds-summary:hover {
-    background: var(--highlighted, #333);
+    background: var(--highlighted);
 }
 
 .settings-feeds-content {
@@ -1331,23 +1348,23 @@ aside {
     align-items: center;
     padding: 8px 12px;
     margin: 4px 0;
-    background: var(--foreground, #222);
+    background: var(--foreground);
     border-radius: 4px;
-    border: 1px solid var(--highlighted, #333);
+    border: 1px solid var(--highlighted);
 }
 
 .settings-feeds-content div:hover {
-    background: var(--highlighted, #333);
+    background: var(--highlighted);
 }
 
 .settings-feeds-content a {
-    color: var(--text, #d7dadc);
+    color: var(--text);
     text-decoration: none;
     font-weight: 500;
 }
 
 .settings-feeds-content a:hover {
-    color: var(--accent, #d54455);
+    color: var(--accent);
     text-decoration: underline;
 }
 
@@ -1359,16 +1376,16 @@ aside {
     padding: 6px 12px;
     font-size: 12px;
     border-radius: 4px;
-    border: 1px solid var(--accent, #d54455);
-    background: var(--highlighted, #333);
-    color: var(--text, #d7dadc);
+    border: 1px solid var(--accent);
+    background: var(--highlighted);
+    color: var(--text);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .settings-feeds-content button:hover {
-    background: var(--accent, #d54455);
-    color: var(--foreground, #222);
+    background: var(--accent);
+    color: var(--foreground);
 }
 
 /* Hide original legend styling when converted */
@@ -1388,8 +1405,8 @@ aside {
                 position: fixed;
                 top: 70px;
                 right: 15px;
-                background: var(--accent, #d54455);
-                color: var(--foreground, #222);
+                background: var(--accent);
+                color: var(--foreground);
                 border: none;
                 border-radius: 50%;
                 width: 40px;
@@ -1406,8 +1423,8 @@ aside {
             }
 
             .redlib-settings-icon:hover {
-                background: var(--highlighted, #333);
-                color: var(--text, #d7dadc);
+                background: var(--highlighted);
+                color: var(--text);
                 transform: scale(1.1);
             }
 
@@ -1426,8 +1443,8 @@ aside {
             }
 
             .redlib-settings-modal {
-                background: var(--background, #0f0f0f);
-                border: 2px solid var(--highlighted, #333);
+                background: var(--background);
+                border: 2px solid var(--highlighted);
                 border-radius: 12px;
                 max-width: 600px;
                 max-height: 80vh;
@@ -1439,9 +1456,9 @@ aside {
             }
 
             .redlib-settings-header {
-                background: var(--post, #161616);
+                background: var(--post);
                 padding: 20px;
-                border-bottom: 2px solid var(--highlighted, #333);
+                border-bottom: 2px solid var(--highlighted);
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -1449,8 +1466,8 @@ aside {
             }
 
             .redlib-settings-apply {
-                background: var(--accent, #d54455);
-                color: var(--foreground, #222);
+                background: var(--accent);
+                color: var(--foreground);
                 border: none;
                 border-radius: 6px;
                 padding: 8px 16px;
@@ -1461,13 +1478,13 @@ aside {
             }
 
             .redlib-settings-apply:hover {
-                background: var(--highlighted, #333);
-                color: var(--text, #d7dadc);
+                background: var(--highlighted);
+                color: var(--text);
             }
 
             .redlib-settings-apply:disabled {
-                background: var(--highlighted, #333);
-                color: var(--text, #d7dadc);
+                background: var(--highlighted);
+                color: var(--text);
                 opacity: 0.5;
                 cursor: not-allowed;
             }
@@ -1483,16 +1500,16 @@ aside {
             }
 
             .redlib-settings-title {
-                color: var(--text, #d7dadc);
+                color: var(--text);
                 font-size: 20px;
                 font-weight: bold;
                 margin: 0;
             }
 
             .redlib-settings-close {
-                background: var(--highlighted, #333);
-                color: var(--text, #d7dadc);
-                border: 1px solid var(--accent, #d54455);
+                background: var(--highlighted);
+                color: var(--text);
+                border: 1px solid var(--accent);
                 border-radius: 50%;
                 width: 32px;
                 height: 32px;
@@ -1505,8 +1522,8 @@ aside {
             }
 
             .redlib-settings-close:hover {
-                background: var(--accent, #d54455);
-                color: var(--foreground, #222);
+                background: var(--accent);
+                color: var(--foreground);
             }
 
             .redlib-settings-content {
@@ -1520,7 +1537,7 @@ aside {
             .redlib-settings-section {
                 margin-bottom: 24px;
                 padding-bottom: 24px;
-                border-bottom: 1px solid var(--highlighted, #333);
+                border-bottom: 1px solid var(--highlighted);
             }
 
             .redlib-settings-section:last-child {
@@ -1529,7 +1546,7 @@ aside {
             }
 
             .redlib-settings-section-title {
-                color: var(--accent, #d54455);
+                color: var(--accent);
                 font-size: 16px;
                 font-weight: bold;
                 margin: 0 0 12px 0;
@@ -1552,14 +1569,14 @@ aside {
             }
 
             .redlib-settings-option-title {
-                color: var(--text, #d7dadc);
+                color: var(--text);
                 font-weight: bold;
                 margin: 0 0 4px 0;
                 font-size: 14px;
             }
 
             .redlib-settings-option-description {
-                color: var(--text, #d7dadc);
+                color: var(--text);
                 opacity: 0.7;
                 font-size: 13px;
                 line-height: 1.4;
@@ -1587,7 +1604,7 @@ aside {
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background-color: var(--highlighted, #333);
+                background-color: var(--highlighted);
                 transition: 0.3s;
                 border-radius: 24px;
             }
@@ -1599,24 +1616,24 @@ aside {
                 width: 18px;
                 left: 3px;
                 bottom: 3px;
-                background-color: var(--foreground, #222);
+                background-color: var(--foreground);
                 transition: 0.3s;
                 border-radius: 50%;
             }
 
             .redlib-settings-toggle input:checked + .redlib-settings-slider {
-                background-color: var(--accent, #d54455);
+                background-color: var(--accent);
             }
 
             .redlib-settings-toggle input:checked + .redlib-settings-slider:before {
                 transform: translateX(24px);
-                background-color: var(--foreground, #222);
+                background-color: var(--foreground);
             }
 
             .redlib-settings-footer {
-                background: var(--post, #161616);
+                background: var(--post);
                 padding: 16px 20px;
-                border-top: 2px solid var(--highlighted, #333);
+                border-top: 2px solid var(--highlighted);
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -1630,15 +1647,15 @@ aside {
             }
 
             .redlib-settings-version {
-                color: var(--text, #d7dadc);
+                color: var(--text);
                 opacity: 0.6;
                 font-size: 12px;
             }
 
             .redlib-settings-reset {
-                background: var(--highlighted, #333);
-                color: var(--text, #d7dadc);
-                border: 1px solid var(--accent, #d54455);
+                background: var(--highlighted);
+                color: var(--text);
+                border: 1px solid var(--accent);
                 padding: 8px 16px;
                 border-radius: 6px;
                 cursor: pointer;
@@ -1646,8 +1663,8 @@ aside {
             }
 
             .redlib-settings-reset:hover {
-                background: var(--accent, #d54455);
-                color: var(--foreground, #222);
+                background: var(--accent);
+                color: var(--foreground);
             }
 
             .redlib-settings-toggle input:disabled + .redlib-settings-slider {
@@ -1663,7 +1680,7 @@ aside {
                 margin-top: 4px;
                 margin-bottom: 16px;
                 padding-left: 16px;
-                border-left: 2px solid var(--highlighted, #333);
+                border-left: 2px solid var(--highlighted);
                 opacity: 0.8;
             }
 
@@ -1692,34 +1709,34 @@ aside {
 .redlib-settings-comparison {
     width: 100%;
     border-collapse: collapse;
-    background: var(--highlighted, #333);
+    background: var(--highlighted);
     border-radius: 6px;
     overflow: hidden;
 }
 
 .redlib-settings-comparison th {
-    background: var(--post, #161616);
-    color: var(--accent, #d54455);
+    background: var(--post);
+    color: var(--accent);
     font-weight: bold;
     font-size: 11px;
     padding: 8px 12px;
     text-align: center;
-    border-bottom: 1px solid var(--background, #0f0f0f);
+    border-bottom: 1px solid var(--background);
 }
 
 /* Make inherit/push headers clickable buttons */
 .redlib-settings-comparison th.button-header {
-    background: var(--highlighted, #333);
-    color: var(--text, #d7dadc);
-    border: 1px solid var(--accent, #d54455);
+    background: var(--highlighted);
+    color: var(--text);
+    border: 1px solid var(--accent);
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
 }
 
 .redlib-settings-comparison th.button-header:hover {
-    background: var(--accent, #d54455);
-    color: var(--foreground, #222);
+    background: var(--accent);
+    color: var(--foreground);
 }
 
 .redlib-settings-comparison th.button-header:disabled {
@@ -1731,8 +1748,8 @@ aside {
     font-family: monospace;
     font-size: 10px;
     padding: 6px 12px;
-    color: var(--text, #d7dadc);
-    border-bottom: 1px solid var(--background, #0f0f0f);
+    color: var(--text);
+    border-bottom: 1px solid var(--background);
     text-align: center;
 }
 
@@ -1742,20 +1759,20 @@ aside {
 
 /* Setting name column styling */
 .redlib-settings-comparison td:first-child {
-    background: var(--post, #161616);
+    background: var(--post);
     font-weight: bold;
-    color: var(--text, #d7dadc);
+    color: var(--text);
     text-align: left;
 }
 
 /* Value cells - darker when same, lighter when different */
 .redlib-settings-comparison td.value-same {
-    background: var(--post, #161616);
+    background: var(--post);
     opacity: 0.7;
 }
 
 .redlib-settings-comparison td.value-different {
-    background: var(--highlighted, #333);
+    background: var(--highlighted);
     opacity: 1;
 }
 
@@ -1763,23 +1780,23 @@ aside {
 .redlib-merge-preview {
     margin-top: 16px;
     padding: 12px;
-    background: var(--highlighted, #333);
+    background: var(--highlighted);
     border-radius: 6px;
     font-size: 11px;
     line-height: 1.3;
-    border: 1px solid var(--accent, #d54455);
+    border: 1px solid var(--accent);
 }
 
 .redlib-sync-action-title {
     font-weight: bold;
-    color: var(--accent, #d54455);
+    color: var(--accent);
     margin-bottom: 8px;
     text-align: center;
     font-size: 12px;
 }
 
 .redlib-sync-action-details {
-    color: var(--text, #d7dadc);
+    color: var(--text);
     opacity: 0.8;
     font-family: monospace;
     white-space: pre-line;
@@ -1789,9 +1806,9 @@ aside {
 /* Sync buttons - reuse working button styles */
 .redlib-settings-merge,
 .redlib-settings-refresh-status {
-    background: var(--highlighted, #333);
-    color: var(--text, #d7dadc);
-    border: 1px solid var(--accent, #d54455);
+    background: var(--highlighted);
+    color: var(--text);
+    border: 1px solid var(--accent);
     padding: 8px 16px;
     border-radius: 6px;
     cursor: pointer;
@@ -1800,8 +1817,8 @@ aside {
 
 .redlib-settings-merge:hover,
 .redlib-settings-refresh-status:hover {
-    background: var(--accent, #d54455);
-    color: var(--foreground, #222);
+    background: var(--accent);
+    color: var(--foreground);
 }
 
 .redlib-settings-merge:disabled,
@@ -1814,7 +1831,7 @@ aside {
 #redlib-sync-status {
     font-family: monospace;
     font-size: 11px;
-    color: var(--text, #d7dadc);
+    color: var(--text);
     opacity: 0.8;
     white-space: pre-line;
     max-height: 150px;
@@ -1835,9 +1852,9 @@ aside {
 .redlib-sync-differences-container {
     margin: 16px 0 20px 0;
     padding: 12px;
-    background: var(--highlighted, #333);
+    background: var(--highlighted);
     border-radius: 6px;
-    border: 1px solid var(--accent, #d54455);
+    border: 1px solid var(--accent);
 }
 
 .redlib-sync-differences-header {
@@ -1848,7 +1865,7 @@ aside {
 }
 
 .redlib-sync-differences-title {
-    color: var(--accent, #d54455);
+    color: var(--accent);
     font-size: 14px;
     font-weight: bold;
     margin: 0;
@@ -1857,27 +1874,27 @@ aside {
 .redlib-sync-differences-table {
     width: 100%;
     border-collapse: collapse;
-    background: var(--post, #161616);
+    background: var(--post);
     border-radius: 4px;
     overflow: hidden;
 }
 
 .redlib-sync-differences-table th {
-    background: var(--highlighted, #333);
-    color: var(--accent, #d54455);
+    background: var(--highlighted);
+    color: var(--accent);
     font-weight: bold;
     font-size: 11px;
     padding: 8px 12px;
     text-align: center;
-    border-bottom: 1px solid var(--background, #0f0f0f);
+    border-bottom: 1px solid var(--background);
 }
 
 .redlib-sync-differences-table td {
     font-family: monospace;
     font-size: 9px;
     padding: 6px 8px;
-    color: var(--text, #d7dadc);
-    border-bottom: 1px solid var(--background, #0f0f0f);
+    color: var(--text);
+    border-bottom: 1px solid var(--background);
     vertical-align: top;
     text-align: left;
     line-height: 1.2;
@@ -1888,9 +1905,9 @@ aside {
 }
 
 .redlib-sync-differences-table td:first-child {
-    background: var(--highlighted, #333);
+    background: var(--highlighted);
     font-weight: bold;
-    color: var(--text, #d7dadc);
+    color: var(--text);
     width: 25%;
 }
 
@@ -1910,11 +1927,11 @@ aside {
 
 /* Merge summary styling */
 .redlib-merge-summary {
-    border-left: 3px solid var(--accent, #d54455);
+    border-left: 3px solid var(--accent);
 }
 
 .redlib-merge-summary div {
-    border-bottom: 1px solid var(--highlighted, #333);
+    border-bottom: 1px solid var(--highlighted);
     padding-bottom: 4px;
 }
 
@@ -2064,89 +2081,89 @@ aside {
 
         /* Level 0: Top level comments - GRAY */
         .thread > .comment {
-            background-color: #161616 !important;
+            background-color: var(--post) !important;
         }
 
         /* Level 1: First children - BLACK */
         .thread > .comment .replies > .comment {
-            background-color: #1f1f1f !important;
+            background-color: var(--foreground) !important;
         }
 
         /* Level 2: Grandchildren - GRAY */
         .thread > .comment .replies > .comment .replies > .comment {
-            background-color: #161616 !important;
+            background-color: var(--post) !important;
         }
 
         /* Level 3: Great grandchildren - BLACK */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #1f1f1f !important;
+            background-color: var(--foreground) !important;
         }
 
         /* Level 4: GRAY */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #161616 !important;
+            background-color: var(--post) !important;
         }
 
         /* Level 5: BLACK */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #1f1f1f !important;
+            background-color: var(--foreground) !important;
         }
 
         /* Level 6: GRAY */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #161616 !important;
+            background-color: var(--post) !important;
         }
 
         /* Level 7: BLACK */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #1f1f1f !important;
+            background-color: var(--foreground) !important;
         }
 
         /* Level 8: GRAY */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #161616 !important;
+            background-color: var(--post) !important;
         }
 
         /* Level 9: BLACK */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #1f1f1f !important;
+            background-color: var(--foreground) !important;
         }
 
         /* Level 10: GRAY */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #161616 !important;
+            background-color: var(--post) !important;
         }
 
         /* Level 11: BLACK */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #1f1f1f !important;
+            background-color: var(--foreground) !important;
         }
 
         /* Level 12: GRAY */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #161616 !important;
+            background-color: var(--post) !important;
         }
 
         /* Level 13: BLACK */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #1f1f1f !important;
+            background-color: var(--foreground) !important;
         }
 
         /* Level 14: GRAY */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #161616 !important;
+            background-color: var(--post) !important;
         }
 
         /* Level 15: BLACK */
         .thread > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment .replies > .comment {
-            background-color: #1f1f1f !important;
+            background-color: var(--foreground) !important;
         }
 
 /* Custom expand/collapse button styling - unified with other buttons */
 .expand-children {
-    background: var(--color-bg, #1a1a1b) !important;
-    border: 1px solid var(--color-border, #343536) !important;
-    color: var(--color-text, #d7dadc) !important;
+    background: var(--background) !important;
+    border: 1px solid var(--highlighted) !important;
+    color: var(--text) !important;
     cursor: pointer !important;
     font-size: 12px !important;
     font-weight: bold !important;
@@ -2159,8 +2176,8 @@ aside {
 }
 
 .expand-children:hover {
-    background: var(--accent, #d54455) !important;
-    color: var(--foreground, #222) !important;
+    background: var(--accent) !important;
+    color: var(--foreground) !important;
     text-decoration: none !important;
 }
 
@@ -3636,9 +3653,9 @@ aside {
             button.title = 'Expand/Collapse post text';
 
             button.style.cssText =
-                'background: var(--color-bg, #1a1a1b);' +
-                'border: 1px solid var(--color-border, #343536);' +
-                'color: var(--color-text, #d7dadc);' +
+                'background: var(--background);' +
+                'border: 1px solid var(--highlighted);' +
+                'color: var(--text);' +
                 'cursor: pointer;' +
                 'font-size: 12px;' +
                 'font-weight: bold;' +
@@ -3649,13 +3666,13 @@ aside {
                 'line-height: 1;';
 
             button.addEventListener('mouseenter', () => {
-                button.style.backgroundColor = 'var(--accent, #d54455)';
-                button.style.color = 'var(--foreground, #222)';
+                button.style.backgroundColor = 'var(--accent)';
+                button.style.color = 'var(--foreground)';
             });
 
             button.addEventListener('mouseleave', () => {
-                button.style.backgroundColor = 'var(--color-bg, #1a1a1b)';
-                button.style.color = 'var(--color-text, #d7dadc)';
+                button.style.backgroundColor = 'var(--background)';
+                button.style.color = 'var(--text)';
             });
 
             button.addEventListener('click', (e) => {
@@ -5049,8 +5066,8 @@ aside {
             popup.className = '_redlib_subreddit_popup';
             popup.style.cssText = `
         position: absolute;
-        background: var(--background, #0f0f0f);
-        border: 1px solid var(--highlighted, #333);
+        background: var(--background);
+        border: 1px solid var(--highlighted);
         border-radius: 8px;
         padding: 0;
         z-index: 9999;
@@ -5059,7 +5076,7 @@ aside {
         width: 320px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         display: none;
-        color: var(--text, #d7dadc);
+        color: var(--text);
         font-size: 14px;
         line-height: 1.4;
         overflow: hidden;
@@ -5077,8 +5094,8 @@ aside {
             style.textContent = `
 ._redlib_subreddit_popup {
     position: absolute;
-    background: var(--background, #0f0f0f);
-    border: 1px solid var(--highlighted, #333);
+    background: var(--background);
+    border: 1px solid var(--highlighted);
     border-radius: 8px;
     padding: 0;
     z-index: 999;
@@ -5087,16 +5104,16 @@ aside {
     width: 320px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     display: none;
-    color: var(--text, #d7dadc);
+    color: var(--text);
     font-size: 14px;
     line-height: 1.4;
     overflow: hidden;
 }
 
             ._redlib_subreddit_popup .popup-header {
-                background: var(--post, #161616);
+                background: var(--post);
                 padding: 12px 16px;
-                border-bottom: 1px solid var(--highlighted, #333);
+                border-bottom: 1px solid var(--highlighted);
                 display: flex;
                 align-items: center;
                 gap: 12px;
@@ -5113,13 +5130,13 @@ aside {
                 margin: 0 0 4px 0;
                 font-size: 16px;
                 font-weight: bold;
-                color: var(--text, #d7dadc);
+                color: var(--text);
             }
 
             ._redlib_subreddit_popup .popup-info .subreddit-name {
                 margin: 0;
                 font-size: 12px;
-                color: var(--accent, #d54455);
+                color: var(--accent);
                 font-weight: normal;
             }
 
@@ -5131,7 +5148,7 @@ aside {
                 margin: 0 0 12px 0;
                 font-size: 13px;
                 line-height: 1.4;
-                color: var(--text-muted, #818384);
+                color: var(--visited);
                 max-height: 60px;
                 overflow: hidden;
                 display: -webkit-box;
@@ -5152,12 +5169,12 @@ aside {
 
             ._redlib_subreddit_popup .popup-stat-value {
                 font-weight: bold;
-                color: var(--text, #d7dadc);
+                color: var(--text);
                 display: block;
             }
 
             ._redlib_subreddit_popup .popup-stat-label {
-                color: var(--text-muted, #818384);
+                color: var(--visited);
                 font-size: 11px;
             }
 
@@ -5169,10 +5186,10 @@ aside {
             ._redlib_subreddit_popup .popup-btn {
                 flex: 1;
                 padding: 6px 12px;
-                border: 1px solid var(--highlighted, #333);
+                border: 1px solid var(--highlighted);
                 border-radius: 4px;
-                background: var(--foreground, #222);
-                color: var(--text, #d7dadc);
+                background: var(--foreground);
+                color: var(--text);
                 font-size: 12px;
                 cursor: pointer;
                 transition: all 0.2s ease;
@@ -5181,13 +5198,13 @@ aside {
             }
 
             ._redlib_subreddit_popup .popup-btn:hover {
-                background: var(--highlighted, #333);
+                background: var(--highlighted);
             }
 
             ._redlib_subreddit_popup .popup-btn.subscribe {
-                background: var(--accent, #d54455);
-                border-color: var(--accent, #d54455);
-                color: var(--foreground, #222);
+                background: var(--accent);
+                border-color: var(--accent);
+                color: var(--foreground);
             }
 
             ._redlib_subreddit_popup .popup-btn.subscribe:hover {
@@ -5195,28 +5212,28 @@ aside {
             }
 
             ._redlib_subreddit_popup .popup-btn.unsubscribe {
-                background: var(--highlighted, #333);
-                border-color: var(--accent, #d54455);
-                color: var(--accent, #d54455);
+                background: var(--highlighted);
+                border-color: var(--accent);
+                color: var(--accent);
             }
 
             ._redlib_subreddit_popup .popup-btn.filtered {
-                background: var(--highlighted, #333);
-                border-color: var(--accent, #d54455);
-                color: var(--accent, #d54455);
+                background: var(--highlighted);
+                border-color: var(--accent);
+                color: var(--accent);
             }
 
             ._redlib_subreddit_popup .popup-loading {
                 padding: 20px;
                 text-align: center;
-                color: var(--text-muted, #818384);
+                color: var(--visited);
                 font-size: 13px;
             }
 
             ._redlib_subreddit_popup .popup-error {
                 padding: 20px;
                 text-align: center;
-                color: var(--accent, #d54455);
+                color: var(--accent);
                 font-size: 13px;
             }
 
@@ -5224,9 +5241,9 @@ aside {
     position: absolute;
     top: 8px;
     right: 8px;
-    background: var(--highlighted, #333);
-    color: var(--text, #d7dadc);
-    border: 1px solid var(--accent, #d54455);
+    background: var(--highlighted);
+    color: var(--text);
+    border: 1px solid var(--accent);
     border-radius: 3px;
     width: 24px;
     height: 24px;
@@ -5241,8 +5258,8 @@ aside {
 
 
 ._redlib_subreddit_popup .popup-close:hover {
-    background: var(--accent, #d54455);
-    color: var(--foreground, #222);
+    background: var(--accent);
+    color: var(--foreground);
 }
 
         `;
@@ -5484,6 +5501,13 @@ aside {
                     setTimeout(() => {
                         cache.delete(data.subreddit);
                     }, 100);
+
+                    // SYNC: Store the action in authoritative settings
+                    const finalAction = action === 'subscribe' ? (data.isSubscribed ? 'subscribe' : 'unsubscribe') :
+                                        action === 'filter' ? (data.isFiltered ? 'filter' : 'unfilter') : action;
+                    console.log('[SYNC] Popup action completed, storing in authority:', { subredditName: data.subreddit, finalAction });
+                    window.RedlibSettingsSync.handleUserAction(data.subreddit, finalAction);
+
                 } else {
                     throw new Error(`HTTP ${response.status}`);
                 }
@@ -5693,15 +5717,15 @@ aside {
             popup.className = '_redlib_username_popup';
             popup.style.cssText = `
         position: absolute;
-        background: var(--background, #0f0f0f);
-        border: 1px solid var(--highlighted, #333);
+        background: var(--background);
+        border: 1px solid var(--highlighted);
         border-radius: 8px;
         padding: 0;
         z-index: 9999;
         max-width: 320px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         display: none;
-        color: var(--text, #d7dadc);
+        color: var(--text);
         font-size: 14px;
         line-height: 1.4;
         overflow: hidden;
@@ -5719,8 +5743,8 @@ aside {
             style.textContent = `
 ._redlib_username_popup {
     position: absolute;
-    background: var(--background, #0f0f0f);
-    border: 1px solid var(--highlighted, #333);
+    background: var(--background);
+    border: 1px solid var(--highlighted);
     border-radius: 8px;
     padding: 0;
     z-index: 999;
@@ -5729,16 +5753,16 @@ aside {
     width: 320px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     display: none;
-    color: var(--text, #d7dadc);
+    color: var(--text);
     font-size: 14px;
     line-height: 1.4;
     overflow: hidden;
 }
 
         ._redlib_username_popup .popup-header {
-            background: var(--post, #161616);
+            background: var(--post);
             padding: 12px 16px;
-            border-bottom: 1px solid var(--highlighted, #333);
+            border-bottom: 1px solid var(--highlighted);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -5755,13 +5779,13 @@ aside {
             margin: 0 0 4px 0;
             font-size: 16px;
             font-weight: bold;
-            color: var(--text, #d7dadc);
+            color: var(--text);
         }
 
         ._redlib_username_popup .popup-info .username-name {
             margin: 0;
             font-size: 12px;
-            color: var(--accent, #d54455);
+            color: var(--accent);
             font-weight: normal;
         }
 
@@ -5773,7 +5797,7 @@ aside {
     margin: 0 0 12px 0;
     font-size: 13px;
     line-height: 1.4;
-    color: var(--text-muted, #818384);
+    color: var(--visited);
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -5798,12 +5822,12 @@ aside {
 
         ._redlib_username_popup .popup-stat-value {
             font-weight: bold;
-            color: var(--text, #d7dadc);
+            color: var(--text);
             display: block;
         }
 
         ._redlib_username_popup .popup-stat-label {
-            color: var(--text-muted, #818384);
+            color: var(--visited);
             font-size: 11px;
         }
 
@@ -5815,10 +5839,10 @@ aside {
         ._redlib_username_popup .popup-btn {
             flex: 1;
             padding: 6px 12px;
-            border: 1px solid var(--highlighted, #333);
+            border: 1px solid var(--highlighted);
             border-radius: 4px;
-            background: var(--foreground, #222);
-            color: var(--text, #d7dadc);
+            background: var(--foreground);
+            color: var(--text);
             font-size: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -5827,13 +5851,13 @@ aside {
         }
 
         ._redlib_username_popup .popup-btn:hover {
-            background: var(--highlighted, #333);
+            background: var(--highlighted);
         }
 
         ._redlib_username_popup .popup-btn.follow {
-            background: var(--accent, #d54455);
-            border-color: var(--accent, #d54455);
-            color: var(--foreground, #222);
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--foreground);
         }
 
         ._redlib_username_popup .popup-btn.follow:hover {
@@ -5841,28 +5865,28 @@ aside {
         }
 
         ._redlib_username_popup .popup-btn.unfollow {
-            background: var(--highlighted, #333);
-            border-color: var(--accent, #d54455);
-            color: var(--accent, #d54455);
+            background: var(--highlighted);
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
         ._redlib_username_popup .popup-btn.filtered {
-            background: var(--highlighted, #333);
-            border-color: var(--accent, #d54455);
-            color: var(--accent, #d54455);
+            background: var(--highlighted);
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
         ._redlib_username_popup .popup-loading {
             padding: 20px;
             text-align: center;
-            color: var(--text-muted, #818384);
+            color: var(--visited);
             font-size: 13px;
         }
 
         ._redlib_username_popup .popup-error {
             padding: 20px;
             text-align: center;
-            color: var(--accent, #d54455);
+            color: var(--accent);
             font-size: 13px;
         }
 
@@ -5870,9 +5894,9 @@ aside {
     position: absolute;
     top: 8px;
     right: 8px;
-    background: var(--highlighted, #333);
-    color: var(--text, #d7dadc);
-    border: 1px solid var(--accent, #d54455);
+    background: var(--highlighted);
+    color: var(--text);
+    border: 1px solid var(--accent);
     border-radius: 3px;
     width: 24px;
     height: 24px;
@@ -5886,8 +5910,8 @@ aside {
 }
 
 ._redlib_username_popup .popup-close:hover {
-    background: var(--accent, #d54455);
-    color: var(--foreground, #222);
+    background: var(--accent);
+    color: var(--foreground);
 }
 
 
@@ -6089,6 +6113,11 @@ aside {
                     setTimeout(() => {
                         cache.delete(data.username);
                     }, 100);
+
+                    // SYNC FIX: Store the action in authoritative settings
+                    const finalAction = action === 'follow' ? (data.isFollowed ? 'follow' : 'unfollow') :
+                                        action === 'filter' ? (data.isFiltered ? 'filter_user' : 'unfilter_user') : action;
+                    handleUserAction(data.username, finalAction);
                 } else {
                     throw new Error(`HTTP ${response.status}`);
                 }
@@ -6763,7 +6792,7 @@ if (refreshStatusBtn) {
 }
 
 if (mergeBtn) {
-    mergeBtn.addEventListener('click', function() {
+    mergeBtn.addEventListener('click', async function() {
         // Get the current merge preview text
         const mergeDetails = document.getElementById('merge-details');
         let confirmMessage = 'Perform selective merge?\n\n';
@@ -6776,22 +6805,29 @@ if (mergeBtn) {
                 confirmMessage += previewText;
             }
         } else {
-            confirmMessage += 'Merge? Inherit missing settings from this instance and update the instance with our own settings that the instance does not have?';
+            confirmMessage += 'Merge settings from this instance with authoritative?';
         }
 
         if (confirm(confirmMessage)) {
-            if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.mergeAndPushToInstance) {
-                RedlibSettingsSync.mergeAndPushToInstance();
+            try {
+                // Perform the merge
+                if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.mergeAndPushToInstance) {
+                    await RedlibSettingsSync.mergeAndPushToInstance();
+                } else if (typeof mergeAndPushToInstance === 'function') {
+                    await mergeAndPushToInstance();
+                }
+
+                // Refresh the entire overlay after merge
+                setTimeout(() => {
+                    refreshSettingsOverlay();
+                }, 1500); // Give time for page redirect/reload
+
+            } catch (error) {
+                console.error('[SYNC] Error during merge:', error);
             }
         }
     });
 }
-
-            refreshStatusBtn.addEventListener('click', function() {
-                if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.updateSyncStatus) {
-                    RedlibSettingsSync.updateSyncStatus(true); // Force refresh
-                }
-            });
 
             // Close on overlay click
             overlay.addEventListener('click', (e) => {
@@ -6960,28 +6996,46 @@ function addHeaderButtonListeners() {
     const pushHeader = document.getElementById('push-header');
 
     if (inheritHeader) {
-        // Remove any existing listeners first
-        inheritHeader.replaceWith(inheritHeader.cloneNode(true));
-        const newInheritHeader = document.getElementById('inherit-header');
-
-        newInheritHeader.addEventListener('click', function() {
+        inheritHeader.addEventListener('click', async function() {
             if (confirm('Copy this instance\'s settings to become authoritative across all instances?')) {
-                if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.inheritFromInstance) {
-                    RedlibSettingsSync.inheritFromInstance();
+                try {
+                    // Perform inherit operation
+                    if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.inheritFromInstance) {
+                        await RedlibSettingsSync.inheritFromInstance();
+                    } else if (typeof inheritFromInstance === 'function') {
+                        await inheritFromInstance();
+                    }
+
+                    // Refresh the entire overlay after inherit
+                    setTimeout(() => {
+                        refreshSettingsOverlay();
+                    }, 500);
+
+                } catch (error) {
+                    console.error('[SYNC] Error during inherit:', error);
                 }
             }
         });
     }
 
     if (pushHeader) {
-        // Remove any existing listeners first
-        pushHeader.replaceWith(pushHeader.cloneNode(true));
-        const newPushHeader = document.getElementById('push-header');
-
-        newPushHeader.addEventListener('click', function() {
+        pushHeader.addEventListener('click', async function() {
             if (confirm('Apply authoritative settings to this instance?')) {
-                if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.pushToInstance) {
-                    RedlibSettingsSync.pushToInstance();
+                try {
+                    // Perform push operation
+                    if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.pushToInstance) {
+                        await RedlibSettingsSync.pushToInstance();
+                    } else if (typeof pushToInstance === 'function') {
+                        await pushToInstance();
+                    }
+
+                    // Refresh the entire overlay after push
+                    setTimeout(() => {
+                        refreshSettingsOverlay();
+                    }, 1500); // Give time for page redirect/reload
+
+                } catch (error) {
+                    console.error('[SYNC] Error during push:', error);
                 }
             }
         });
@@ -7065,7 +7119,7 @@ function addHeaderButtonListeners() {
 
 async function extractInstanceSettings() {
     try {
-        console.log('[SYNC] Extracting current instance settings...');
+//        console.log('[SYNC] Extracting current instance settings...');
 
         let doc;
         let settingsUrl;
@@ -7076,13 +7130,13 @@ async function extractInstanceSettings() {
             doc = document;
             settingsUrl = window.location.href;
         } else {
-            console.log('[SYNC] Fetching settings page...');
+//            console.log('[SYNC] Fetching settings page...');
             settingsUrl = window.location.origin + '/settings';
             const response = await fetch(settingsUrl);
             const html = await response.text();
             const parser = new DOMParser();
             doc = parser.parseFromString(html, 'text/html');
-            console.log('[SYNC] Settings page fetched');
+//            console.log('[SYNC] Settings page fetched');
         }
 
         const restoreLink = doc.querySelector('a[href*="/settings/restore/"]');
@@ -7092,7 +7146,7 @@ async function extractInstanceSettings() {
             return {};
         }
 
-        console.log('[SYNC] Raw restore link found:', restoreLink.href);
+//        console.log('[SYNC] Raw restore link found:', restoreLink.href);
 
         const restoreUrl = new URL(restoreLink.href, window.location.origin);
         const urlParams = new URLSearchParams(restoreUrl.search);
@@ -7189,7 +7243,7 @@ async function extractInstanceSettings() {
                 filteredUsersParam.split('+').map(s => s.trim()).filter(s => s.length > 0) : [];
         }
 
-        console.log('[SYNC] Instance settings extracted:', {
+        console.log('[SYNC] Instance settings extracted from instance\'s restore url:', {
             settingsFound: Object.keys(instanceSettings),
             subscriptionsCount: instanceSettings.subscriptions?.length || 0,
             filtersCount: instanceSettings.filters?.length || 0,
@@ -7303,44 +7357,11 @@ async function extractInstanceSettings() {
             // 1. Get authoritative (stored) settings
             cachedAuthoritative = getAuthoritativeSettings();
             console.log('[SYNC] 1. AUTHORITATIVE SETTINGS:', {
-                settingsFound: Object.keys(cachedAuthoritative).filter(key => !key.includes('timestamp')),
-
-                // Appearance
-                theme: cachedAuthoritative.theme,
-
-                // Interface
-                front_page: cachedAuthoritative.front_page,
-                layout: cachedAuthoritative.layout,
-                wide: cachedAuthoritative.wide,
-                remove_default_feeds: cachedAuthoritative.remove_default_feeds,
-
-                // Content
-                post_sort: cachedAuthoritative.post_sort,
-                comment_sort: cachedAuthoritative.comment_sort,
-                video_quality: cachedAuthoritative.video_quality,
-                blur_spoiler: cachedAuthoritative.blur_spoiler,
-                show_nsfw: cachedAuthoritative.show_nsfw,
-                blur_nsfw: cachedAuthoritative.blur_nsfw,
-                autoplay_videos: cachedAuthoritative.autoplay_videos,
-                fixed_navbar: cachedAuthoritative.fixed_navbar,
-                hide_sidebar_and_summary: cachedAuthoritative.hide_sidebar_and_summary,
-                use_hls: cachedAuthoritative.use_hls,
-                hide_hls_notification: cachedAuthoritative.hide_hls_notification,
-                disable_visit_reddit_confirmation: cachedAuthoritative.disable_visit_reddit_confirmation,
-                hide_awards: cachedAuthoritative.hide_awards,
-                hide_score: cachedAuthoritative.hide_score,
-
-                // Lists
+                settingsFound: Object.keys(cachedAuthoritative),
                 subscriptionsCount: cachedAuthoritative.subscriptions?.length || 0,
                 filtersCount: cachedAuthoritative.filters?.length || 0,
                 followedUsersCount: cachedAuthoritative.followed_users?.length || 0,
                 filteredUsersCount: cachedAuthoritative.filtered_users?.length || 0,
-
-                // Timestamps
-                overall_timestamp: cachedAuthoritative.overall_timestamp,
-                timestampFormatted: formatTimestamp(cachedAuthoritative.overall_timestamp),
-
-                // Full data
                 allSettings: cachedAuthoritative
             });
 
@@ -7362,13 +7383,17 @@ async function extractInstanceSettings() {
                 reason = 'Instance has no settings configured';
             } else {
                 // Compare all settings individually
-                const authSettings = Object.keys(cachedAuthoritative).filter(key => !key.includes('timestamp'));
+// Compare all settings individually - check BOTH directions
+const authSettings = Object.keys(cachedAuthoritative).filter(key => !key.includes('timestamp'));
+const instanceSettings = Object.keys(cachedInstance).filter(key => !key.includes('timestamp'));
+const allSettings = [...new Set([...authSettings, ...instanceSettings])];
 
-                authSettings.forEach(setting => {
-                    if (Array.isArray(cachedAuthoritative[setting])) {
-                        if (!arraysEqual(cachedInstance[setting], cachedAuthoritative[setting])) {
-                            const authArray = cachedAuthoritative[setting] || [];
-                            const instanceArray = cachedInstance[setting] || [];
+allSettings.forEach(setting => {
+if (Array.isArray(cachedAuthoritative[setting]) || Array.isArray(cachedInstance[setting])) {
+    const authArray = cachedAuthoritative[setting] || [];
+    const instanceArray = cachedInstance[setting] || [];
+
+    if (!arraysEqual(instanceArray, authArray)) {
 
                             // Find what's in auth but not in instance (missing from instance)
                             const missingFromInstance = authArray.filter(item => !instanceArray.includes(item));
@@ -7386,6 +7411,17 @@ async function extractInstanceSettings() {
                                 netDifference: authArray.length - instanceArray.length,
                                 needsMerge: extraInInstance.length > 0 && missingFromInstance.length > 0
                             });
+console.log(`[SYNC DEBUG] Added difference for ${setting}:`, {
+    setting: setting,
+    authArrayLength: authArray.length,
+    instanceArrayLength: instanceArray.length,
+    authArraySample: authArray.slice(0, 3),
+    instanceArraySample: instanceArray.slice(0, 3),
+    missingFromInstanceCount: missingFromInstance.length,
+    missingFromInstanceSample: missingFromInstance.slice(0, 3),
+    extraInInstanceCount: extraInInstance.length,
+    extraInInstanceSample: extraInInstance.slice(0, 3)
+});
                         }
                     } else {
                         if (cachedInstance[setting] !== cachedAuthoritative[setting]) {
@@ -7540,6 +7576,16 @@ async function extractInstanceSettings() {
 
             // 4. Update sync status using cached data
             updateSyncStatusFromCache();
+console.log('[SYNC DEBUG] Final settingsDifferences before caching:', settingsDifferences.map(diff => ({
+    setting: diff.setting,
+    type: diff.type,
+    authValue: diff.authValue,
+    instanceValue: diff.instanceValue,
+    missingFromInstanceLength: diff.missingFromInstance?.length || 0,
+    extraInInstanceLength: diff.extraInInstance?.length || 0,
+    missingFromInstanceSample: diff.missingFromInstance?.slice(0, 2) || [],
+    extraInInstanceSample: diff.extraInInstance?.slice(0, 2) || []
+})));
             cachedSettingsDifferences = settingsDifferences; // Store for later use
 
             console.log('[SYNC] === SYNC CHECK END ===');
@@ -7548,11 +7594,18 @@ async function extractInstanceSettings() {
 
         // Handle user actions (hover popup filter/subscribe)
         function handleUserAction(subredditName, action) {
+            console.log('[SYNC] === USER ACTION START ===');
             console.log('[SYNC] User action:', { subredditName, action });
 
             try {
                 const authoritative = getAuthoritativeSettings();
                 const now = Date.now();
+
+                console.log('[SYNC] BEFORE ACTION - Authority state:');
+                console.log('[SYNC] - Subscriptions:', authoritative.subscriptions);
+                console.log('[SYNC] - TikTokCringe in subscriptions?', authoritative.subscriptions?.includes(subredditName));
+                console.log('[SYNC] - Filters:', authoritative.filters);
+                console.log('[SYNC] - TikTokCringe in filters?', authoritative.filters?.includes(subredditName));
 
                 // When user adds/removes, make sure we're working with individual subreddits
                 if (!authoritative.subscriptions) authoritative.subscriptions = [];
@@ -7567,15 +7620,33 @@ async function extractInstanceSettings() {
                 }
 
                 // Remove from both arrays first
+                console.log('[SYNC] REMOVING from both arrays first...');
+                const wasInSubscriptions = authoritative.subscriptions?.includes(subredditName);
+                const wasInFilters = authoritative.filters?.includes(subredditName);
+                console.log('[SYNC] - Was in subscriptions:', wasInSubscriptions);
+                console.log('[SYNC] - Was in filters:', wasInFilters);
+
                 authoritative.subscriptions = authoritative.subscriptions.filter(s => s !== subredditName);
                 authoritative.filters = authoritative.filters.filter(s => s !== subredditName);
 
+                console.log('[SYNC] AFTER REMOVAL:');
+                console.log('[SYNC] - Subscriptions:', authoritative.subscriptions);
+                console.log('[SYNC] - Filters:', authoritative.filters);
+
                 // Add to appropriate array
+                console.log('[SYNC] ADDING to appropriate array based on action:', action);
                 if (action === 'subscribe') {
                     authoritative.subscriptions.push(subredditName);
+                    console.log('[SYNC] - Added to subscriptions. New list:', authoritative.subscriptions);
                 } else if (action === 'filter') {
                     authoritative.filters.push(subredditName);
+                    console.log('[SYNC] - Added to filters. New list:', authoritative.filters);
                 }
+
+                console.log('[SYNC] FINAL RESULT:');
+                console.log('[SYNC] - Final subscriptions:', authoritative.subscriptions);
+                console.log('[SYNC] - Final filters:', authoritative.filters);
+                console.log('[SYNC] === USER ACTION END ===');
 
                 // Update timestamps - this creates new authoritative truth
                 authoritative.timestamp = now;
@@ -7598,8 +7669,8 @@ async function extractInstanceSettings() {
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                background: var(--accent, #d54455);
-                color: var(--foreground, #222);
+                background: var(--accent);
+                color: var(--foreground);
                 padding: 12px 20px;
                 border-radius: 6px;
                 z-index: 10000;
@@ -7824,11 +7895,11 @@ document.addEventListener('click', function(e) {
         position: fixed;
         top: 20px;
         right: 20px;
-        background: var(--accent, #d54455);
-        color: var(--foreground, #222);
+        background: var(--accent);
+        color: var(--foreground);
         padding: 12px 20px;
         border-radius: 6px;
-        z-index: 10000;
+        z-index: 90000;
         font-family: sans-serif;
         font-size: 14px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -7838,9 +7909,49 @@ document.addEventListener('click', function(e) {
     notification.textContent = `Pushing ${settingsCount} authoritative settings to instance...`;
     document.body.appendChild(notification);
 
-    setTimeout(() => {
-        window.location.href = settingsUrl;
-    }, 2000);
+    console.log('[SYNC] Authority restore URL that will be submitted:', settingsUrl);
+
+    try {
+        // Submit the restore URL in the background
+        const response = await fetch(settingsUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            }
+        });
+
+        console.log('[SYNC] Push submit response:', {
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url,
+            ok: response.ok
+        });
+
+        if (response.ok) {
+            notification.textContent = `Push completed successfully!`;
+            notification.style.background = '#28a745';
+
+            // Update instance timestamp to reflect the sync
+            const now = Date.now();
+            GM_setValue(`instance_timestamp_${window.location.hostname}`, now);
+
+            // Refresh all sync information in-place
+            setTimeout(async () => {
+                await performSync(); // This updates sync state, differences table, and merge preview
+                notification.remove();
+            }, 1000);
+        } else {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error('[SYNC] Push failed:', error);
+        notification.textContent = `Push failed: ${error.message}`;
+        notification.style.background = '#dc3545';
+
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
 }
 
     // Update the old updateSyncStatus to use cache or refresh if needed
@@ -7908,7 +8019,14 @@ function updateSyncStatusFromCache() {
 
 function createDetailedDifferencesTable() {
     const tableContainer = document.getElementById('sync-differences-table');
-    if (!tableContainer || !cachedSettingsDifferences) return;
+    if (!tableContainer || !cachedSettingsDifferences) {
+        console.log('[SYNC DEBUG] createDetailedDifferencesTable - missing container or data:', {
+            hasContainer: !!tableContainer,
+            hasCachedDiffs: !!cachedSettingsDifferences,
+            cachedDiffsLength: cachedSettingsDifferences ? cachedSettingsDifferences.length : 0
+        });
+        return;
+    }
 
     // Filter for only array-type differences (subscriptions, filters, etc.)
     const arrayDifferences = cachedSettingsDifferences.filter(diff =>
@@ -7916,17 +8034,17 @@ function createDetailedDifferencesTable() {
     );
 
     if (arrayDifferences.length === 0) {
-        tableContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text, #d7dadc); opacity: 0.6;">No subscription/filter differences</div>';
+        tableContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text); opacity: 0.6;">No subscription/filter differences</div>';
         return;
     }
 
-    // Create summary table in 3-column format
-    let summaryHtml = '<div class="redlib-merge-summary" style="margin-bottom: 16px;">';
-    summaryHtml += '<table style="width: 100%; border-collapse: collapse; background: var(--post, #161616); border-radius: 4px; overflow: hidden; font-family: monospace; font-size: 10px;">';
+    // Create summary table with fixed column widths - matching the original structure
+    let summaryHtml = '<div class="redlib-merge-summary" style="margin-bottom: 0;">';
+    summaryHtml += '<table style="width: 100%; border-collapse: collapse; background: var(--post); border-radius: 4px 4px 0 0; overflow: hidden; font-family: monospace; font-size: 10px;">';
     summaryHtml += '<thead><tr>';
-    summaryHtml += '<th style="background: var(--highlighted, #333); color: var(--accent, #d54455); padding: 8px; text-align: left; font-weight: bold;">Setting</th>';
-    summaryHtml += '<th style="background: var(--highlighted, #333); color: var(--accent, #d54455); padding: 8px; text-align: center; font-weight: bold;">Inherit from Instance</th>';
-summaryHtml += '<th style="background: var(--highlighted, #333); color: var(--accent, #d54455); padding: 8px; text-align: center; font-weight: bold;">Push to Instance</th>';
+    summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: left; font-weight: bold; width: 33.33%;">Setting</th>';
+    summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: center; font-weight: bold; width: 33.33%;">Inherit from Instance</th>';
+    summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: center; font-weight: bold; width: 33.33%;">Push to Instance</th>';
     summaryHtml += '</tr></thead><tbody>';
 
     arrayDifferences.forEach(diff => {
@@ -7942,62 +8060,403 @@ summaryHtml += '<th style="background: var(--highlighted, #333); color: var(--ac
         if (extraCount > 0) {
             inheritCell = `<div style="color: #4ecdc4; font-weight: bold;">${extraCount} items</div>`;
             if (extraCount <= 3) {
-                inheritCell += `<div style="color: var(--text, #d7dadc); opacity: 0.8; margin-top: 2px;">${diff.extraInInstance.join(', ')}</div>`;
+                inheritCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${diff.extraInInstance.join(', ')}</div>`;
             } else {
                 const examples = diff.extraInInstance.slice(0, 2).join(', ');
-                inheritCell += `<div style="color: var(--text, #d7dadc); opacity: 0.8; margin-top: 2px;">${examples}... (+${extraCount - 2} more)</div>`;
+                inheritCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${examples}... (+${extraCount - 2} more)</div>`;
             }
         }
 
         if (missingCount > 0) {
             pushCell = `<div style="color: #ff6b6b; font-weight: bold;">${missingCount} items</div>`;
             if (missingCount <= 3) {
-                pushCell += `<div style="color: var(--text, #d7dadc); opacity: 0.8; margin-top: 2px;">${diff.missingFromInstance.join(', ')}</div>`;
+                pushCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${diff.missingFromInstance.join(', ')}</div>`;
             } else {
                 const examples = diff.missingFromInstance.slice(0, 2).join(', ');
-                pushCell += `<div style="color: var(--text, #d7dadc); opacity: 0.8; margin-top: 2px;">${examples}... (+${missingCount - 2} more)</div>`;
+                pushCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${examples}... (+${missingCount - 2} more)</div>`;
             }
         }
 
         summaryHtml += `<tr>`;
-        summaryHtml += `<td style="padding: 8px; background: var(--highlighted, #333); color: var(--text, #d7dadc); font-weight: bold; border-bottom: 1px solid var(--background, #0f0f0f);">`;
+        summaryHtml += `<td style="padding: 8px; background: var(--highlighted); color: var(--text); font-weight: bold; border-bottom: 1px solid var(--background); width: 33.33%;">`;
         summaryHtml += `${settingName}<br><span style="font-size: 9px; opacity: 0.7;">${instCount} vs ${authCount} items</span></td>`;
-        summaryHtml += `<td style="padding: 8px; text-align: center; vertical-align: top; border-bottom: 1px solid var(--background, #0f0f0f);">${inheritCell}</td>`;
-        summaryHtml += `<td style="padding: 8px; text-align: center; vertical-align: top; border-bottom: 1px solid var(--background, #0f0f0f);">${pushCell}</td>`;
+        summaryHtml += `<td style="padding: 8px; text-align: center; vertical-align: top; border-bottom: 1px solid var(--background); width: 33.33%;">${inheritCell}</td>`;
+        summaryHtml += `<td style="padding: 8px; text-align: center; vertical-align: top; border-bottom: 1px solid var(--background); width: 33.33%;">${pushCell}</td>`;
         summaryHtml += `</tr>`;
     });
 
     summaryHtml += '</tbody></table></div>';
 
-    // Create detailed table
-    let tableHtml = `<table class="redlib-sync-differences-table">`;
-    tableHtml += `<thead><tr><th>Setting</th><th>Inherit from Instance</th><th>Push to Instance</th></tr></thead><tbody>`;
+    // Create detailed table with clickable subreddit links that work with existing hover popup
+    let tableHtml = `<table class="redlib-sync-differences-table" style="margin-top: 0; border-top: none; border-radius: 0 0 4px 4px;"><thead><tr><th style="width: 33.33%;">Setting</th><th style="width: 66.66%;">Side-by-Side Comparison</th></tr></thead><tbody>`;
 
     arrayDifferences.forEach(diff => {
         const settingName = diff.setting.replace('_', ' ');
 
-        let inheritContent = '';
-        let pushContent = '';
+        // Create horizontally aligned view of all items with hover-enabled links
+        const instanceArray = (cachedInstance[diff.setting] || []).slice().sort();
+        const authArray = (cachedAuthoritative[diff.setting] || []).slice().sort();
 
-        // Inherit column - show ALL items that would be inherited from instance
-        if (diff.extraInInstance && diff.extraInInstance.length > 0) {
-            inheritContent = diff.extraInInstance.join('<br>');
-            inheritContent += `<br><strong>(${diff.extraInInstance.length} items total)</strong>`;
+        let contentHtml = '';
+
+        if (instanceArray.length > 0 || authArray.length > 0) {
+            // Get all unique items from both sides, sorted
+            const allItems = [...new Set([...instanceArray, ...authArray])].sort();
+
+            // Build rows for each item with proper hover-enabled links
+            const itemRows = allItems.map(item => {
+                const inInstance = instanceArray.includes(item);
+                const inAuth = authArray.includes(item);
+
+                let instanceCell = '';
+                let authCell = '';
+
+                // Create the subreddit link with proper classes for existing hover system
+                const linkPath = diff.setting === 'subscriptions' ? `/r/${item}` :
+                                diff.setting === 'filters' ? `/r/${item}` :
+                                diff.setting === 'followed_users' ? `/u/${item}` :
+                                diff.setting === 'filtered_users' ? `/u/${item}` : `/r/${item}`;
+
+                if (inInstance && inAuth) {
+                    // Item exists in both - show faded with hover-enabled links
+                    instanceCell = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="shared">${item}</a>`;
+                    authCell = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="shared">${item}</a>`;
+                } else if (inInstance && !inAuth) {
+                    // Unique to instance - show in cyan with hover-enabled link, gap on right
+                    instanceCell = `<a href="${linkPath}" style="color: #4ecdc4; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="instance-only">${item}</a>`;
+                    authCell = `<span style="opacity: 0.3;">—</span>`;
+                } else if (!inInstance && inAuth) {
+                    // Unique to authority - show in red with hover-enabled link, gap on left
+                    instanceCell = `<span style="opacity: 0.3;">—</span>`;
+                    authCell = `<a href="${linkPath}" style="color: #ff6b6b; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="authority-only">${item}</a>`;
+                }
+
+                return `<tr style="border-bottom: 1px solid rgba(255,255,255,0.1);" data-setting="${diff.setting}" data-item="${item}"><td style="padding: 2px 8px; text-align: center; background: var(--post); width: 50%; font-weight: normal !important;">${instanceCell}</td><td style="padding: 2px 8px; text-align: center; background: var(--post); width: 50%; font-weight: normal !important;">${authCell}</td></tr>`;
+            }).join('');
+
+            // Calculate summary stats
+            const instanceUnique = instanceArray.filter(item => !authArray.includes(item)).length;
+            const authUnique = authArray.filter(item => !instanceArray.includes(item)).length;
+            const shared = instanceArray.filter(item => authArray.includes(item)).length;
+
+            // Build the summary and detailed table
+            const summaryRow = `
+                <tr style="background: var(--highlighted); font-weight: bold;">
+                    <td colspan="2" style="padding: 8px; text-align: center;">
+                        <span style="color: #4ecdc4;">${instanceUnique} instance-only</span> •
+                        <span style="color: var(--text);">${shared} shared</span> •
+                        <span style="color: #ff6b6b;">${authUnique} authority-only</span>
+                        <br><small style="opacity: 0.7;">Total: ${instanceArray.length} instance, ${authArray.length} authority</small>
+                    </td>
+                </tr>
+            `;
+
+            contentHtml = `
+                <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
+                    <thead>
+                        <tr style="background: var(--post);">
+                            <th style="padding: 4px 8px; text-align: center; font-size: 10px; color: #4ecdc4; background: var(--post); width: 50%;">Instance</th>
+                            <th style="padding: 4px 8px; text-align: center; font-size: 10px; color: #ff6b6b; background: var(--post); width: 50%;">Authority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${summaryRow}
+                        ${itemRows}
+                    </tbody>
+                </table>
+            `;
         }
 
-        // Push column - show ALL items that would be pushed to instance
-        if (diff.missingFromInstance && diff.missingFromInstance.length > 0) {
-            pushContent = diff.missingFromInstance.join('<br>');
-            pushContent += `<br><strong>(${diff.missingFromInstance.length} items total)</strong>`;
-        }
-
-        tableHtml += `<tr><td>${settingName}</td><td>${inheritContent}</td><td>${pushContent}</td></tr>`;
+        tableHtml += `<tr><td style="vertical-align: top; padding: 8px; font-weight: bold; width: 33.33%;">${settingName}</td><td style="padding: 4px; width: 66.66%;">${contentHtml}</td></tr>`;
     });
 
     tableHtml += `</tbody></table>`;
 
     // Combine summary and detailed table
     tableContainer.innerHTML = summaryHtml + tableHtml;
+
+    // Add live update functionality and fix z-index issues
+    addLiveDiffTableListeners();
+    fixHoverPopupZIndex();
+}
+
+// Fix z-index issues for hover popup in settings overlay
+function fixHoverPopupZIndex() {
+    // Find the settings overlay and adjust z-index hierarchy
+    const settingsOverlay = document.querySelector('.redlib-settings-overlay');
+    if (settingsOverlay) {
+        // Ensure settings overlay has a lower z-index than hover popup
+        settingsOverlay.style.zIndex = '9998';
+    }
+
+    // Ensure any existing hover popups have higher z-index
+    const existingPopups = document.querySelectorAll('.popup, .redlib-popup, [class*="popup"]');
+    existingPopups.forEach(popup => {
+        popup.style.zIndex = '10000';
+    });
+
+    // Set up mutation observer to catch new hover popups and fix their z-index
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === 1) { // Element node
+                    // Check if it's a popup or contains one
+                    if (node.classList?.contains('popup') || node.querySelector?.('.popup')) {
+                        const popup = node.classList?.contains('popup') ? node : node.querySelector('.popup');
+                        if (popup) {
+                            popup.style.zIndex = '10000';
+                        }
+                    }
+                }
+            });
+        });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Add event listeners for live diff table updates
+function addLiveDiffTableListeners() {
+    // Listen for popup button clicks specifically
+    document.addEventListener('click', function(e) {
+        // Check if it's a popup button click within our diff table area
+        if (e.target.matches('.popup-btn') && e.target.dataset.subreddit) {
+            const subreddit = e.target.dataset.subreddit;
+            const action = e.target.dataset.action;
+
+            console.log('[DIFF TABLE] Popup button clicked:', { subreddit, action });
+
+            // Set up a listener for when the action completes
+            setTimeout(() => {
+                checkForSubredditChange(subreddit, action);
+            }, 1000); // Give time for the server request to complete
+        }
+    });
+
+    // Also listen for the specific sync system events
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('.hover-follow-btn, .hover-unfollow-btn, .hover-filter-btn, .hover-unfilter-btn')) {
+            const subreddit = e.target.dataset.subreddit;
+            let action = '';
+
+            if (e.target.classList.contains('hover-follow-btn')) action = 'subscribe';
+            else if (e.target.classList.contains('hover-unfollow-btn')) action = 'unsubscribe';
+            else if (e.target.classList.contains('hover-filter-btn')) action = 'filter';
+            else if (e.target.classList.contains('hover-unfilter-btn')) action = 'unfilter';
+
+            console.log('[DIFF TABLE] Hover button clicked:', { subreddit, action });
+
+            setTimeout(() => {
+                checkForSubredditChange(subreddit, action);
+            }, 1000);
+        }
+    });
+}
+
+// Check if a subreddit's subscription/filter status changed and update the diff table
+async function checkForSubredditChange(subreddit, action) {
+    console.log('[DIFF TABLE] Checking for changes to:', subreddit, action);
+
+    try {
+        // Make a request to the subreddit page to check current status
+        const response = await fetch(`/r/${subreddit}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'text/html'
+            }
+        });
+
+        if (!response.ok) {
+            console.log('[DIFF TABLE] Failed to fetch subreddit page for status check');
+            return;
+        }
+
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // Check subscription status from the sidebar
+        const subscribeBtn = doc.querySelector('#sub_subscription button');
+        const filterBtn = doc.querySelector('#sub_filter button');
+
+        let isSubscribed = false;
+        let isFiltered = false;
+
+        if (subscribeBtn) {
+            isSubscribed = subscribeBtn.classList.contains('unsubscribe');
+        }
+
+        if (filterBtn) {
+            isFiltered = filterBtn.classList.contains('unfilter');
+        }
+
+        console.log('[DIFF TABLE] Current status:', { subreddit, isSubscribed, isFiltered });
+
+        // Update our cached data based on the current status
+        if (action === 'subscribe' || action === 'unsubscribe') {
+            updateCachedSubscriptions(subreddit, isSubscribed);
+        } else if (action === 'filter' || action === 'unfilter') {
+            updateCachedFilters(subreddit, isFiltered);
+        }
+
+        // Update all overlay components
+        updateDiffTableSummary(); // This now updates everything
+
+    } catch (error) {
+        console.error('[DIFF TABLE] Error checking subreddit status:', error);
+    }
+}
+
+// Update cached instance data when subscriptions change
+function updateCachedSubscriptions(subreddit, isSubscribed) {
+    if (!cachedInstance) return;
+
+    if (!cachedInstance.subscriptions) cachedInstance.subscriptions = [];
+
+    const index = cachedInstance.subscriptions.indexOf(subreddit);
+
+    if (isSubscribed && index === -1) {
+        // Add subscription
+        cachedInstance.subscriptions.push(subreddit);
+        cachedInstance.subscriptions.sort();
+        console.log('[DIFF TABLE] Added subscription:', subreddit);
+    } else if (!isSubscribed && index !== -1) {
+        // Remove subscription
+        cachedInstance.subscriptions.splice(index, 1);
+        console.log('[DIFF TABLE] Removed subscription:', subreddit);
+    }
+}
+
+// Update cached instance data when filters change
+function updateCachedFilters(subreddit, isFiltered) {
+    if (!cachedInstance) return;
+
+    if (!cachedInstance.filters) cachedInstance.filters = [];
+
+    const index = cachedInstance.filters.indexOf(subreddit);
+
+    if (isFiltered && index === -1) {
+        // Add filter
+        cachedInstance.filters.push(subreddit);
+        cachedInstance.filters.sort();
+        console.log('[DIFF TABLE] Added filter:', subreddit);
+    } else if (!isFiltered && index !== -1) {
+        // Remove filter
+        cachedInstance.filters.splice(index, 1);
+        console.log('[DIFF TABLE] Removed filter:', subreddit);
+    }
+}
+
+// Update a specific row in the diff table
+function updateDiffTableRow(subreddit, setting) {
+    const tableRow = document.querySelector(`tr[data-setting="${setting}"][data-item="${subreddit}"]`);
+    if (!tableRow) {
+        console.log('[DIFF TABLE] Row not found for:', subreddit, setting);
+        return;
+    }
+
+    const instanceArray = cachedInstance[setting] || [];
+    const authArray = cachedAuthoritative[setting] || [];
+
+    const inInstance = instanceArray.includes(subreddit);
+    const inAuth = authArray.includes(subreddit);
+
+    console.log('[DIFF TABLE] Updating row:', { subreddit, setting, inInstance, inAuth });
+
+    // Determine the new status
+    let newStatus = '';
+    if (inInstance && inAuth) {
+        newStatus = 'shared';
+    } else if (inInstance && !inAuth) {
+        newStatus = 'instance-only';
+    } else if (!inInstance && inAuth) {
+        newStatus = 'authority-only';
+    } else {
+        // Not in either - remove the row
+        console.log('[DIFF TABLE] Removing row for:', subreddit);
+        tableRow.remove();
+        return;
+    }
+
+    // Update the row styling and links
+    const instanceCell = tableRow.cells[0];
+    const authCell = tableRow.cells[1];
+
+    const linkPath = setting === 'subscriptions' ? `/r/${subreddit}` :
+                    setting === 'filters' ? `/r/${subreddit}` :
+                    setting === 'followed_users' ? `/u/${subreddit}` :
+                    setting === 'filtered_users' ? `/u/${subreddit}` : `/r/${subreddit}`;
+
+    if (newStatus === 'shared') {
+        instanceCell.innerHTML = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="shared">${subreddit}</a>`;
+        authCell.innerHTML = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="shared">${subreddit}</a>`;
+    } else if (newStatus === 'instance-only') {
+        instanceCell.innerHTML = `<a href="${linkPath}" style="color: #4ecdc4; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="instance-only">${subreddit}</a>`;
+        authCell.innerHTML = `<span style="opacity: 0.3;">—</span>`;
+    } else if (newStatus === 'authority-only') {
+        instanceCell.innerHTML = `<span style="opacity: 0.3;">—</span>`;
+        authCell.innerHTML = `<a href="${linkPath}" style="color: #ff6b6b; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="authority-only">${subreddit}</a>`;
+    }
+
+    console.log('[DIFF TABLE] Updated row to status:', newStatus);
+}
+
+// Update the summary counts in the diff table
+function updateDiffTableSummary() {
+    // Recalculate differences and update the summary table
+    if (cachedInstance && cachedAuthoritative) {
+        console.log('[DIFF TABLE] Refreshing summary counts and all overlay components');
+
+        // Update sync status
+        if (typeof updateSyncStatus === 'function') {
+            updateSyncStatus();
+        }
+
+        // Update the inherit/push comparison table
+        if (typeof updateActionPreviews === 'function') {
+            updateActionPreviews();
+        }
+
+        // Trigger a refresh of the detailed diff table to update counts
+        setTimeout(() => {
+            createDetailedDifferencesTable();
+        }, 100);
+    }
+}
+
+// Comprehensive function to refresh all parts of the settings overlay
+async function refreshSettingsOverlay() {
+    console.log('[SYNC] Refreshing entire settings overlay...');
+
+    try {
+        // Re-fetch current instance and authoritative settings
+        if (typeof extractInstanceSettings === 'function') {
+            cachedInstance = await extractInstanceSettings();
+        }
+
+        if (typeof getAuthoritativeSettings === 'function') {
+            cachedAuthoritative = getAuthoritativeSettings();
+        }
+
+        // Update sync status
+        if (typeof updateSyncStatus === 'function') {
+            updateSyncStatus();
+        }
+
+        // Update the inherit/push comparison table
+        if (typeof updateActionPreviews === 'function') {
+            updateActionPreviews();
+        }
+
+        // Update the merge preview section (both summary and detailed diff)
+        if (typeof createDetailedDifferencesTable === 'function') {
+            createDetailedDifferencesTable();
+        }
+
+        console.log('[SYNC] Settings overlay refresh complete');
+    } catch (error) {
+        console.error('[SYNC] Error refreshing settings overlay:', error);
+    }
 }
 
 function updateActionPreviews() {
@@ -8045,7 +8504,7 @@ function createUnifiedSettingsTable(instanceSettings, authoritySettings) {
     ]);
 
     if (allSettings.size === 0) {
-        return `<div style="text-align: center; color: var(--text, #d7dadc); opacity: 0.6;">No settings found</div>`;
+        return `<div style="text-align: center; color: var(--text); opacity: 0.6;">No settings found</div>`;
     }
 
     let html = `<table class="redlib-settings-comparison">`;
@@ -8116,82 +8575,117 @@ function createUnifiedSettingsTable(instanceSettings, authoritySettings) {
     return html;
 }
 
-async function mergeAndPushToInstance() {
-    const authoritative = getAuthoritativeSettings();
-    const instance = await extractInstanceSettings();
-    const now = Date.now();
+    async function mergeAndPushToInstance() {
+        const authoritative = getAuthoritativeSettings();
+        const instance = await extractInstanceSettings();
+        const now = Date.now();
 
-    console.log('[SYNC] Starting merge and push operation...');
-    console.log('[SYNC] Current authoritative:', authoritative);
-    console.log('[SYNC] Current instance:', instance);
+        console.log('[SYNC] Starting merge and push operation...');
+        console.log('[SYNC] Current authoritative:', authoritative);
+        console.log('[SYNC] Current instance:', instance);
 
-    // Create merged authoritative settings
-    const mergedAuthoritative = { ...authoritative };
-    let changesMade = false;
+        // Create merged authoritative settings
+        const mergedAuthoritative = { ...authoritative };
+        let changesMade = false;
 
-    // Find settings that need merging
-    Object.keys(authoritative).forEach(setting => {
-        if (Array.isArray(authoritative[setting]) && Array.isArray(instance[setting])) {
-            const authArray = authoritative[setting] || [];
-            const instanceArray = instance[setting] || [];
+        // Find settings that need merging
+        Object.keys(authoritative).forEach(setting => {
+            if (Array.isArray(authoritative[setting]) && Array.isArray(instance[setting])) {
+                const authArray = authoritative[setting] || [];
+                const instanceArray = instance[setting] || [];
 
-            // Find extras in instance that auth doesn't have
-            const extraInInstance = instanceArray.filter(item => !authArray.includes(item));
+                // Find extras in instance that auth doesn't have
+                const extraInInstance = instanceArray.filter(item => !authArray.includes(item));
 
-            if (extraInInstance.length > 0) {
-                // Merge: add instance extras to authoritative
-                mergedAuthoritative[setting] = [...authArray, ...extraInInstance];
-                changesMade = true;
+                if (extraInInstance.length > 0) {
+                    // Merge: add instance extras to authoritative
+                    mergedAuthoritative[setting] = [...authArray, ...extraInInstance];
+                    changesMade = true;
 
-                console.log(`[SYNC] Merged ${setting}: inherited ${extraInInstance.length} items from instance:`, extraInInstance);
+                    console.log(`[SYNC] Merged ${setting}: inherited ${extraInInstance.length} items from instance:`, extraInInstance);
+                }
             }
+        });
+
+        if (changesMade) {
+            // Update authoritative with merged data
+            mergedAuthoritative.overall_timestamp = now;
+            saveAuthoritativeSettings(mergedAuthoritative);
+
+            console.log('[SYNC] Updated authoritative with merged data');
         }
-    });
 
-    if (changesMade) {
-        // Update authoritative with merged data
-        mergedAuthoritative.overall_timestamp = now;
-        saveAuthoritativeSettings(mergedAuthoritative);
+        // Now push the merged result to instance
+        const settingsUrl = generateSettingsUrl(mergedAuthoritative);
 
-        console.log('[SYNC] Updated authoritative with merged data');
+        console.log('[SYNC] Merge queued - Authority restore URL that will be submitted:', settingsUrl);
+
+        // Show notification about what's happening
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: var(--foreground);
+            padding: 12px 20px;
+            border-radius: 6px;
+            z-index: 90000;
+            font-family: sans-serif;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        `;
+        notification.textContent = `Submitting merge in background...`;
+        document.body.appendChild(notification);
+
+        try {
+            // Submit the restore URL in the background
+            const response = await fetch(settingsUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                }
+            });
+
+            console.log('[SYNC] Merge submit response:', {
+                status: response.status,
+                statusText: response.statusText,
+                url: response.url,
+                ok: response.ok
+            });
+
+            if (response.ok) {
+                notification.textContent = `Merge completed successfully!`;
+                notification.style.background = '#28a745';
+
+                // Update instance timestamp to reflect the sync
+                GM_setValue(`instance_timestamp_${window.location.hostname}`, now);
+
+                // Refresh all sync information in-place
+                setTimeout(async () => {
+                    await performSync(); // This updates sync state, differences table, and merge preview
+                    notification.remove();
+                }, 1000);
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('[SYNC] Merge failed:', error);
+
+            // Provide more descriptive error messages for network issues
+            let errorMessage = error.message;
+            if (error.message === 'Failed to fetch') {
+                errorMessage = 'Network error (ERR_CONNECTION_CLOSED or similar)';
+            }
+
+            notification.textContent = `Merge failed: ${errorMessage}`;
+            notification.style.background = '#dc3545';
+
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
     }
-
-    // Now push the merged result to instance
-    const settingsUrl = generateSettingsUrl(mergedAuthoritative);
-
-    console.log('[SYNC] Pushing merged settings to instance:', {
-        mergedSubscriptions: mergedAuthoritative.subscriptions?.length || 0,
-        mergedFilters: mergedAuthoritative.filters?.length || 0,
-        url: settingsUrl
-    });
-
-    // Show notification about what's happening
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: var(--accent, #d54455);
-        color: var(--foreground, #222);
-        padding: 12px 20px;
-        border-radius: 6px;
-        z-index: 10000;
-        font-family: sans-serif;
-        font-size: 14px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    `;
-    notification.textContent = `Merge complete! Applying ${mergedAuthoritative.subscriptions?.length || 0} subs, ${mergedAuthoritative.filters?.length || 0} filters...`;
-    document.body.appendChild(notification);
-
-    // Update instance timestamp to mark merge as completed
-    GM_setValue(`instance_timestamp_${window.location.hostname}`, now);
-
-    // Wait for user to see the notification, then redirect to apply settings
-    setTimeout(() => {
-        console.log('[SYNC] Redirecting to:', settingsUrl);
-        window.location.href = settingsUrl;
-    }, 2000);
-}
 
     async function selectivePushToInstance() {
         const authoritative = getAuthoritativeSettings();
@@ -8270,8 +8764,8 @@ async function mergeAndPushToInstance() {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: var(--accent, #d54455);
-            color: var(--foreground, #222);
+            background: var(--accent);
+            color: var(--foreground);
             padding: 12px 20px;
             border-radius: 6px;
             z-index: 10000;
@@ -8368,6 +8862,8 @@ async function mergeAndPushToInstance() {
     };
 })();
 
+// Make sync functionality globally accessible
+window.RedlibSettingsSync = RedlibSettingsSync;
 
 // ============================================================================
 // SETTINGS PAGE FEED COLLAPSERS
