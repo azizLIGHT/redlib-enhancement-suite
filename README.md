@@ -1,81 +1,150 @@
 # Redlib Enhancement Suite
 
-A comprehensive userscript that supercharges your Redlib experience with RES-style features, smooth animations, and powerful customization options.
+A comprehensive userscript that supercharges your Redlib experience with RES style features, smooth animations, and powerful customization options.
 
-## ✨ Features Overview
+## 🚀 Installation
 
-Transform your Redlib browsing with modern enhancements that make the interface more intuitive, efficient, and visually appealing. From collapsible posts with floating video players to hover previews and customizable layouts, this suite brings the best of Reddit Enhancement Suite to Redlib.
+### Browser Compatibility
+- ✅ **Chrome** 88+
+- ✅ **Firefox** 85+
+- ✅ **Safari** 14+
+- ✅ **Edge** 88+
+- ✅ **Mobile browsers** (with touch adaptations)
 
-<details>
-<summary><h2>🎯 Feature Breakdown</h2></summary>
+1. **Install a userscript manager:**
+   - [Tampermonkey](https://tampermonkey.net/) (Chrome, Firefox, Safari, Edge)
+   - [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) (Firefox)
+   - [Violentmonkey](https://violentmonkey.github.io/) (Chrome, Firefox, Edge)
 
-### 🏠 General Features
-- **⚙️ Settings Manager** - Comprehensive settings overlay with organized toggles and descriptions
-- **🔗 Subreddit Hover Info** - Rich popups showing subreddit details, member count, and quick subscribe/filter actions
-- **👤 Username Hover Info** - User profile previews with karma, join date, and follow/filter options
+2. **Install the script:**
+   - Click [here to install latest version](https://github.com/azizLIGHT/redlib-enhancement-suite/raw/refs/heads/main/redlib-enhancement-suite.user.js) or copy the script content
+   - Your userscript manager will prompt you to install
+   - Refresh any open Redlib pages
 
-### 📰 Frontpage & Subreddit Pages
+3. **Configure settings:**
+   - Look for the ⚙️ settings icon in the top-right corner of any Redlib page
+   - Customize features to your preference
+   - Changes apply immediately after clicking "Apply"
 
-#### Post Management
-- **🙈 Post Hider** - Click to hide/unhide posts with smooth slide animations
-- **📏 Post Expand Buttons** - Three-state text expansion: Default → Expanded → Minimized
-- **🎬 Floating Video Player** - Videos become draggable, resizable floating players when posts are hidden
-- **👁️ Hover Comment Previews** - Preview top comments by hovering over comment links
+## ✨ Features
 
-#### Interface Enhancements
-- **📱 Subreddit Info Toggler** - Hide/show sidebar with floating toggle button
-- **💾 Persistent State** - All preferences saved across browser sessions
+Transform your Redlib browsing with modern enhancements that make the interface more intuitive, efficient, and visually appealing. From collapsible posts with floating video players to hover previews, all with cross-device settings synchronization and export/import functionality, this suite brings the best of Reddit Enhancement Suite to Redlib.
 
-### 💬 Comment Pages
+## 🏠 General Features
 
-#### Post Enhancements
-- **📌 Sticky Post Mode** - Post header stays visible when scrolling through comments
-- **🎬 Floating Video Player** - Same floating video functionality on comment pages
+### ⚙️ Settings Manager
+Comprehensive settings overlay with organized toggles and descriptions. Access the settings panel via the ⚙️ icon in the top-right corner.
 
-#### Comment Features
-- **🗂️ Comment Collapser** - Comments collapsed by default with custom expand buttons
-- **🎨 Comment Styling** - Compact layout with alternating background colors and improved visual hierarchy
+![Settings Manager](https://github.com/user-attachments/assets/1e1638a9-0130-4c2f-baa0-c25dc0a82bea)
 
-</details>
+### 🔗 Subreddit Hover Info
+Rich popups showing subreddit details, member count, and quick subscribe/filter actions.
 
-<details>
-<summary><h2>⚡ Smooth Animations</h2></summary>
+![Subreddit Hover Info](https://github.com/user-attachments/assets/68b7ea67-223f-4a68-bbed-4cffab0b60d4)
 
-All interactions feature carefully crafted transitions:
-- **Slide animations** for hiding/showing posts
-- **Height transitions** for text expansion
-- **Fade effects** for UI elements
-- **Easing curves** for natural, polished feel
+### 👤 Username Hover Info
+User profile previews with karma, join date, and follow/filter options.
 
-</details>
+![Username Hover Info](https://github.com/user-attachments/assets/0fbf3836-29ad-4ccf-bc44-1f936b90eb26)
 
-<details>
-<summary><h2>🛠️ Settings & Customization</h2></summary>
+### 🔄 Cross-Instance Sync
+Synchronize settings across multiple Redlib instances with authoritative source management.
 
-Access the settings panel via the ⚙️ icon in the top-right corner:
+![Cross-Instance Sync](https://github.com/user-attachments/assets/1e056325-b5cc-45ee-b15f-aa86482c2d2f)
 
-### General Settings
-- ✅ Subreddit Hover Info
-- 🚧 Username Hover Info *(in development)*
+**Cross-Instance Sync Features:**
+- ✅ **Authoritative Source Management** - Adopt any Redlib instance as master for all settings
+- ✅ **Settings Sync Status** - Side by side comparison showing Instance vs Script settings with difference highlighted
+- ✅ **Push Settings to Instances** - Push master settings to instance, with confirmation messages
+- ✅ **Merge Settings** - Adopt missing settings from the instance and push stored settings to the instance
+- ✅ **Intelligent Merge Preview** - See exactly what changes will be made before applying
 
-### Frontpage & Subreddit Settings
-- ✅ Subreddit Info Toggler
-  - 🔧 Hide sidebars by default
-- ✅ Post Hider
-- ✅ Post Expand Buttons
-  - 🔧 Expand posts by default
-- ✅ Hover Comment Previews
+### 📤 Export/Import System
+Complete redlib-style settings backup and restore to import/export between devices: redlib settings, redlib subscriptions/filters, RES configuration options, and hidden posts states.
 
-### Comment Page Settings
-- ✅ Sticky Post Mode
-- ✅ Floating Video Player
-- ✅ Comment Collapser
-- ✅ Comment Styling
+![Export/Import System](https://github.com/user-attachments/assets/2c4e1941-9489-4373-b1bb-ae5a73008f0c)
 
-</details>
+**Export/Import Features:**
+- ✅ **Complete Settings Backup** - Export all redlib settings, userscript settings, and hidden posts in one encoded string
+- ✅ **Unicode-Safe Encoding** - Base64 + Cyrillic mapping ensures reliable copy/paste across platforms
+- ✅ **One-Click Clipboard** - Copy export strings with visual success/failure feedback
+- ✅ **Comprehensive Import** - Restore complete configuration with validation and error handling
+- ✅ **Cross-Device Transfer** - Move complete configuration between devices/browsers
 
-<details>
-<summary><h2>🎨 Visual Design & Technical Features</h2></summary>
+## 📰 Posts List Pages
+
+### 🙈 Post Hider
+Click to hide/unhide posts with smooth slide animations and persistent state across instances.
+
+![Post Hider](https://github.com/user-attachments/assets/b8e9d719-a7d1-4617-972f-964026f93d8b)
+
+### 📏 Post Expand Buttons
+Three-state text expansion: Default → Expanded → Minimized.
+
+**Default state:**
+![Post Expand Default](https://github.com/user-attachments/assets/5014ae9f-62f1-4225-bb73-199efd77a646)
+
+**Expanded state** with full post text visible:
+![Post Expand Expanded](https://github.com/user-attachments/assets/800f939f-9f7b-4267-8aac-45f433e4a782)
+
+**Minimized state** with post text hidden and post picture thumbnailed (if available):
+![Post Expand Minimized](https://github.com/user-attachments/assets/4eaf0c13-47c9-4ed6-9050-2e9d6ac07e0f)
+
+### 👁️ Hover Comment Previews
+Preview top comments by hovering over comment links.
+
+![Hover Comment Previews](https://github.com/user-attachments/assets/ae677c78-8c47-4a70-93d4-b8c7ab39efbb)
+
+**Load more top level comments** in the preview:
+![Hover Comments Load More](https://github.com/user-attachments/assets/85eba91c-6914-4703-9c43-c69310f78f1b)
+
+**Load more child comments:**
+![Hover Comments Child](https://github.com/user-attachments/assets/c5323229-4a8b-4af9-a7c5-e96622265f72)
+
+## 📰 Subreddit Pages
+
+### 📱 Subreddit Info Toggler
+Hide/show sidebar with floating toggle button.
+
+![Subreddit Info Toggler](https://github.com/user-attachments/assets/f310796c-419b-4930-b809-d469bcdfe047)
+
+**Hide subreddit panel and sidebar panel** to expand post width:
+![Subreddit Sidebar Hidden](https://github.com/user-attachments/assets/8b3c32e4-c6e0-4714-9823-40770b38313d)
+
+## 💬 Comments Pages
+
+### 📌 Sticky Post Mode
+Post header stays visible when scrolling through comments.
+
+![Sticky Post Mode](https://github.com/user-attachments/assets/df77442b-ec36-4625-99c8-27d6028fbfb1)
+
+**Hover mouse over sticky post** to reveal post content:
+![Sticky Post Hover](https://github.com/user-attachments/assets/64150ad4-74b1-4312-a269-78be2c146a27)
+
+### 🎬 Floating Video Player
+Videos become draggable, resizable floating players when posts are hidden.
+
+![Floating Video Player](https://github.com/user-attachments/assets/003646c6-b5c0-486c-b826-0be041dd17eb)
+
+## 💬 Comments Readability
+
+### 🗂️ Comment Collapser
+Child comments collapsed by default with custom expand buttons.
+
+![Comment Collapser](https://github.com/user-attachments/assets/eadf86eb-3a94-4b70-bb9f-4930947fbde6)
+
+**Click to expand children:**
+![Comment Expand](https://github.com/user-attachments/assets/4ff3fbc6-1af4-4519-b139-81866dbd68c8)
+
+**Per level child comments** expansion/collapse:
+![Comment Levels](https://github.com/user-attachments/assets/8a77872e-11f2-490b-b367-cb84e6ba6031)
+
+### 🎨 Comment Styling
+Compact layout with alternating background colors and improved visual hierarchy.
+
+![Comment Styling](https://github.com/user-attachments/assets/dcc7c292-7342-47a6-b09b-2fe336da96be)
+
+## 🎨 Visual Design & Technical Features
 
 ### Visual Design
 - **Dark theme optimized** with proper contrast and readability
@@ -89,13 +158,7 @@ Access the settings panel via the ⚙️ icon in the top-right corner:
 - **Error handling** - Graceful fallbacks for network issues
 - **CSP compliance** - Works within Content Security Policy restrictions
 - **Mobile responsive** - Adapts to smaller screens
-
-### Browser Compatibility
-- ✅ **Chrome** 88+
-- ✅ **Firefox** 85+
-- ✅ **Safari** 14+
-- ✅ **Edge** 88+
-- ✅ **Mobile browsers** (with touch adaptations)
+- **Unicode-safe encoding** - Reliable export/import across platforms and browsers
 
 ### Performance
 - **Lazy loading** - Features only initialize when needed
@@ -103,80 +166,7 @@ Access the settings panel via the ⚙️ icon in the top-right corner:
 - **Debounced interactions** - Prevents excessive API calls
 - **Minimal footprint** - Clean code with no memory leaks
 
-</details>
-
-<details>
-<summary><h2>🖼️ Screenshots</h2></summary>
-
-Settings
-
-![Settings](https://github.com/user-attachments/assets/9fb04b80-99b9-4b59-9ea7-cd7d109e8ea8)
-
-Subreddit Hover Info
-
-![Subreddit Hover Info](https://github.com/user-attachments/assets/9500f8b1-8cdf-4bbc-9d37-bda21ea0b27a)
-
-User Hover Info
-
-![User Hover Info](https://github.com/user-attachments/assets/03ff091d-6528-4a54-9929-c37ad6f4e827)
-
-Hidden post with state preservation
-
-![Hiden post](https://github.com/user-attachments/assets/9bd741f9-b048-45c1-acc6-e0324b1b8e2a)
-
-Comments Preview
-
-![Comments Preview](https://github.com/user-attachments/assets/62bfd2fc-d048-42d5-8afe-80fc75112542)
-
-Comments Preview
-
-![Comments Preview](https://github.com/user-attachments/assets/3c655e22-7838-4f7b-a38a-4a651bcd1ae7)
-
-Sticky post at the top
-
-![Sticky post at the top](https://github.com/user-attachments/assets/df77442b-ec36-4625-99c8-27d6028fbfb1)
-
-Hover sticky post for preview
-
-![Hover sticky post for preview](https://github.com/user-attachments/assets/64150ad4-74b1-4312-a269-78be2c146a27)
-
-Floating video player, resizable and movable
-
-![Floating video player, resizable and movable](https://github.com/user-attachments/assets/003646c6-b5c0-486c-b826-0be041dd17eb)
-
-</details>
-
-## 🚀 Installation
-
-1. **Install a userscript manager:**
-   - [Tampermonkey](https://tampermonkey.net/) (Chrome, Firefox, Safari, Edge)
-   - [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) (Firefox)
-   - [Violentmonkey](https://violentmonkey.github.io/) (Chrome, Firefox, Edge)
-
-2. **Install the script:**
-   - Click [here to install](https://github.com/azizLIGHT/redlib-enhancement-suite/raw/refs/heads/main/redlib-enhancement-suite.user.js) or copy the script content
-   - Your userscript manager will prompt you to install
-   - Refresh any open Redlib pages
-
-3. **Configure settings:**
-   - Look for the ⚙️ settings icon in the top-right corner of any Redlib page
-   - Customize features to your preference
-   - Changes apply immediately after clicking "Apply"
-
-<details>
-<summary><h2>📋 Supported Instances</h2></summary>
-
-Works on all major Redlib instances including:
-- redlib.freedit.eu
-- redlib.privacyredirect.com
-- redlib.zaggy.nl
-- redlib.ducks.party
-- And many more...
-
-</details>
-
-<details>
-<summary><h2>🤝 Contributing</h2></summary>
+## 🤝 Contributing
 
 Found a bug or have a feature request?
 
@@ -184,12 +174,33 @@ Found a bug or have a feature request?
 2. **Pull Requests** - Submit improvements via pull requests
 3. **Testing** - Help test new features across different Redlib instances
 
-</details>
+## 📝 Version History
+
+### v2.0 - Current
+
+🚀 **Major Export/Import System**
+- **Complete redlib-style Backup** - Export all userscript settings, sync settings, and hidden posts in one encoded string
+- **Unicode-Safe Encoding** - Base64 + Cyrillic character mapping ensures reliable copy/paste across all platforms and browsers
+- **One-Click Clipboard** - Copy export strings with visual success/failure feedback
+- **Comprehensive Import** - Restore complete configuration with validation, error handling, and detailed success summaries
+- **Cross-Device Transfer** - Move entire setup between devices, browsers, and Redlib instances seamlessly
+- **Hidden Posts Integration** - Collapsed/hidden post states fully included in backup and restore operations
+
+🔄 **Enhanced Sync System Integration**
+- **Export/Import + Sync Compatibility** - New backup system works seamlessly with existing cross-instance synchronization
+- **Enhanced Merge Dialogs** - Import operations trigger comprehensive change summaries and sync status updates
+- **Intelligent Refresh** - Settings overlay automatically refreshes after import to show new configuration
+- **Hidden Posts Tracking** - Sync system now includes hidden post counts in instance comparisons and merge previews
+
+🔧 **Technical Improvements**
+- **Robust Error Handling** - Enhanced validation for import operations with detailed error messages
+- **Memory Management** - Improved cleanup and caching for export/import operations
+- **Settings Integration** - Export/import functions properly integrated with existing settings management
+- **Performance Optimizations** - Efficient encoding/decoding for large configuration exports
 
 <details>
-<summary><h2>📝 Version History</h2></summary>
-
-### v1.91 - Current
+<summary><h2>v1.91 - Previous</h2></summary>
+  
 🔄 **Sync System Enhancements**
 - **Auto-Refresh Settings Panel** - Settings overlay automatically refreshes after sync operations
 - **Enhanced Merge Operations** - Improved mergeAndPushToInstance() with better error handling and timing
@@ -212,8 +223,11 @@ Found a bug or have a feature request?
 - Fixed popup display issues when settings overlay is open
 - Resolved timing conflicts between merge operations and UI updates
 - Improved stability of sync status monitoring and refresh cycles
+</details>
 
-### v1.52 - Previous
+<details>
+<summary><h2>v1.52</h2></summary>
+  
 🆕 **Major New Feature**
 - **🔄 Cross-Instance Settings Synchronization** - Complete multi-instance settings sync system
   - **Authoritative Source Management** - Designate one Redlib instance as the master source for all settings
@@ -242,18 +256,27 @@ Found a bug or have a feature request?
 - **Background Processing** - Sync initialization happens after DOM stabilization
 - **Memory Management** - Proper cleanup of cached sync data
 - **Error Recovery** - Fallback mechanisms for failed sync operations
+</details>
 
-### v1.1.4 - Previous
+<details>
+<summary><h2>v1.1.4</h2></summary>
+  
 - Unify button appearances
+</details>
 
-### v1.1.3
+<details>
+<summary><h2>v1.1.3</h2></summary>
+  
 - 🐛 **Mobile Fix** - Fixed hover comments popup width on mobile (prevents horizontal scrolling)
 - 🎨 **UI Consistency** - Made sidebar toggle button same size as settings button (40px)
 - ✨ **Smooth Animations** - Added shrinking animation when showing sidebar (matches existing expand animation)
 - 🔧 **Version Sync** - Settings dialog now automatically reflects script version number
 - 🐛 **Popup Interactions** - Fixed issue where comments popup wouldn't hide after username popup closes
+</details>
 
-### v1.1.2
+<details>
+<summary><h2>v1.1.2</h2></summary>
+  
 🆕 **New Features**
 - **AJAX Comment Loader Module** - Extracted comment loading functionality into a separate module for better organization
 - **Close Buttons** - Added close buttons (×) to Subreddit Hover and Username Hover popups for better UX
@@ -280,8 +303,11 @@ Found a bug or have a feature request?
 - Resolved issues with comment loading state management
 - Improved scroll handling for floating close buttons
 - Better error handling in AJAX comment loading
+</details>
 
-### v1.1.1
+<details>
+<summary><h2>v1.1.1</h2></summary>
+  
 - ✨ Complete settings management system
 - ✨ Username hover info with follow/filter actions
 - ✨ Smooth slide transitions for all interactions
@@ -289,7 +315,6 @@ Found a bug or have a feature request?
 - ✨ Floating video player with drag/resize
 - 🐛 Fixed popup sizing consistency
 - 🐛 Improved mobile responsiveness
-
 </details>
 
 ## 📄 License
