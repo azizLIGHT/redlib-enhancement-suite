@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Redlib Enhancement Suite
 // @namespace    https://github.com/azizLIGHT/redlib-enhancement-suite
-// @version      1.91
+// @version      2.0
 // @description  A comprehensive userscript that supercharges your Redlib experience with RES-style features, smooth animations, and powerful customization options.
 // @author       azizLIGHT
 // @match        https://redlib.catsarch.com/*
@@ -43,6 +43,9 @@
 // @match        https://reddit.nerdvpn.de/*
 // @match        https://redlib.reallyaweso.me/*
 // @match        https://safereddit.com/*
+// @match        https://redlib.baczek.me/*
+// @match        https://lr.ptr.moe/*
+// @match        https://libreddit.diffraction.dev/*
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_deleteValue
@@ -57,61 +60,61 @@
     'use strict';
 
     // Script version - update this when you change @version above
-    const SCRIPT_VERSION = '1.91';
+    const SCRIPT_VERSION = '2.0';
 
-// ============================================================================
-// PAGE VALIDATION - Must be first
-// ============================================================================
-function isValidRedlibPage() {
-    // Check if we're on a Cloudflare bot check page
-    if (document.title.includes('Just a moment') ||
-        document.body.innerHTML.includes('cf-browser-verification') ||
-        document.body.innerHTML.includes('DDoS protection by Cloudflare') ||
-        document.querySelector('.cf-browser-verification') ||
-        document.querySelector('#cf-wrapper')) {
-        console.log('[Redlib Enhancement Suite] Detected Cloudflare bot check page, skipping initialization');
-        return false;
+    // ============================================================================
+    // PAGE VALIDATION - Must be first
+    // ============================================================================
+    function isValidRedlibPage() {
+        // Check if we're on a Cloudflare bot check page
+        if (document.title.includes('Just a moment') ||
+            document.body.innerHTML.includes('cf-browser-verification') ||
+            document.body.innerHTML.includes('DDoS protection by Cloudflare') ||
+            document.querySelector('.cf-browser-verification') ||
+            document.querySelector('#cf-wrapper')) {
+            console.log('[Redlib Enhancement Suite] Detected Cloudflare bot check page, skipping initialization');
+            return false;
+        }
+
+        // Check if we're on an Anubis bot check page
+        if (document.title.includes('Anubis') ||
+            document.body.innerHTML.includes('anubis') ||
+            document.querySelector('[data-anubis]') ||
+            document.body.innerHTML.includes('bot protection')) {
+            console.log('[Redlib Enhancement Suite] Detected Anubis bot check page, skipping initialization');
+            return false;
+        }
+
+        // Check if we're on a redlib error page
+        if (document.querySelector('#error') ||
+            document.querySelector('main #error') ||
+            document.body.innerHTML.includes('Failed to parse page JSON data') ||
+            document.title.includes('Error')) {
+            console.log('[Redlib Enhancement Suite] Detected redlib error page, skipping initialization');
+            return false;
+        }
+
+        // Check if this is actually a redlib instance
+        const isRedlibPage = document.querySelector('nav') ||
+              document.querySelector('#logo') ||
+              document.querySelector('footer') ||
+              document.body.innerHTML.includes('redlib') ||
+              window.location.pathname.includes('/r/') ||
+              window.location.pathname.includes('/settings') ||
+              window.location.pathname.includes('/u/');
+
+        if (!isRedlibPage) {
+            console.log('[Redlib Enhancement Suite] Not a valid redlib page, skipping initialization');
+            return false;
+        }
+
+        return true;
     }
 
-    // Check if we're on an Anubis bot check page
-    if (document.title.includes('Anubis') ||
-        document.body.innerHTML.includes('anubis') ||
-        document.querySelector('[data-anubis]') ||
-        document.body.innerHTML.includes('bot protection')) {
-        console.log('[Redlib Enhancement Suite] Detected Anubis bot check page, skipping initialization');
-        return false;
+    // Early exit if not a valid redlib page
+    if (!isValidRedlibPage()) {
+        return; // Stop script execution entirely
     }
-
-    // Check if we're on a redlib error page
-    if (document.querySelector('#error') ||
-        document.querySelector('main #error') ||
-        document.body.innerHTML.includes('Failed to parse page JSON data') ||
-        document.title.includes('Error')) {
-        console.log('[Redlib Enhancement Suite] Detected redlib error page, skipping initialization');
-        return false;
-    }
-
-    // Check if this is actually a redlib instance
-    const isRedlibPage = document.querySelector('nav') ||
-                        document.querySelector('#logo') ||
-                        document.querySelector('footer') ||
-                        document.body.innerHTML.includes('redlib') ||
-                        window.location.pathname.includes('/r/') ||
-                        window.location.pathname.includes('/settings') ||
-                        window.location.pathname.includes('/u/');
-
-    if (!isRedlibPage) {
-        console.log('[Redlib Enhancement Suite] Not a valid redlib page, skipping initialization');
-        return false;
-    }
-
-    return true;
-}
-
-// Early exit if not a valid redlib page
-if (!isValidRedlibPage()) {
-    return; // Stop script execution entirely
-}
 
     // ============================================================================
     // COMBINED CSS STYLES
@@ -3482,7 +3485,38 @@ aside {
 
                 } else if (shouldEnableSticky) {
                     post.style.setProperty('top', navHeight + 'px', 'important');
+      instCount = (cachedInstance[diff.setting] || []).length;
+                const missingCount = diff.missingFromInstance?.length || 0;
+                const extraCount = diff.extraInInstance?.length || 0;
+                const settingName = diff.setting.replace('_', ' ');
+
+                let inheritCell = '';
+                let pushCell = '';
+
+                if (extraCount > 0) {
+                    inheritCell = `<div style="color: #4ecdc4; font-weight: bold;">${extraCount} items</div>`;
+                    if (extraCount <= 3) {
+                        inheritCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${diff.extraInInstance.join(', ')}</div>`;
+                    } else {
+                        const examples = diff.extraInInstance.slice(0, 2).join(', ');
+                        inheritCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${examples}... (+${extraCount - 2} more)</div>`;
+                    }
                 }
+
+                if (missingCount > 0) {
+                    pushCell = `<div style="color: #ff6b6b; font-weight: bold;">${missingCount} items</div>`;
+                    if (missingCount <= 3) {
+                        pushCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${diff.missingFromInstance.join(', ')}</div>`;
+                    } else {
+                        const examples = diff.missingFromInstance.slice(0, 2).join(', ');
+                        pushCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${examples}... (+${missingCount - 2} more)</div>`;
+                    }
+                }
+
+                summaryHtml += `<tr>`;
+                summaryHtml += `<td style="padding: 8px; background: var(--highlighted); color: var(--text); font-weight: bold; border-bottom: 1px solid var(--background); width: 33.33%;">`;
+                summaryHtml += `${settingName}<br><span style="font-size: 9px; opacity: 0.7;">${instCount} vs ${authCount} items</span></td>`;
+                summaryHtm          }
             };
 
             const handleMouseEnter = () => {
@@ -5504,7 +5538,7 @@ aside {
 
                     // SYNC: Store the action in authoritative settings
                     const finalAction = action === 'subscribe' ? (data.isSubscribed ? 'subscribe' : 'unsubscribe') :
-                                        action === 'filter' ? (data.isFiltered ? 'filter' : 'unfilter') : action;
+                    action === 'filter' ? (data.isFiltered ? 'filter' : 'unfilter') : action;
                     console.log('[SYNC] Popup action completed, storing in authority:', { subredditName: data.subreddit, finalAction });
                     window.RedlibSettingsSync.handleUserAction(data.subreddit, finalAction);
 
@@ -6116,7 +6150,7 @@ aside {
 
                     // SYNC FIX: Store the action in authoritative settings
                     const finalAction = action === 'follow' ? (data.isFollowed ? 'follow' : 'unfollow') :
-                                        action === 'filter' ? (data.isFiltered ? 'filter_user' : 'unfilter_user') : action;
+                    action === 'filter' ? (data.isFiltered ? 'filter_user' : 'unfilter_user') : action;
                     handleUserAction(data.username, finalAction);
                 } else {
                     throw new Error(`HTTP ${response.status}`);
@@ -6745,15 +6779,85 @@ aside {
         </div>
     </div>
 
+    <div class="redlib-settings-section">
+        <h3 class="redlib-settings-section-title">Export/Import Settings</h3>
+
+        <div class="redlib-settings-option">
+            <div class="redlib-settings-option-info">
+                <div class="redlib-settings-option-title">Export Settings</div>
+                <div class="redlib-settings-option-description">Copy this encoded string to transfer your RES settings to another device</div>
+            </div>
+        </div>
+
+        <div class="redlib-settings-option">
+            <textarea id="res-export-string" readonly style="
+                width: 100%;
+                height: 80px;
+                background: var(--post, #161616);
+                color: var(--text, #d7dadc);
+                border: 1px solid var(--highlighted, #333);
+                border-radius: 4px;
+                padding: 8px;
+                font-family: monospace;
+                font-size: 11px;
+                resize: vertical;
+                word-break: break-all;
+            "></textarea>
+            <button class="redlib-settings-copy-export" type="button" style="
+                margin-top: 8px;
+                background: var(--highlighted, #333);
+                color: var(--text, #d7dadc);
+                border: 1px solid var(--accent, #d54455);
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px;
+            ">Copy to Clipboard</button>
+        </div>
+
+        <div class="redlib-settings-option" style="margin-top: 20px;">
+            <div class="redlib-settings-option-info">
+                <div class="redlib-settings-option-title">Import Settings</div>
+                <div class="redlib-settings-option-description">Paste an encoded settings string from another device</div>
+            </div>
+        </div>
+
+        <div class="redlib-settings-option">
+            <textarea id="res-import-string" placeholder="Paste your encoded RES settings here..." style="
+                width: 100%;
+                height: 80px;
+                background: var(--post, #161616);
+                color: var(--text, #d7dadc);
+                border: 1px solid var(--highlighted, #333);
+                border-radius: 4px;
+                padding: 8px;
+                font-family: monospace;
+                font-size: 11px;
+                resize: vertical;
+                word-break: break-all;
+            "></textarea>
+            <button class="redlib-settings-import-apply" type="button" style="
+                margin-top: 8px;
+                background: var(--accent, #d54455);
+                color: var(--foreground, #222);
+                border: 1px solid var(--accent, #d54455);
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px;
+            ">Import Settings</button>
+        </div>
+    </div>
+
   </div>
 
   <div class="redlib-settings-footer">
-    <div class="redlib-settings-version">Redlib Enhancement Suite v${SCRIPT_VERSION}</div>
-    <div class="redlib-settings-footer-actions">
-      <button class="redlib-settings-reset" type="button">Reset to Defaults</button>
-      <button class="redlib-settings-apply" type="button" disabled>Apply Changes</button>
-    </div>
-  </div>
+      <div class="redlib-settings-version">Redlib Enhancement Suite v${SCRIPT_VERSION}</div>
+<div class="redlib-settings-footer-actions">
+    <button class="redlib-settings-reset" type="button">Reset to Defaults</button>
+<button class="redlib-settings-apply" type="button" disabled>Apply Changes</button>
+</div>
+</div>
 
 </div>
 `;
@@ -6778,57 +6882,174 @@ aside {
             applyBtn.addEventListener('click', handleApplySettings);
             resetBtn.addEventListener('click', resetSettings);
 
-// Only add listeners for buttons that exist (not the table header buttons)
-const refreshStatusBtn = overlay.querySelector('.redlib-settings-refresh-status');
-const mergeBtn = overlay.querySelector('.redlib-settings-merge');
+            // Only add listeners for buttons that exist (not the table header buttons)
+            const refreshStatusBtn = overlay.querySelector('.redlib-settings-refresh-status');
+            const mergeBtn = overlay.querySelector('.redlib-settings-merge');
 
-// Only add event listeners if the elements exist
-if (refreshStatusBtn) {
-    refreshStatusBtn.addEventListener('click', function() {
-        if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.updateSyncStatus) {
-            RedlibSettingsSync.updateSyncStatus(true); // Force refresh
-        }
-    });
-}
-
-if (mergeBtn) {
-    mergeBtn.addEventListener('click', async function() {
-        // Get the current merge preview text
-        const mergeDetails = document.getElementById('merge-details');
-        let confirmMessage = 'Perform selective merge?\n\n';
-
-        if (mergeDetails && mergeDetails.textContent.trim()) {
-            const previewText = mergeDetails.textContent.trim();
-            if (previewText === 'No merge needed\nAll settings match') {
-                confirmMessage += 'No changes needed - all settings already match.';
-            } else {
-                confirmMessage += previewText;
+            // Only add event listeners if the elements exist
+            if (refreshStatusBtn) {
+                refreshStatusBtn.addEventListener('click', async function() {
+                    console.log('[SYNC] Refresh button clicked - performing comprehensive refresh');
+                    if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.refreshSettingsOverlay) {
+                        await RedlibSettingsSync.refreshSettingsOverlay();
+                    }
+                    // The export string will be updated by refreshSettingsOverlay
+                });
             }
-        } else {
-            confirmMessage += 'Merge settings from this instance with authoritative?';
-        }
 
-        if (confirm(confirmMessage)) {
-            try {
-                // Perform the merge
-                if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.mergeAndPushToInstance) {
-                    await RedlibSettingsSync.mergeAndPushToInstance();
-                } else if (typeof mergeAndPushToInstance === 'function') {
-                    await mergeAndPushToInstance();
+            if (mergeBtn) {
+                mergeBtn.addEventListener('click', async function() {
+                    // Get fresh analysis for merge preview
+                    const syncResult = await RedlibSettingsSync.performSync();
+                    const changeSummary = RedlibSettingsSync.generateChangeSummary(syncResult.differences || [], 'merge');
+                    
+                    let confirmMessage = 'Perform selective merge?\n\n';
+                    
+                    if (changeSummary.details.length === 0) {
+                        confirmMessage += 'No changes needed - all settings already match.\n\nMerge anyway?';
+                    } else {
+                        confirmMessage += `This will merge:\n${changeSummary.details.join('\n')}\n\nProceed with merge?`;
+                    }
+
+                    if (confirm(confirmMessage)) {
+                        try {
+                            // Perform the merge
+                            if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.mergeAndPushToInstance) {
+                                await RedlibSettingsSync.mergeAndPushToInstance();
+                            } else if (typeof mergeAndPushToInstance === 'function') {
+                                await mergeAndPushToInstance();
+                            }
+
+                            // Refresh the entire overlay after merge
+                            setTimeout(() => {
+                                refreshSettingsOverlay();
+                            }, 1500);
+
+                        } catch (error) {
+                            console.error('[SYNC] Error during merge:', error);
+                        }
+                    }
+                });
+            }
+            // Add these after the existing button event listeners
+
+            // Copy export string
+            overlay.querySelector('.redlib-settings-copy-export')?.addEventListener('click', function() {
+                const exportTextarea = document.getElementById('res-export-string');
+                exportTextarea.select();
+                exportTextarea.setSelectionRange(0, 99999);
+
+                try {
+                    document.execCommand('copy');
+                    this.textContent = 'Copied!';
+                    this.style.background = '#28a745';
+                    setTimeout(() => {
+                        this.textContent = 'Copy to Clipboard';
+                        this.style.background = 'var(--highlighted, #333)';
+                    }, 2000);
+                } catch (err) {
+                    console.error('[RES] Failed to copy:', err);
+                    this.textContent = 'Copy failed';
+                    setTimeout(() => {
+                        this.textContent = 'Copy to Clipboard';
+                    }, 2000);
+                }
+            });
+
+            // Import settings
+            overlay.querySelector('.redlib-settings-import-apply')?.addEventListener('click', async function() {
+                const importTextarea = document.getElementById('res-import-string');
+                const encodedString = importTextarea.value.trim();
+
+                if (!encodedString) {
+                    alert('Please paste an encoded settings string first');
+                    return;
                 }
 
-                // Refresh the entire overlay after merge
-                setTimeout(() => {
-                    refreshSettingsOverlay();
-                }, 1500); // Give time for page redirect/reload
+                if (!confirm('Import these settings? This will overwrite your current RES configuration.')) {
+                    return;
+                }
 
-            } catch (error) {
-                console.error('[SYNC] Error during merge:', error);
-            }
-        }
-    });
-}
+                try {
+                    const decodedSettings = RedlibSettingsSync.decodeRESSettings(encodedString);
 
+                    if (!decodedSettings) {
+                        throw new Error('Invalid settings format');
+                    }
+
+                    // Apply the imported settings
+                    if (decodedSettings.settings) {
+                        GM_setValue('redlib_settings', decodedSettings.settings);
+                    }
+                    if (decodedSettings.authoritative) {
+                        GM_setValue('redlib_authoritative_settings', decodedSettings.authoritative);
+                    }
+                    if (decodedSettings.hiddenPosts) {
+                        GM_setValue('redlib_collapsed_posts', decodedSettings.hiddenPosts);
+                    }
+
+                    this.textContent = 'Imported Successfully!';
+                    this.style.background = '#28a745';
+
+                    // Clear import field
+                    importTextarea.value = '';
+
+                    // Clear cache to ensure fresh data
+                    if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.clearCache) {
+                        RedlibSettingsSync.clearCache();
+                    }
+
+                    // Refresh the overlay to show new settings first
+                    if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.refreshSettingsOverlay) {
+                        await RedlibSettingsSync.refreshSettingsOverlay();
+                    }
+
+                    // Reset button appearance
+                    this.textContent = 'Import Settings';
+                    this.style.background = 'var(--accent, #d54455)';
+
+                    // DIALOG 1: Show detailed import success summary with full changelog
+                    if (decodedSettings.authoritative && Object.keys(decodedSettings.authoritative).length > 0) {
+                        const emptySettings = { hiddenPostsCount: 0 };
+                        const importedAuthWithHidden = { 
+                            ...JSON.parse(decodedSettings.authoritative),
+                            hiddenPostsCount: decodedSettings.hiddenPosts ? 
+                                Object.keys(JSON.parse(decodedSettings.hiddenPosts)).length : 0
+                        };
+
+                        // Use inherit context like 1.139 to show what was imported into authority
+                        const importSummary = RedlibSettingsSync.generateChangeSummary([], 'inherit', emptySettings, importedAuthWithHidden);
+                        
+                        let importMessage = `Import Successful!`;
+                        if (importSummary.details.length > 0) {
+                            importMessage += `\n\nImported:\n${importSummary.details.join('\n')}`;
+                        }
+                        alert(importMessage);
+
+                        // DIALOG 2: Ask about pushing to instance with detailed changelog
+                        const syncResult = await RedlibSettingsSync.performSync();
+                        const pushSummary = RedlibSettingsSync.generateChangeSummary(syncResult.differences || [], 'push-organized');
+                        
+                        const pushMessage = `Apply imported settings to this instance?\n\n${pushSummary.details.join('\n')}\n\nApply these changes now?`;
+                        
+                        if (confirm(pushMessage)) {
+                            try {
+                                if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.pushToInstance) {
+                                    await RedlibSettingsSync.pushToInstance();
+                                }
+                            } catch (error) {
+                                console.error('[RES] Error during push after import:', error);
+                                alert('Import completed but push failed. You can manually push using the sync controls above.');
+                            }
+                        }
+                    }
+
+                } catch (error) {
+                    console.error('[RES] Import failed:', error);
+                    alert('Failed to import settings. Please check the encoded string format.');
+                }
+            });
+            
             // Close on overlay click
             overlay.addEventListener('click', (e) => {
                 if (e.target === overlay) {
@@ -6865,6 +7086,15 @@ if (mergeBtn) {
                     }
                 });
             }
+
+            // Update the export string with current settings
+            setTimeout(() => {
+                const exportTextarea = overlay.querySelector('#res-export-string');
+                if (exportTextarea) {
+                    const encodedSettings = RedlibSettingsSync.encodeRESSettings ? RedlibSettingsSync.encodeRESSettings() : 'Export functions not available';
+                    exportTextarea.value = encodedSettings;
+                }
+            }, 100);
 
             document.body.appendChild(overlay);
             return overlay;
@@ -6971,9 +7201,23 @@ if (mergeBtn) {
         }
 
         function resetSettings() {
-            if (confirm('Reset all settings to defaults? This will reload the page.')) {
+            if (confirm('Reset all settings to defaults? This will clear enhancement settings, authority settings, and hidden posts. This will reload the page.')) {
                 try {
+                    // Clear RES-specific storage keys
                     GM_deleteValue('redlib_settings');
+                    GM_deleteValue('redlib_authoritative_settings');
+                    
+                    // Clear hidden posts (collapsed posts)
+                    GM_deleteValue('redlib_collapsed_posts');
+                    
+                    // Clear other related storage keys
+                    GM_deleteValue('redlib_sidebar_hidden');
+
+                    // Clear any cached data in the sync module
+                    if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.clearCache) {
+                        RedlibSettingsSync.clearCache();
+                    }
+
                     window.location.reload();
                 } catch (e) {
                     console.warn('[Redlib Enhancement Suite] Failed to reset settings');
@@ -6994,51 +7238,70 @@ if (mergeBtn) {
 function addHeaderButtonListeners() {
     const inheritHeader = document.getElementById('inherit-header');
     const pushHeader = document.getElementById('push-header');
-
+    
     if (inheritHeader) {
-        inheritHeader.addEventListener('click', async function() {
-            if (confirm('Copy this instance\'s settings to become authoritative across all instances?')) {
-                try {
-                    // Perform inherit operation
-                    if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.inheritFromInstance) {
-                        await RedlibSettingsSync.inheritFromInstance();
-                    } else if (typeof inheritFromInstance === 'function') {
-                        await inheritFromInstance();
-                    }
-
-                    // Refresh the entire overlay after inherit
-                    setTimeout(() => {
-                        refreshSettingsOverlay();
-                    }, 500);
-
-                } catch (error) {
-                    console.error('[SYNC] Error during inherit:', error);
+        inheritHeader.onclick = async function() {
+            // Get current settings to show what will be inherited
+            const instance = await RedlibSettingsSync.extractInstanceSettings();
+            const currentAuth = RedlibSettingsSync.getAuthoritativeSettings();
+            
+            // Generate preview of what will be inherited
+            const changeSummary = RedlibSettingsSync.generateChangeSummary([], 'inherit', currentAuth, instance);
+            
+            const hasAuthoritySettings = Object.keys(currentAuth).length > 0;
+            let confirmMessage = hasAuthoritySettings ? 
+                'Overwrite existing authoritative settings?\n\n' :
+                'Copy this instance\'s settings to become authoritative?\n\n';
+            
+            if (changeSummary.details.length === 0) {
+                confirmMessage += 'No meaningful changes detected.\n\nProceed anyway?';
+            } else {
+                confirmMessage += `This will inherit:\n${changeSummary.details.join('\n')}\n\nProceed with inherit?`;
+            }
+            
+            if (confirm(confirmMessage)) {
+                if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.inheritFromInstance) {
+                    RedlibSettingsSync.inheritFromInstance();
                 }
             }
-        });
+        };
     }
-
+    
     if (pushHeader) {
-        pushHeader.addEventListener('click', async function() {
-            if (confirm('Apply authoritative settings to this instance?')) {
-                try {
-                    // Perform push operation
-                    if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.pushToInstance) {
-                        await RedlibSettingsSync.pushToInstance();
-                    } else if (typeof pushToInstance === 'function') {
-                        await pushToInstance();
-                    }
-
-                    // Refresh the entire overlay after push
-                    setTimeout(() => {
-                        refreshSettingsOverlay();
-                    }, 1500); // Give time for page redirect/reload
-
-                } catch (error) {
-                    console.error('[SYNC] Error during push:', error);
+        pushHeader.onclick = async function() {
+            // Force a fresh analysis to see what would change
+            const syncResult = await RedlibSettingsSync.performSync();
+            const changeSummary = RedlibSettingsSync.generateChangeSummary(syncResult.differences || [], 'push');
+            
+            let confirmMessage = 'Push authoritative settings to this instance?\n\n';
+            
+            if (changeSummary.details.length === 0) {
+                confirmMessage += 'No changes needed - settings already match.\n\nPush anyway?';
+            } else {
+                confirmMessage += `This will change:\n${changeSummary.details.join('\n')}\n\nProceed with push?`;
+            }
+            
+            if (confirm(confirmMessage)) {
+                if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.pushToInstance) {
+                    RedlibSettingsSync.pushToInstance();
                 }
             }
-        });
+        };
+    }
+}
+
+function updateExportString() {
+    const exportTextarea = document.getElementById('res-export-string');
+    if (exportTextarea) {
+        try {
+            const encodedSettings = RedlibSettingsSync.encodeRESSettings ? 
+                RedlibSettingsSync.encodeRESSettings() : 'Export functions not available';
+            exportTextarea.value = encodedSettings;
+            console.log('[SYNC] Export string updated');
+        } catch (error) {
+            console.warn('[SYNC] Failed to update export string:', error);
+            exportTextarea.value = 'Error generating export string';
+        }
     }
 }
 
@@ -7047,7 +7310,8 @@ function addHeaderButtonListeners() {
             getSetting: getSetting,
             setSetting: setSetting,
             loadSettings: loadSettings,
-            addHeaderButtonListeners: addHeaderButtonListeners
+            addHeaderButtonListeners: addHeaderButtonListeners,
+            updateExportString: updateExportString
         };
     })();
 
@@ -7062,6 +7326,150 @@ function addHeaderButtonListeners() {
         let cachedInstanceTimestamp = null;
         let cachedSettingsDifferences = []; // Add this line
 
+        // Helper function to create unified 3-column settings comparison with clickable headers
+        const createUnifiedSettingsTable = function(instanceSettings, authoritySettings) {
+        // Get all unique setting keys from both sources, excluding global data
+        const allSettings = new Set([
+            ...Object.keys(instanceSettings).filter(key => !key.includes('timestamp') && key !== 'hiddenPostsCount'),
+            ...Object.keys(authoritySettings).filter(key => !key.includes('timestamp') && key !== 'hiddenPostsCount')
+        ]);
+
+            if (allSettings.size === 0) {
+                return `<div style="text-align: center; color: var(--text); opacity: 0.6;">No settings found</div>`;
+            }
+
+            let html = `<table class="redlib-settings-comparison">`;
+            html += `<thead><tr>
+                <th>Setting</th>
+                <th class="button-header" id="inherit-header" title="Copy this instance's settings to become authoritative across all instances">Inherit</th>
+                <th class="button-header" id="push-header" title="Apply authoritative settings to this instance">Push</th>
+            </tr></thead><tbody>`;
+
+            // Define the order we want to show settings
+            const settingOrder = [
+                'theme', 'front_page', 'layout', 'wide', 'remove_default_feeds',
+                'show_nsfw', 'blur_nsfw', 'blur_spoiler', 'video_quality', 'post_sort', 'comment_sort',
+                'autoplay_videos', 'fixed_navbar', 'hide_sidebar_and_summary', 'use_hls', 'hide_hls_notification',
+                'disable_visit_reddit_confirmation', 'hide_awards', 'hide_score',
+                'subscriptions', 'filters', 'followed_users', 'filtered_users'
+            ];
+
+            // Show settings in preferred order, then any remaining
+            const orderedSettings = [
+                ...settingOrder.filter(setting => allSettings.has(setting)),
+                ...Array.from(allSettings).filter(setting => !settingOrder.includes(setting))
+            ];
+
+            orderedSettings.forEach(setting => {
+                const instanceValue = instanceSettings[setting];
+                const authorityValue = authoritySettings[setting];
+
+                let inheritDisplay = '';
+                let pushDisplay = '';
+                let valuesAreSame = false; // Declare this variable at the top
+
+                if (instanceValue !== undefined) {
+                    if (Array.isArray(instanceValue)) {
+                        // Special handling for arrays we want to show counts for
+                        if (setting === 'subscriptions') {
+                            inheritDisplay = `${instanceValue.length} subscriptions`;
+                        } else if (setting === 'filters') {
+                            inheritDisplay = `${instanceValue.length} filtered subreddits`;
+                        } else if (setting === 'followed_users') {
+                            inheritDisplay = `${instanceValue.length} followed users`;
+                        } else if (setting === 'filtered_users') {
+                            inheritDisplay = `${instanceValue.length} filtered users`;
+                        } else {
+                            inheritDisplay = `${instanceValue.length} items`;
+                        }
+                    } else {
+                        inheritDisplay = String(instanceValue);
+                    }
+                } else {
+                    inheritDisplay = '';
+                }
+
+                if (authorityValue !== undefined) {
+                    if (Array.isArray(authorityValue)) {
+                        // Special handling for arrays we want to show counts for
+                        if (setting === 'subscriptions') {
+                            pushDisplay = `${authorityValue.length} subscriptions`;
+                        } else if (setting === 'filters') {
+                            pushDisplay = `${authorityValue.length} filtered subreddits`;
+                        } else if (setting === 'followed_users') {
+                            pushDisplay = `${authorityValue.length} followed users`;
+                        } else if (setting === 'filtered_users') {
+                            pushDisplay = `${authorityValue.length} filtered users`;
+                        } else {
+                            pushDisplay = `${authorityValue.length} items`;
+                        }
+                    } else {
+                        pushDisplay = String(authorityValue);
+                    }
+                } else {
+                    pushDisplay = '';
+                }
+
+                // Determine if values are the same for highlighting
+                // valuesAreSame is already declared at the top of the forEach
+
+                // Helper function to check if a value represents "empty" state
+                const isEmptyValue = function(value) {
+                    if (value === undefined || value === null) return true;
+                    if (Array.isArray(value) && value.length === 0) return true;
+                    if (typeof value === 'string' && value.trim() === '') return true;
+                    return false;
+                };
+
+                // Compare values considering empty states as equivalent
+                if (isEmptyValue(instanceValue) && isEmptyValue(authorityValue)) {
+                    // Both are empty/undefined - consider them the same
+                    valuesAreSame = true;
+                } else if (!isEmptyValue(instanceValue) && !isEmptyValue(authorityValue)) {
+                    // Both have values - compare them
+                    if (Array.isArray(instanceValue) && Array.isArray(authorityValue)) {
+                        // For arrays, compare lengths and contents
+                        valuesAreSame = instanceValue.length === authorityValue.length &&
+                            instanceValue.every(item => authorityValue.includes(item)) &&
+                            authorityValue.every(item => instanceValue.includes(item));
+                    } else {
+                        // For simple values, direct comparison
+                        valuesAreSame = String(instanceValue) === String(authorityValue);
+                    }
+                } else {
+                    // One has a value, one is empty - they're different
+                    valuesAreSame = false;
+                }
+
+                const cellClass = valuesAreSame ? 'value-same' : 'value-different';
+
+                html += `<tr><td>${setting}</td><td class="${cellClass}">${inheritDisplay}</td><td class="${cellClass}">${pushDisplay}</td></tr>`;
+            });
+
+            html += `</tbody></table>`;
+
+            // Add separate section for global hidden posts (not part of sync comparison)
+            const globalHiddenCount = authoritySettings.hiddenPostsCount || 0;
+            html += `
+            <div style="margin-top: 12px;">
+                <table class="redlib-settings-comparison">
+                    <thead><tr>
+                        <th>Global Data</th>
+                        <th>Info</th>
+                        <th>Count</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr>
+                            <td>Hidden Posts</td>
+                            <td>Shared across all instances</td>
+                            <td class="value-same">${globalHiddenCount} hidden posts</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>`;
+
+            return html;
+        };
 
         // Timestamp formatting helpers
         function formatTimestamp(timestamp) {
@@ -7094,9 +7502,430 @@ function addHeaderButtonListeners() {
         // Get authoritative (stored) settings
         function getAuthoritativeSettings() {
             const storedJson = GM_getValue('redlib_authoritative_settings', '{}');
-            return JSON.parse(storedJson);
+            const settings = JSON.parse(storedJson);
+            
+            // Add hidden posts count - they're actually stored in redlib_collapsed_posts
+            const collapsedPostsData = GM_getValue('redlib_collapsed_posts', '{}');
+            const collapsedPosts = JSON.parse(collapsedPostsData || '{}');
+            
+            // Count posts that are collapsed (hidden)
+            const hiddenCount = Object.keys(collapsedPosts).filter(postId => {
+                const post = collapsedPosts[postId];
+                return post && post.collapsed === true;
+            }).length;
+            
+            settings.hiddenPostsCount = hiddenCount;
+            
+            console.log(`[HIDDEN POSTS DEBUG] Found ${hiddenCount} hidden posts in redlib_collapsed_posts`);
+            
+            return settings;
         }
 
+        // Helper function to generate meaningful change summaries from cached differences
+        const generateChangeSummary = function(settingsDifferences, contextType = 'general', beforeSettings = null, afterSettings = null) {
+            // For inherit context, we need to compare empty authority vs instance manually
+            if (contextType === 'inherit' && beforeSettings && afterSettings) {
+                const details = [];
+                let totalChanges = 0;
+
+                // Define all possible native redlib settings
+                const nativeSettings = [
+                    'theme', 'front_page', 'layout', 'wide', 'remove_default_feeds',
+                    'show_nsfw', 'blur_nsfw', 'blur_spoiler', 'video_quality', 'post_sort', 
+                    'comment_sort', 'autoplay_videos', 'fixed_navbar', 'hide_sidebar_and_summary', 
+                    'use_hls', 'hide_hls_notification', 'disable_visit_reddit_confirmation', 
+                    'hide_awards', 'hide_score'
+                ];
+
+                // Check for hidden posts changes (only show if there's a meaningful change)
+                const beforeHiddenCount = beforeSettings.hiddenPostsCount || 0;
+                const afterHiddenCount = afterSettings.hiddenPostsCount || 0;
+                if (beforeHiddenCount !== afterHiddenCount) {
+                    details.push(`• Hidden posts: ${beforeHiddenCount} → ${afterHiddenCount}`);
+                    totalChanges += Math.abs(afterHiddenCount - beforeHiddenCount);
+                }
+                
+                // Check each native setting for changes
+                nativeSettings.forEach(setting => {
+                    const beforeValue = beforeSettings[setting];
+                    const afterValue = afterSettings[setting];
+                    
+                    // Helper function to check if a value is effectively empty/not set
+                    const isEmptyValue = (value) => {
+                        return value === undefined || value === null || value === '' || value === 'not set';
+                    };
+                    
+                    // Only show if there's a meaningful change (not both empty, and after value is not empty)
+                    const beforeIsEmpty = isEmptyValue(beforeValue);
+                    const afterIsEmpty = isEmptyValue(afterValue);
+                    
+                    // Skip if both are empty, or if after value is empty (going from something to nothing is usually not interesting for inherit)
+                    if (beforeIsEmpty && afterIsEmpty) return; // Both empty - no change
+                    if (!beforeIsEmpty && afterIsEmpty) return; // Going from value to empty - not shown in inherit
+                    if (beforeIsEmpty && !afterIsEmpty) {
+                        // Going from empty to value - this is a meaningful change for inherit
+                        const settingName = setting === 'theme' ? 'Theme' :
+                                        setting === 'layout' ? 'Layout' :
+                                        setting === 'front_page' ? 'Front page' :
+                                        setting === 'wide' ? 'Wide layout' :
+                                        setting === 'remove_default_feeds' ? 'Remove default feeds' :
+                                        setting === 'show_nsfw' ? 'Show NSFW' :
+                                        setting === 'blur_nsfw' ? 'Blur NSFW' :
+                                        setting === 'blur_spoiler' ? 'Blur spoiler' :
+                                        setting === 'video_quality' ? 'Video quality' :
+                                        setting === 'post_sort' ? 'Post sort' :
+                                        setting === 'comment_sort' ? 'Comment sort' :
+                                        setting === 'autoplay_videos' ? 'Autoplay videos' :
+                                        setting === 'fixed_navbar' ? 'Fixed navbar' :
+                                        setting === 'hide_sidebar_and_summary' ? 'Hide sidebar' :
+                                        setting === 'use_hls' ? 'Use HLS' :
+                                        setting === 'hide_hls_notification' ? 'Hide HLS notification' :
+                                        setting === 'disable_visit_reddit_confirmation' ? 'No Reddit confirmation' :
+                                        setting === 'hide_awards' ? 'Hide awards' :
+                                        setting === 'hide_score' ? 'Hide score' :
+                                        setting;
+
+                        const beforeDisplay = 'not set';
+                        const afterDisplay = afterValue;
+                        
+                        details.push(`• ${settingName}: ${beforeDisplay} → ${afterDisplay}`);
+                        totalChanges += 1;
+                    } else if (!beforeIsEmpty && !afterIsEmpty && beforeValue !== afterValue) {
+                        // Both have values but they're different - meaningful change
+                        const settingName = setting === 'theme' ? 'Theme' :
+                                        // ... same mapping as above
+                                        setting;
+
+                        const beforeDisplay = beforeValue;
+                        const afterDisplay = afterValue;
+                        
+                        details.push(`• ${settingName}: ${beforeDisplay} → ${afterDisplay}`);
+                        totalChanges += 1;
+                    }
+                });
+
+                // Add section headers for better organization
+                if (details.length > 0) {
+                    // Insert REDLIB SETTINGS header before existing settings
+                    const settingsDetails = [...details];
+                    details.length = 0; // Clear array
+                    
+                    if (beforeHiddenCount !== afterHiddenCount) {
+                        details.push('GLOBAL DATA:');
+                        details.push(`• Hidden posts: ${beforeHiddenCount} → ${afterHiddenCount}`);
+                        details.push('');
+                    }
+                    
+                    details.push('RES MODULES:');
+                    details.push('• Enhancement modules imported and enabled');
+                    details.push('');
+                    
+                    if (settingsDetails.length > 0) {
+                        details.push('REDLIB SETTINGS:');
+                        details.push(...settingsDetails);
+                        details.push('');
+                    }
+                }
+                
+                // LISTS section
+                if (['subscriptions', 'filters', 'followed_users', 'filtered_users'].some(setting => 
+                    (afterSettings[setting] || []).length > 0)) {
+                    details.push('LISTS:');
+                }
+                
+                ['subscriptions', 'filters', 'followed_users', 'filtered_users'].forEach(setting => {
+                    const beforeArray = beforeSettings[setting] || [];
+                    const afterArray = afterSettings[setting] || [];
+                    
+                    if (afterArray.length > 0) {
+                        const settingName = setting === 'subscriptions' ? 'subscriptions' :
+                                        setting === 'filters' ? 'filtered subreddits' :
+                                        setting === 'followed_users' ? 'followed users' :
+                                        setting === 'filtered_users' ? 'filtered users' : setting;
+                        
+                        details.push(`• ${beforeArray.length} → ${afterArray.length} ${settingName}`);
+                        totalChanges += afterArray.length;
+                    }
+                });
+
+                return {
+                    summary: details.length > 0 ? `${details.length} types of changes (${totalChanges} total items)` : 'No meaningful changes detected',
+                    details: details,
+                    totalChanges: totalChanges
+                };
+            }
+
+            // For push/general context, use the existing differences analysis
+            if (!settingsDifferences || settingsDifferences.length === 0) {
+                return { summary: 'No changes detected', details: [] };
+            }
+
+            const details = [];
+            let totalChanges = 0;
+
+            // For import success dialog - organized sections
+            if (contextType === 'import-success' && beforeSettings && afterSettings) {
+                const details = [];
+                let totalChanges = 0;
+                
+                // GLOBAL DATA section
+                const beforeHidden = beforeSettings.hiddenPostsCount || 0;
+                const afterHidden = afterSettings.hiddenPostsCount || 0;
+                if (beforeHidden !== afterHidden) {
+                    details.push(`GLOBAL DATA:`);
+                    details.push(`• Hidden posts: ${beforeHidden} → ${afterHidden}`);
+                    details.push('');
+                }
+                
+                // RES MODULES section  
+                details.push(`RES MODULES:`);
+                details.push(`• Enhancement modules imported and enabled`);
+                details.push('');
+                
+                // REDLIB SETTINGS section
+                details.push(`REDLIB SETTINGS:`);
+                const nativeSettings = [
+                    'theme', 'front_page', 'layout', 'wide', 'remove_default_feeds',
+                    'show_nsfw', 'blur_nsfw', 'blur_spoiler', 'video_quality', 'post_sort', 
+                    'comment_sort', 'autoplay_videos', 'fixed_navbar', 'hide_sidebar_and_summary', 
+                    'use_hls', 'hide_hls_notification', 'disable_visit_reddit_confirmation', 
+                    'hide_awards', 'hide_score'
+                ];
+                
+                nativeSettings.forEach(setting => {
+                    const beforeValue = beforeSettings[setting];
+                    const afterValue = afterSettings[setting];
+                    
+                    const isEmptyValue = (value) => value === undefined || value === null || value === '' || value === 'not set';
+                    const beforeIsEmpty = isEmptyValue(beforeValue);
+                    const afterIsEmpty = isEmptyValue(afterValue);
+                    
+                    if (beforeIsEmpty && !afterIsEmpty) {
+                        const settingName = setting === 'theme' ? 'Theme' :
+                                        setting === 'front_page' ? 'Front page' :
+                                        setting === 'layout' ? 'Layout' :
+                                        setting === 'wide' ? 'Wide layout' :
+                                        setting === 'remove_default_feeds' ? 'Remove default feeds' :
+                                        setting === 'show_nsfw' ? 'Show NSFW' :
+                                        setting === 'blur_nsfw' ? 'Blur NSFW' :
+                                        setting === 'blur_spoiler' ? 'Blur spoiler' :
+                                        setting === 'video_quality' ? 'Video quality' :
+                                        setting === 'post_sort' ? 'Post sort' :
+                                        setting === 'comment_sort' ? 'Comment sort' :
+                                        setting === 'autoplay_videos' ? 'Autoplay videos' :
+                                        setting === 'fixed_navbar' ? 'Fixed navbar' :
+                                        setting === 'hide_sidebar_and_summary' ? 'Hide sidebar' :
+                                        setting === 'use_hls' ? 'Use HLS' :
+                                        setting === 'hide_hls_notification' ? 'Hide HLS notification' :
+                                        setting === 'disable_visit_reddit_confirmation' ? 'No Reddit confirmation' :
+                                        setting === 'hide_awards' ? 'Hide awards' :
+                                        setting === 'hide_score' ? 'Hide score' : setting;
+                        
+                        details.push(`• ${settingName}: → ${afterValue}`);
+                    }
+                });
+                
+                details.push('');
+                
+                // LISTS section
+                details.push(`LISTS:`);
+                ['subscriptions', 'filters', 'followed_users', 'filtered_users'].forEach(setting => {
+                    const beforeArray = beforeSettings[setting] || [];
+                    const afterArray = afterSettings[setting] || [];
+                    
+                    if (afterArray.length > 0) {
+                        const settingName = setting === 'subscriptions' ? 'subscriptions' :
+                                        setting === 'filters' ? 'filtered subreddits' :
+                                        setting === 'followed_users' ? 'followed users' :
+                                        setting === 'filtered_users' ? 'filtered users' : setting;
+                        
+                        details.push(`• Add ${afterArray.length} ${settingName}`);
+                        totalChanges += afterArray.length;
+                    }
+                });
+
+                return {
+                    summary: details.length > 0 ? `Import completed with ${totalChanges} total items` : 'Import completed',
+                    details: details,
+                    totalChanges: totalChanges
+                };
+            }
+
+            // For push confirmation after import - organized sections  
+            if (contextType === 'push-organized') {
+                const details = [];
+                
+                if (!settingsDifferences || settingsDifferences.length === 0) {
+                    return { summary: 'No changes needed', details: ['• All settings already match'] };
+                }
+                
+                // Group by type for better organization
+                const simpleValueChanges = [];
+                const listChanges = [];
+                
+                settingsDifferences.forEach(diff => {
+                    if (diff.type === 'array') {
+                        const missing = diff.missingFromInstance?.length || 0;
+                        if (missing > 0) {
+                            const settingName = diff.setting === 'subscriptions' ? 'subscriptions' :
+                                            diff.setting === 'filters' ? 'filtered subreddits' :
+                                            diff.setting === 'followed_users' ? 'followed users' :
+                                            diff.setting === 'filtered_users' ? 'filtered users' : diff.setting;
+                            listChanges.push(`• Add ${missing} ${settingName}`);
+                        }
+                    } else if (diff.type === 'value') {
+                        const settingName = diff.setting === 'theme' ? 'Theme' :
+                                        diff.setting === 'layout' ? 'Layout' :
+                                        diff.setting === 'front_page' ? 'Front page' :
+                                        diff.setting === 'wide' ? 'Wide layout' :
+                                        diff.setting === 'remove_default_feeds' ? 'Remove default feeds' :
+                                        diff.setting === 'show_nsfw' ? 'Show NSFW' :
+                                        diff.setting === 'blur_nsfw' ? 'Blur NSFW' :
+                                        diff.setting === 'blur_spoiler' ? 'Blur spoiler' :
+                                        diff.setting === 'video_quality' ? 'Video quality' :
+                                        diff.setting === 'post_sort' ? 'Post sort' :
+                                        diff.setting === 'comment_sort' ? 'Comment sort' :
+                                        diff.setting === 'autoplay_videos' ? 'Autoplay videos' :
+                                        diff.setting === 'fixed_navbar' ? 'Fixed navbar' :
+                                        diff.setting === 'hide_sidebar_and_summary' ? 'Hide sidebar' :
+                                        diff.setting === 'use_hls' ? 'Use HLS' :
+                                        diff.setting === 'hide_hls_notification' ? 'Hide HLS notification' :
+                                        diff.setting === 'disable_visit_reddit_confirmation' ? 'No Reddit confirmation' :
+                                        diff.setting === 'hide_awards' ? 'Hide awards' :
+                                        diff.setting === 'hide_score' ? 'Hide score' : diff.setting;
+                        
+                        simpleValueChanges.push(`• ${settingName}: → ${diff.authValue}`);
+                    }
+                });
+                
+                // Add sections
+                if (simpleValueChanges.length > 0) {
+                    details.push('REDLIB SETTINGS:');
+                    details.push(...simpleValueChanges);
+                    details.push('');
+                }
+                
+                if (listChanges.length > 0) {
+                    details.push('LISTS:');
+                    details.push(...listChanges);
+                }
+                
+                return { summary: `${settingsDifferences.length} changes to apply`, details, totalChanges: settingsDifferences.length };
+            }
+            
+            if (contextType === 'merge') {
+                // For merge operations, only show what will be inherited from instance
+                settingsDifferences.forEach(diff => {
+                    if (diff.type === 'array' && diff.extraInInstance && diff.extraInInstance.length > 0) {
+                        const settingName = diff.setting === 'subscriptions' ? 'subscriptions' :
+                                        diff.setting === 'filters' ? 'filtered subreddits' :
+                                        diff.setting === 'followed_users' ? 'followed users' :
+                                        diff.setting === 'filtered_users' ? 'filtered users' : diff.setting;
+                        details.push(`• Inherit ${diff.extraInInstance.length} ${settingName} from instance`);
+                        totalChanges += diff.extraInInstance.length;
+                    } else if (diff.type === 'value' && (diff.authValue === undefined || diff.authValue === null || diff.authValue === '')) {
+                        const settingName = diff.setting === 'theme' ? 'Theme' :
+                                        diff.setting === 'layout' ? 'Layout' :
+                                        diff.setting === 'front_page' ? 'Front page' : diff.setting;
+                        details.push(`• Inherit ${settingName}: ${diff.instanceValue} from instance`);
+                        totalChanges += 1;
+                    }
+                });
+                
+                if (details.length === 0) {
+                    details.push('• No settings to inherit - authority already has all instance settings');
+                }
+            } else {
+                // For push/general context, process all differences
+                settingsDifferences.forEach(diff => {
+                    if (diff.type === 'array') {
+                        const missing = diff.missingFromInstance?.length || 0;
+                        const extra = diff.extraInInstance?.length || 0;
+                        
+                        if (missing > 0 || extra > 0) {
+                            const settingName = diff.setting === 'subscriptions' ? 'subscriptions' :
+                                            diff.setting === 'filters' ? 'filtered subreddits' :
+                                            diff.setting === 'followed_users' ? 'followed users' :
+                                            diff.setting === 'filtered_users' ? 'filtered users' : diff.setting;
+
+                            if (contextType === 'push') {
+                                // For push: show what will change
+                                if (missing > 0) {
+                                    details.push(`• Add ${missing} ${settingName}`);
+                                    totalChanges += missing;
+                                }
+                                if (extra > 0) {
+                                    details.push(`• Remove ${extra} ${settingName}`);
+                                    totalChanges += extra;
+                                }
+                            } else {
+                                // General summary
+                                if (diff.authValue > 0 || diff.instanceValue > 0) {
+                                    details.push(`• ${settingName}: ${diff.authValue || 0} → ${diff.instanceValue || 0}`);
+                                    totalChanges += missing + extra;
+                                }
+                            }
+                        }
+                    } else if (diff.type === 'value' && diff.authValue !== diff.instanceValue) {
+                        // Simple value differences
+                        const isEmptyValue = (value) => {
+                            return value === undefined || value === null || value === '' || value === 'not set';
+                        };
+                        
+                        const authIsEmpty = isEmptyValue(diff.authValue);
+                        const instIsEmpty = isEmptyValue(diff.instanceValue);
+                        
+                        // Only show meaningful changes (skip if both empty)
+                        if (!(authIsEmpty && instIsEmpty)) {
+                            const settingName = diff.setting === 'theme' ? 'Theme' :
+                                            diff.setting === 'layout' ? 'Layout' :
+                                            diff.setting === 'front_page' ? 'Front page' :
+                                            diff.setting === 'wide' ? 'Wide layout' :
+                                            diff.setting === 'remove_default_feeds' ? 'Remove default feeds' :
+                                            diff.setting === 'show_nsfw' ? 'Show NSFW' :
+                                            diff.setting === 'blur_nsfw' ? 'Blur NSFW' :
+                                            diff.setting === 'blur_spoiler' ? 'Blur spoiler' :
+                                            diff.setting === 'video_quality' ? 'Video quality' :
+                                            diff.setting === 'post_sort' ? 'Post sort' :
+                                            diff.setting === 'comment_sort' ? 'Comment sort' :
+                                            diff.setting === 'autoplay_videos' ? 'Autoplay videos' :
+                                            diff.setting === 'fixed_navbar' ? 'Fixed navbar' :
+                                            diff.setting === 'hide_sidebar_and_summary' ? 'Hide sidebar' :
+                                            diff.setting === 'use_hls' ? 'Use HLS' :
+                                            diff.setting === 'hide_hls_notification' ? 'Hide HLS notification' :
+                                            diff.setting === 'disable_visit_reddit_confirmation' ? 'No Reddit confirmation' :
+                                            diff.setting === 'hide_awards' ? 'Hide awards' :
+                                            diff.setting === 'hide_score' ? 'Hide score' :
+                                            diff.setting;
+                            
+                            if (contextType === 'push') {
+                                details.push(`• ${settingName}: → ${diff.authValue}`);
+                                totalChanges += 1;
+                            } else {
+                                const beforeValue = authIsEmpty ? 'not set' : diff.authValue;
+                                const afterValue = instIsEmpty ? 'not set' : diff.instanceValue;
+                                details.push(`• ${settingName}: ${beforeValue} → ${afterValue}`);
+                                totalChanges += 1;
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Filter out meaningless entries
+            const meaningfulDetails = details.filter(detail => 
+                !detail.includes('0 ') && 
+                !detail.includes('not set → not set') &&
+                !detail.includes(': 0 → 0')
+            );
+
+            const summary = meaningfulDetails.length > 0 ? 
+                `${meaningfulDetails.length} types of changes (${totalChanges} total items)` :
+                'No meaningful changes detected';
+
+            return { summary, details: meaningfulDetails, totalChanges };
+        };
+        
         // Save authoritative settings
         function saveAuthoritativeSettings(settings) {
             GM_setValue('redlib_authoritative_settings', JSON.stringify(settings));
@@ -7117,148 +7946,148 @@ function addHeaderButtonListeners() {
             return a.sort().join(',') === b.sort().join(',');
         }
 
-async function extractInstanceSettings() {
-    try {
-//        console.log('[SYNC] Extracting current instance settings...');
+        async function extractInstanceSettings() {
+            try {
+                //        console.log('[SYNC] Extracting current instance settings...');
 
-        let doc;
-        let settingsUrl;
+                let doc;
+                let settingsUrl;
 
-        // Check if we're already on the settings page
-        if (window.location.pathname === '/settings' || window.location.pathname.endsWith('/settings')) {
-            console.log('[SYNC] Already on settings page, using current document');
-            doc = document;
-            settingsUrl = window.location.href;
-        } else {
-//            console.log('[SYNC] Fetching settings page...');
-            settingsUrl = window.location.origin + '/settings';
-            const response = await fetch(settingsUrl);
-            const html = await response.text();
-            const parser = new DOMParser();
-            doc = parser.parseFromString(html, 'text/html');
-//            console.log('[SYNC] Settings page fetched');
-        }
+                // Check if we're already on the settings page
+                if (window.location.pathname === '/settings' || window.location.pathname.endsWith('/settings')) {
+                    console.log('[SYNC] Already on settings page, using current document');
+                    doc = document;
+                    settingsUrl = window.location.href;
+                } else {
+                    //            console.log('[SYNC] Fetching settings page...');
+                    settingsUrl = window.location.origin + '/settings';
+                    const response = await fetch(settingsUrl);
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    doc = parser.parseFromString(html, 'text/html');
+                    //            console.log('[SYNC] Settings page fetched');
+                }
 
-        const restoreLink = doc.querySelector('a[href*="/settings/restore/"]');
+                const restoreLink = doc.querySelector('a[href*="/settings/restore/"]');
 
-        if (!restoreLink) {
-            console.warn('[SYNC] Could not find restore link');
-            return {};
-        }
+                if (!restoreLink) {
+                    console.warn('[SYNC] Could not find restore link');
+                    return {};
+                }
 
-//        console.log('[SYNC] Raw restore link found:', restoreLink.href);
+                //        console.log('[SYNC] Raw restore link found:', restoreLink.href);
 
-        const restoreUrl = new URL(restoreLink.href, window.location.origin);
-        const urlParams = new URLSearchParams(restoreUrl.search);
+                const restoreUrl = new URL(restoreLink.href, window.location.origin);
+                const urlParams = new URLSearchParams(restoreUrl.search);
 
-        const instanceSettings = {};
+                const instanceSettings = {};
 
-        // **EXTRACT ALL SETTINGS - COMPLETE VERSION**
+                // **EXTRACT ALL SETTINGS - COMPLETE VERSION**
 
-        // Appearance
-        if (urlParams.has('theme')) {
-            instanceSettings.theme = urlParams.get('theme');
-        }
+                // Appearance
+                if (urlParams.has('theme')) {
+                    instanceSettings.theme = urlParams.get('theme');
+                }
 
-        // Interface
-        if (urlParams.has('remove_default_feeds')) {
-            instanceSettings.remove_default_feeds = urlParams.get('remove_default_feeds');
-        }
-        if (urlParams.has('front_page')) {
-            instanceSettings.front_page = urlParams.get('front_page');
-        }
-        if (urlParams.has('layout')) {
-            instanceSettings.layout = urlParams.get('layout');
-        }
-        if (urlParams.has('wide')) {
-            instanceSettings.wide = urlParams.get('wide');
-        }
+                // Interface
+                if (urlParams.has('remove_default_feeds')) {
+                    instanceSettings.remove_default_feeds = urlParams.get('remove_default_feeds');
+                }
+                if (urlParams.has('front_page')) {
+                    instanceSettings.front_page = urlParams.get('front_page');
+                }
+                if (urlParams.has('layout')) {
+                    instanceSettings.layout = urlParams.get('layout');
+                }
+                if (urlParams.has('wide')) {
+                    instanceSettings.wide = urlParams.get('wide');
+                }
 
-        // Content
-        if (urlParams.has('video_quality')) {
-            instanceSettings.video_quality = urlParams.get('video_quality');
-        }
-        if (urlParams.has('post_sort')) {
-            instanceSettings.post_sort = urlParams.get('post_sort');
-        }
-        if (urlParams.has('blur_spoiler')) {
-            instanceSettings.blur_spoiler = urlParams.get('blur_spoiler');
-        }
-        if (urlParams.has('show_nsfw')) {
-            instanceSettings.show_nsfw = urlParams.get('show_nsfw');
-        }
-        if (urlParams.has('blur_nsfw')) {
-            instanceSettings.blur_nsfw = urlParams.get('blur_nsfw');
-        }
-        if (urlParams.has('autoplay_videos')) {
-            instanceSettings.autoplay_videos = urlParams.get('autoplay_videos');
-        }
-        if (urlParams.has('fixed_navbar')) {
-            instanceSettings.fixed_navbar = urlParams.get('fixed_navbar');
-        }
-        if (urlParams.has('hide_sidebar_and_summary')) {
-            instanceSettings.hide_sidebar_and_summary = urlParams.get('hide_sidebar_and_summary');
-        }
-        if (urlParams.has('use_hls')) {
-            instanceSettings.use_hls = urlParams.get('use_hls');
-        }
-        if (urlParams.has('hide_hls_notification')) {
-            instanceSettings.hide_hls_notification = urlParams.get('hide_hls_notification');
-        }
-        if (urlParams.has('disable_visit_reddit_confirmation')) {
-            instanceSettings.disable_visit_reddit_confirmation = urlParams.get('disable_visit_reddit_confirmation');
-        }
-        if (urlParams.has('comment_sort')) {
-            instanceSettings.comment_sort = urlParams.get('comment_sort');
-        }
-        if (urlParams.has('hide_awards')) {
-            instanceSettings.hide_awards = urlParams.get('hide_awards');
-        }
-        if (urlParams.has('hide_score')) {
-            instanceSettings.hide_score = urlParams.get('hide_score');
-        }
+                // Content
+                if (urlParams.has('video_quality')) {
+                    instanceSettings.video_quality = urlParams.get('video_quality');
+                }
+                if (urlParams.has('post_sort')) {
+                    instanceSettings.post_sort = urlParams.get('post_sort');
+                }
+                if (urlParams.has('blur_spoiler')) {
+                    instanceSettings.blur_spoiler = urlParams.get('blur_spoiler');
+                }
+                if (urlParams.has('show_nsfw')) {
+                    instanceSettings.show_nsfw = urlParams.get('show_nsfw');
+                }
+                if (urlParams.has('blur_nsfw')) {
+                    instanceSettings.blur_nsfw = urlParams.get('blur_nsfw');
+                }
+                if (urlParams.has('autoplay_videos')) {
+                    instanceSettings.autoplay_videos = urlParams.get('autoplay_videos');
+                }
+                if (urlParams.has('fixed_navbar')) {
+                    instanceSettings.fixed_navbar = urlParams.get('fixed_navbar');
+                }
+                if (urlParams.has('hide_sidebar_and_summary')) {
+                    instanceSettings.hide_sidebar_and_summary = urlParams.get('hide_sidebar_and_summary');
+                }
+                if (urlParams.has('use_hls')) {
+                    instanceSettings.use_hls = urlParams.get('use_hls');
+                }
+                if (urlParams.has('hide_hls_notification')) {
+                    instanceSettings.hide_hls_notification = urlParams.get('hide_hls_notification');
+                }
+                if (urlParams.has('disable_visit_reddit_confirmation')) {
+                    instanceSettings.disable_visit_reddit_confirmation = urlParams.get('disable_visit_reddit_confirmation');
+                }
+                if (urlParams.has('comment_sort')) {
+                    instanceSettings.comment_sort = urlParams.get('comment_sort');
+                }
+                if (urlParams.has('hide_awards')) {
+                    instanceSettings.hide_awards = urlParams.get('hide_awards');
+                }
+                if (urlParams.has('hide_score')) {
+                    instanceSettings.hide_score = urlParams.get('hide_score');
+                }
 
-        // Lists (only extract if present and not empty)
-        if (urlParams.has('subscriptions')) {
-            const subscriptionsParam = urlParams.get('subscriptions');
-            instanceSettings.subscriptions = (subscriptionsParam && subscriptionsParam.trim() !== '') ?
-                subscriptionsParam.split('+').map(s => s.trim()).filter(s => s.length > 0) : [];
+                // Lists (only extract if present and not empty)
+                if (urlParams.has('subscriptions')) {
+                    const subscriptionsParam = urlParams.get('subscriptions');
+                    instanceSettings.subscriptions = (subscriptionsParam && subscriptionsParam.trim() !== '') ?
+                        subscriptionsParam.split('+').map(s => s.trim()).filter(s => s.length > 0) : [];
+                }
+
+                if (urlParams.has('filters')) {
+                    const filtersParam = urlParams.get('filters');
+                    instanceSettings.filters = (filtersParam && filtersParam.trim() !== '') ?
+                        filtersParam.split('+').map(s => s.trim()).filter(s => s.length > 0) : [];
+                }
+
+                if (urlParams.has('followed_users')) {
+                    const followedUsersParam = urlParams.get('followed_users');
+                    instanceSettings.followed_users = (followedUsersParam && followedUsersParam.trim() !== '') ?
+                        followedUsersParam.split('+').map(s => s.trim()).filter(s => s.length > 0) : [];
+                }
+
+                if (urlParams.has('filtered_users')) {
+                    const filteredUsersParam = urlParams.get('filtered_users');
+                    instanceSettings.filtered_users = (filteredUsersParam && filteredUsersParam.trim() !== '') ?
+                        filteredUsersParam.split('+').map(s => s.trim()).filter(s => s.length > 0) : [];
+                }
+
+                console.log('[SYNC] Instance settings extracted from instance\'s restore url:', {
+                    settingsFound: Object.keys(instanceSettings),
+                    subscriptionsCount: instanceSettings.subscriptions?.length || 0,
+                    filtersCount: instanceSettings.filters?.length || 0,
+                    followedUsersCount: instanceSettings.followed_users?.length || 0,
+                    filteredUsersCount: instanceSettings.filtered_users?.length || 0,
+                    allSettings: instanceSettings
+                });
+
+                return instanceSettings;
+
+            } catch (e) {
+                console.warn('[SYNC] Failed to extract instance settings:', e);
+                return {};
+            }
         }
-
-        if (urlParams.has('filters')) {
-            const filtersParam = urlParams.get('filters');
-            instanceSettings.filters = (filtersParam && filtersParam.trim() !== '') ?
-                filtersParam.split('+').map(s => s.trim()).filter(s => s.length > 0) : [];
-        }
-
-        if (urlParams.has('followed_users')) {
-            const followedUsersParam = urlParams.get('followed_users');
-            instanceSettings.followed_users = (followedUsersParam && followedUsersParam.trim() !== '') ?
-                followedUsersParam.split('+').map(s => s.trim()).filter(s => s.length > 0) : [];
-        }
-
-        if (urlParams.has('filtered_users')) {
-            const filteredUsersParam = urlParams.get('filtered_users');
-            instanceSettings.filtered_users = (filteredUsersParam && filteredUsersParam.trim() !== '') ?
-                filteredUsersParam.split('+').map(s => s.trim()).filter(s => s.length > 0) : [];
-        }
-
-        console.log('[SYNC] Instance settings extracted from instance\'s restore url:', {
-            settingsFound: Object.keys(instanceSettings),
-            subscriptionsCount: instanceSettings.subscriptions?.length || 0,
-            filtersCount: instanceSettings.filters?.length || 0,
-            followedUsersCount: instanceSettings.followed_users?.length || 0,
-            filteredUsersCount: instanceSettings.filtered_users?.length || 0,
-            allSettings: instanceSettings
-        });
-
-        return instanceSettings;
-
-    } catch (e) {
-        console.warn('[SYNC] Failed to extract instance settings:', e);
-        return {};
-    }
-}
 
         // Generate settings URL for applying to instance
         function generateSettingsUrl(authoritativeSettings) {
@@ -7383,17 +8212,21 @@ async function extractInstanceSettings() {
                 reason = 'Instance has no settings configured';
             } else {
                 // Compare all settings individually
-// Compare all settings individually - check BOTH directions
-const authSettings = Object.keys(cachedAuthoritative).filter(key => !key.includes('timestamp'));
-const instanceSettings = Object.keys(cachedInstance).filter(key => !key.includes('timestamp'));
-const allSettings = [...new Set([...authSettings, ...instanceSettings])];
+                // Compare all settings individually - check BOTH directions
+                const authSettings = Object.keys(cachedAuthoritative).filter(key => !key.includes('timestamp'));
+                const instanceSettings = Object.keys(cachedInstance).filter(key => !key.includes('timestamp'));
+                const allSettings = [...new Set([...authSettings, ...instanceSettings])];
 
-allSettings.forEach(setting => {
-if (Array.isArray(cachedAuthoritative[setting]) || Array.isArray(cachedInstance[setting])) {
-    const authArray = cachedAuthoritative[setting] || [];
-    const instanceArray = cachedInstance[setting] || [];
+                allSettings.forEach(setting => {
+                    // Skip global settings that shouldn't be part of sync comparison
+                    if (setting === 'hiddenPostsCount') {
+                        return;
+                    }
+                    if (Array.isArray(cachedAuthoritative[setting]) || Array.isArray(cachedInstance[setting])) {
+                        const authArray = cachedAuthoritative[setting] || [];
+                        const instanceArray = cachedInstance[setting] || [];
 
-    if (!arraysEqual(instanceArray, authArray)) {
+                        if (!arraysEqual(instanceArray, authArray)) {
 
                             // Find what's in auth but not in instance (missing from instance)
                             const missingFromInstance = authArray.filter(item => !instanceArray.includes(item));
@@ -7411,17 +8244,17 @@ if (Array.isArray(cachedAuthoritative[setting]) || Array.isArray(cachedInstance[
                                 netDifference: authArray.length - instanceArray.length,
                                 needsMerge: extraInInstance.length > 0 && missingFromInstance.length > 0
                             });
-console.log(`[SYNC DEBUG] Added difference for ${setting}:`, {
-    setting: setting,
-    authArrayLength: authArray.length,
-    instanceArrayLength: instanceArray.length,
-    authArraySample: authArray.slice(0, 3),
-    instanceArraySample: instanceArray.slice(0, 3),
-    missingFromInstanceCount: missingFromInstance.length,
-    missingFromInstanceSample: missingFromInstance.slice(0, 3),
-    extraInInstanceCount: extraInInstance.length,
-    extraInInstanceSample: extraInInstance.slice(0, 3)
-});
+                            console.log(`[SYNC DEBUG] Added difference for ${setting}:`, {
+                                setting: setting,
+                                authArrayLength: authArray.length,
+                                instanceArrayLength: instanceArray.length,
+                                authArraySample: authArray.slice(0, 3),
+                                instanceArraySample: instanceArray.slice(0, 3),
+                                missingFromInstanceCount: missingFromInstance.length,
+                                missingFromInstanceSample: missingFromInstance.slice(0, 3),
+                                extraInInstanceCount: extraInInstance.length,
+                                extraInInstanceSample: extraInInstance.slice(0, 3)
+                            });
                         }
                     } else {
                         if (cachedInstance[setting] !== cachedAuthoritative[setting]) {
@@ -7524,8 +8357,8 @@ console.log(`[SYNC DEBUG] Added difference for ${setting}:`, {
 
                 case 'SELECTIVE_PUSH':
                     const selectiveChanges = settingsDifferences.filter(diff =>
-                        (diff.missingFromInstance?.length || 0) + (diff.extraInInstance?.length || 0) > 0
-                    );
+                                                                        (diff.missingFromInstance?.length || 0) + (diff.extraInInstance?.length || 0) > 0
+                                                                       );
 
                     console.log('[SYNC] 4. WOULD PUSH SELECTIVELY:', {
                         action: 'Would push individual items using hover popup actions to avoid cookie limits',
@@ -7536,8 +8369,8 @@ console.log(`[SYNC DEBUG] Added difference for ${setting}:`, {
                             method: 'Individual hover popup actions'
                         })),
                         totalOperations: selectiveChanges.reduce((total, diff) =>
-                            total + (diff.missingFromInstance?.length || 0) + (diff.extraInInstance?.length || 0), 0
-                        )
+                                                                 total + (diff.missingFromInstance?.length || 0) + (diff.extraInInstance?.length || 0), 0
+                                                                )
                     });
                     break;
 
@@ -7576,20 +8409,26 @@ console.log(`[SYNC DEBUG] Added difference for ${setting}:`, {
 
             // 4. Update sync status using cached data
             updateSyncStatusFromCache();
-console.log('[SYNC DEBUG] Final settingsDifferences before caching:', settingsDifferences.map(diff => ({
-    setting: diff.setting,
-    type: diff.type,
-    authValue: diff.authValue,
-    instanceValue: diff.instanceValue,
-    missingFromInstanceLength: diff.missingFromInstance?.length || 0,
-    extraInInstanceLength: diff.extraInInstance?.length || 0,
-    missingFromInstanceSample: diff.missingFromInstance?.slice(0, 2) || [],
-    extraInInstanceSample: diff.extraInInstance?.slice(0, 2) || []
-})));
+            console.log('[SYNC DEBUG] Final settingsDifferences before caching:', settingsDifferences.map(diff => ({
+                setting: diff.setting,
+                type: diff.type,
+                authValue: diff.authValue,
+                instanceValue: diff.instanceValue,
+                missingFromInstanceLength: diff.missingFromInstance?.length || 0,
+                extraInInstanceLength: diff.extraInInstance?.length || 0,
+                missingFromInstanceSample: diff.missingFromInstance?.slice(0, 2) || [],
+                extraInInstanceSample: diff.extraInInstance?.slice(0, 2) || []
+            })));
             cachedSettingsDifferences = settingsDifferences; // Store for later use
 
             console.log('[SYNC] === SYNC CHECK END ===');
-            return action;
+
+            return { 
+                action, 
+                reason, 
+                differences: settingsDifferences,
+                totalDifferences: settingsDifferences.length 
+            };
         }
 
         // Handle user actions (hover popup filter/subscribe)
@@ -7667,480 +8506,499 @@ console.log('[SYNC DEBUG] Final settingsDifferences before caching:', settingsDi
                 const notification = document.createElement('div');
                 notification.style.cssText = `
                 position: fixed;
-                top: 20px;
-                right: 20px;
-                background: var(--accent);
-                color: var(--foreground);
-                padding: 12px 20px;
-                border-radius: 6px;
-                z-index: 10000;
-                font-family: sans-serif;
-                font-size: 14px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            `;
+top: 20px;
+right: 20px;
+background: var(--accent);
+color: var(--foreground);
+padding: 12px 20px;
+border-radius: 6px;
+z-index: 10000;
+font-family: sans-serif;
+font-size: 14px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+`;
 
-            let actionText = '';
-            if (action === 'subscribe') actionText = 'Subscribed to';
-            else if (action === 'unsubscribe') actionText = 'Unsubscribed from';
-            else if (action === 'filter') actionText = 'Filtered';
-            else if (action === 'unfilter') actionText = 'Unfiltered';
+                let actionText = '';
+                if (action === 'subscribe') actionText = 'Subscribed to';
+                else if (action === 'unsubscribe') actionText = 'Unsubscribed from';
+                else if (action === 'filter') actionText = 'Filtered';
+                else if (action === 'unfilter') actionText = 'Unfiltered';
 
-            notification.textContent = `${actionText} r/${subredditName} (Authoritative)`;
-            document.body.appendChild(notification);
+                notification.textContent = `${actionText} r/${subredditName} (Authoritative)`;
+                document.body.appendChild(notification);
 
-            setTimeout(() => notification.remove(), 3000);
+                setTimeout(() => notification.remove(), 3000);
 
-        } catch (e) {
-            console.warn('[SYNC] Failed to handle user action:', e);
-        }
-        }
-
-function getCurrentSubredditName() {
-    console.log('[SYNC] getCurrentSubredditName - pathname:', window.location.pathname);
-
-    // Extract subreddit name from URL or page elements
-    const pathMatch = window.location.pathname.match(/^\/r\/([^\/]+)/);
-    if (pathMatch) {
-        console.log('[SYNC] Found subreddit from URL:', pathMatch[1]);
-        return pathMatch[1];
-    }
-
-    // Fallback: try to get from subreddit name element
-    const nameElement = document.querySelector('#sub_name');
-    if (nameElement) {
-        const name = nameElement.textContent.replace(/^r\//, '');
-        console.log('[SYNC] Found subreddit from element:', name);
-        return name;
-    }
-
-    console.warn('[SYNC] Could not find subreddit name');
-    return null;
-}
-
-// function updateNativeButtonState(button, action) {
-//     console.log('[SYNC] updateNativeButtonState called with:', { action, currentText: button.textContent, currentClass: button.className });
-//
-//     // Update button text and class based on action
-//     if (action === 'subscribe') {
-//         button.textContent = 'Unsubscribe';
-//         button.className = 'unsubscribe';
-//         // Update the form action if needed
-//         const form = button.closest('form');
-//         if (form) {
-//             const oldAction = form.action;
-//             form.action = form.action.replace('/subscribe', '/unsubscribe');
-//             console.log('[SYNC] Updated form action from', oldAction, 'to', form.action);
-//         }
-//     } else if (action === 'unsubscribe') {
-//         button.textContent = 'Subscribe';
-//         button.className = 'subscribe';
-//         const form = button.closest('form');
-//         if (form) {
-//             const oldAction = form.action;
-//             form.action = form.action.replace('/unsubscribe', '/subscribe');
-//             console.log('[SYNC] Updated form action from', oldAction, 'to', form.action);
-//         }
-//     } else if (action === 'filter') {
-//         button.textContent = 'Unfilter';
-//         button.className = 'unfilter';
-//         const form = button.closest('form');
-//         if (form) {
-//             const oldAction = form.action;
-//             form.action = form.action.replace('/filter', '/unfilter');
-//             console.log('[SYNC] Updated form action from', oldAction, 'to', form.action);
-//         }
-//     } else if (action === 'unfilter') {
-//         button.textContent = 'Filter';
-//         button.className = 'filter';
-//         const form = button.closest('form');
-//         if (form) {
-//             const oldAction = form.action;
-//             form.action = form.action.replace('/unfilter', '/filter');
-//             console.log('[SYNC] Updated form action from', oldAction, 'to', form.action);
-//         }
-//     }
-//
-//     console.log('[SYNC] Button updated - new text:', button.textContent, 'new class:', button.className);
-// }
-
-    // Initialize the sync system
-async function init() {
-    if (isInitialized) return;
-
-    try {
-        isInitialized = true;
-
-        // Perform sync check
-        await performSync();
-
-        // Update sync status in settings if they're open
-        setTimeout(() => {
-            if (typeof updateSyncStatus === 'function') {
-                updateSyncStatus();
+            } catch (e) {
+                console.warn('[SYNC] Failed to handle user action:', e);
             }
-        }, 100);
-
-// Listen for user actions including native redlib sidebar buttons
-document.addEventListener('click', function(e) {
-    console.log('[SYNC] Click detected on:', e.target, 'Classes:', e.target.className, 'ID:', e.target.id);
-
-    if (e.target.matches('.hover-follow-btn, .hover-unfollow-btn')) {
-        const subredditName = e.target.dataset.subreddit;
-        const action = e.target.classList.contains('hover-follow-btn') ? 'subscribe' : 'unsubscribe';
-        console.log('[SYNC] Hover button action:', { subredditName, action });
-        handleUserAction(subredditName, action);
-    } else if (e.target.matches('.hover-filter-btn, .hover-unfilter-btn')) {
-        const subredditName = e.target.dataset.subreddit;
-        const action = e.target.classList.contains('hover-filter-btn') ? 'filter' : 'unfilter';
-        console.log('[SYNC] Hover filter action:', { subredditName, action });
-        handleUserAction(subredditName, action);
-    } else if (e.target.matches('#sub_subscription button, #sub_filter button')) {
-        console.log('[SYNC] Native sidebar button clicked!', {
-            target: e.target,
-            parentId: e.target.parentElement?.id,
-            classes: e.target.className,
-            text: e.target.textContent
-        });
-
-        // DO NOT prevent default - let redlib handle the form submission and page refresh
-
-        const subredditName = getCurrentSubredditName();
-        console.log('[SYNC] Current subreddit name:', subredditName);
-
-        if (!subredditName) {
-            console.warn('[SYNC] Could not determine subreddit name');
-            return;
         }
 
-        let action = '';
-        if (e.target.matches('#sub_subscription button')) {
-            action = e.target.classList.contains('unsubscribe') ? 'unsubscribe' : 'subscribe';
-        } else if (e.target.matches('#sub_filter button')) {
-            action = e.target.classList.contains('unfilter') ? 'unfilter' : 'filter';
-        }
+        function getCurrentSubredditName() {
+            console.log('[SYNC] getCurrentSubredditName - pathname:', window.location.pathname);
 
-        console.log('[SYNC] Determined action:', action);
-
-        if (action) {
-            console.log('[SYNC] Calling handleUserAction with:', { subredditName, action });
-            handleUserAction(subredditName, action);
-            console.log('[SYNC] Decision saved to authority, allowing redlib to proceed with form submission');
-
-            // DO NOT update button state here - let redlib handle the refresh and show the new state
-        } else {
-            console.warn('[SYNC] Could not determine action from button');
-        }
-    }
-});
-
-        console.log('[SYNC] Sync system initialized');
-    } catch (e) {
-        console.error('[SYNC] Failed to initialize sync system:', e);
-        isInitialized = false; // Reset so it can be retried
-    }
-}
-
-    async function inheritFromInstance() {
-        const instance = await extractInstanceSettings();
-        const now = Date.now();
-
-        const newAuthoritative = {
-            ...instance, // Copy all instance settings
-            overall_timestamp: now
-        };
-
-        saveAuthoritativeSettings(newAuthoritative);
-        GM_setValue(`instance_timestamp_${window.location.hostname}`, now);
-
-        console.log('[SYNC] Inherited from instance:', newAuthoritative);
-
-        // Count all settings types
-        const settingsCount = Object.keys(instance).filter(key => !key.includes('timestamp')).length;
-        const subsCount = instance.subscriptions?.length || 0;
-        const filtersCount = instance.filters?.length || 0;
-        const followedCount = instance.followed_users?.length || 0;
-        const filteredUsersCount = instance.filtered_users?.length || 0;
-
-        updateSyncStatus();
-        alert(`Inherited ${settingsCount} settings as authoritative:\n` +
-              `• ${subsCount} subscriptions\n` +
-              `• ${filtersCount} filtered subreddits\n` +
-              `• ${followedCount} followed users\n` +
-              `• ${filteredUsersCount} filtered users\n` +
-              `• Theme: ${instance.theme || 'not set'}\n` +
-              `• Layout: ${instance.layout || 'not set'}\n` +
-              `• Front page: ${instance.front_page || 'not set'}`);
-    }
-
-    async function pushToInstance() {
-        const authoritative = getAuthoritativeSettings();
-
-        // Fix: Check for overall_timestamp, not just timestamp
-        if (!authoritative.overall_timestamp && Object.keys(authoritative).length === 0) {
-            alert('No authoritative settings found. Inherit from an instance first.');
-            return;
-        }
-
-        console.log('[SYNC] Pushing authoritative to instance:', {
-            settingsCount: Object.keys(authoritative).filter(key => !key.includes('timestamp')).length,
-            authoritative: authoritative
-        });
-
-        const settingsUrl = generateSettingsUrl(authoritative);
-        console.log('[SYNC] Generated push URL:', settingsUrl);
-
-        // Show what's being pushed
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: var(--accent);
-        color: var(--foreground);
-        padding: 12px 20px;
-        border-radius: 6px;
-        z-index: 90000;
-        font-family: sans-serif;
-        font-size: 14px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    `;
-
-    const settingsCount = Object.keys(authoritative).filter(key => !key.includes('timestamp')).length;
-    notification.textContent = `Pushing ${settingsCount} authoritative settings to instance...`;
-    document.body.appendChild(notification);
-
-    console.log('[SYNC] Authority restore URL that will be submitted:', settingsUrl);
-
-    try {
-        // Submit the restore URL in the background
-        const response = await fetch(settingsUrl, {
-            method: 'GET',
-            headers: {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            // Extract subreddit name from URL or page elements
+            const pathMatch = window.location.pathname.match(/^\/r\/([^\/]+)/);
+            if (pathMatch) {
+                console.log('[SYNC] Found subreddit from URL:', pathMatch[1]);
+                return pathMatch[1];
             }
-        });
 
-        console.log('[SYNC] Push submit response:', {
-            status: response.status,
-            statusText: response.statusText,
-            url: response.url,
-            ok: response.ok
-        });
+            // Fallback: try to get from subreddit name element
+            const nameElement = document.querySelector('#sub_name');
+            if (nameElement) {
+                const name = nameElement.textContent.replace(/^r\//, '');
+                console.log('[SYNC] Found subreddit from element:', name);
+                return name;
+            }
 
-        if (response.ok) {
-            notification.textContent = `Push completed successfully!`;
-            notification.style.background = '#28a745';
+            console.warn('[SYNC] Could not find subreddit name');
+            return null;
+        }
 
-            // Update instance timestamp to reflect the sync
+        // function updateNativeButtonState(button, action) {
+        //     console.log('[SYNC] updateNativeButtonState called with:', { action, currentText: button.textContent, currentClass: button.className });
+        //
+        //     // Update button text and class based on action
+        //     if (action === 'subscribe') {
+        //         button.textContent = 'Unsubscribe';
+        //         button.className = 'unsubscribe';
+        //         // Update the form action if needed
+        //         const form = button.closest('form');
+        //         if (form) {
+        //             const oldAction = form.action;
+        //             form.action = form.action.replace('/subscribe', '/unsubscribe');
+        //             console.log('[SYNC] Updated form action from', oldAction, 'to', form.action);
+        //         }
+        //     } else if (action === 'unsubscribe') {
+        //         button.textContent = 'Subscribe';
+        //         button.className = 'subscribe';
+        //         const form = button.closest('form');
+        //         if (form) {
+        //             const oldAction = form.action;
+        //             form.action = form.action.replace('/unsubscribe', '/subscribe');
+        //             console.log('[SYNC] Updated form action from', oldAction, 'to', form.action);
+        //         }
+        //     } else if (action === 'filter') {
+        //         button.textContent = 'Unfilter';
+        //         button.className = 'unfilter';
+        //         const form = button.closest('form');
+        //         if (form) {
+        //             const oldAction = form.action;
+        //             form.action = form.action.replace('/filter', '/unfilter');
+        //             console.log('[SYNC] Updated form action from', oldAction, 'to', form.action);
+        //         }
+        //     } else if (action === 'unfilter') {
+        //         button.textContent = 'Filter';
+        //         button.className = 'filter';
+        //         const form = button.closest('form');
+        //         if (form) {
+        //             const oldAction = form.action;
+        //             form.action = form.action.replace('/unfilter', '/filter');
+        //             console.log('[SYNC] Updated form action from', oldAction, 'to', form.action);
+        //         }
+        //     }
+        //
+        //     console.log('[SYNC] Button updated - new text:', button.textContent, 'new class:', button.className);
+        // }
+
+        // Initialize the sync system
+        async function init() {
+            if (isInitialized) return;
+
+            try {
+                isInitialized = true;
+
+                // Perform sync check
+                await performSync();
+
+                // Update sync status in settings if they're open
+                setTimeout(() => {
+                    if (typeof updateSyncStatus === 'function') {
+                        updateSyncStatus();
+                    }
+                }, 100);
+
+                // Listen for user actions including native redlib sidebar buttons
+                document.addEventListener('click', function(e) {
+                    console.log('[SYNC] Click detected on:', e.target, 'Classes:', e.target.className, 'ID:', e.target.id);
+
+                    if (e.target.matches('.hover-follow-btn, .hover-unfollow-btn')) {
+                        const subredditName = e.target.dataset.subreddit;
+                        const action = e.target.classList.contains('hover-follow-btn') ? 'subscribe' : 'unsubscribe';
+                        console.log('[SYNC] Hover button action:', { subredditName, action });
+                        handleUserAction(subredditName, action);
+                    } else if (e.target.matches('.hover-filter-btn, .hover-unfilter-btn')) {
+                        const subredditName = e.target.dataset.subreddit;
+                        const action = e.target.classList.contains('hover-filter-btn') ? 'filter' : 'unfilter';
+                        console.log('[SYNC] Hover filter action:', { subredditName, action });
+                        handleUserAction(subredditName, action);
+                    } else if (e.target.matches('#sub_subscription button, #sub_filter button')) {
+                        console.log('[SYNC] Native sidebar button clicked!', {
+                            target: e.target,
+                            parentId: e.target.parentElement?.id,
+                            classes: e.target.className,
+                            text: e.target.textContent
+                        });
+
+                        // DO NOT prevent default - let redlib handle the form submission and page refresh
+
+                        const subredditName = getCurrentSubredditName();
+                        console.log('[SYNC] Current subreddit name:', subredditName);
+
+                        if (!subredditName) {
+                            console.warn('[SYNC] Could not determine subreddit name');
+                            return;
+                        }
+
+                        let action = '';
+                        if (e.target.matches('#sub_subscription button')) {
+                            action = e.target.classList.contains('unsubscribe') ? 'unsubscribe' : 'subscribe';
+                        } else if (e.target.matches('#sub_filter button')) {
+                            action = e.target.classList.contains('unfilter') ? 'unfilter' : 'filter';
+                        }
+
+                        console.log('[SYNC] Determined action:', action);
+
+                        if (action) {
+                            console.log('[SYNC] Calling handleUserAction with:', { subredditName, action });
+                            handleUserAction(subredditName, action);
+                            console.log('[SYNC] Decision saved to authority, allowing redlib to proceed with form submission');
+
+                            // DO NOT update button state here - let redlib handle the refresh and show the new state
+                        } else {
+                            console.warn('[SYNC] Could not determine action from button');
+                        }
+                    }
+                });
+
+                console.log('[SYNC] Sync system initialized');
+            } catch (e) {
+                console.error('[SYNC] Failed to initialize sync system:', e);
+                isInitialized = false; // Reset so it can be retried
+            }
+        }
+
+        async function inheritFromInstance() {
+            const instance = await extractInstanceSettings();
             const now = Date.now();
+
+            const newAuthoritative = {
+                ...instance, // Copy all instance settings
+                overall_timestamp: now
+            };
+
+            saveAuthoritativeSettings(newAuthoritative);
             GM_setValue(`instance_timestamp_${window.location.hostname}`, now);
 
-            // Refresh all sync information in-place
-            setTimeout(async () => {
-                await performSync(); // This updates sync state, differences table, and merge preview
-                notification.remove();
-            }, 1000);
-        } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-    } catch (error) {
-        console.error('[SYNC] Push failed:', error);
-        notification.textContent = `Push failed: ${error.message}`;
-        notification.style.background = '#dc3545';
+            // At the end of inheritFromInstance function
+            console.log('[SYNC] Inherited from instance:', newAuthoritative);
 
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
-    }
-}
-
-    // Update the old updateSyncStatus to use cache or refresh if needed
-    async function updateSyncStatus(forceRefresh = false) {
-        if (forceRefresh) {
-            // Only fetch if explicitly requested (refresh button)
-            console.log('[SYNC] Force refreshing sync status...');
-            await performSync();
-        } else {
-            // Use cached data
-            updateSyncStatusFromCache();
-        }
-        updateActionPreviews();
-    }
-
-function updateSyncStatusFromCache() {
-    const statusElement = document.getElementById('redlib-sync-status');
-    const differencesContainer = document.getElementById('sync-differences-container');
-
-    if (!statusElement || !cachedAuthoritative || !cachedInstance) {
-        if (statusElement) statusElement.textContent = 'Sync data not available';
-        if (differencesContainer) differencesContainer.style.display = 'none';
-        return;
-    }
-
-    let status = '';
-    let showDetailedDifferences = false;
-
-    if (!cachedAuthoritative.overall_timestamp) {
-        status = 'No authoritative settings. Use "Inherit" to set this instance as master.';
-        if (differencesContainer) differencesContainer.style.display = 'none';
-    } else {
-        // Use the cached differences from performSync
-        if (cachedSettingsDifferences && cachedSettingsDifferences.length > 0) {
-            const totalChanges = cachedSettingsDifferences.reduce((total, diff) => {
-                if (diff.type === 'array') {
-                    return total + (diff.missingFromInstance?.length || 0) + (diff.extraInInstance?.length || 0);
+            // Automatically refresh the settings overlay WITHOUT triggering another inherit
+            setTimeout(() => {
+                if (typeof refreshSettingsOverlay === 'function') {
+                    refreshSettingsOverlay();
                 }
-                return total + 1;
-            }, 0);
+            }, 100);
 
-            status = `❌ Out of sync in ${cachedSettingsDifferences.length} settings:\n`;
-            status += `Total changes needed: ${totalChanges}\n`;
-            status += `Last update: ${formatTimestamp(cachedAuthoritative.overall_timestamp)}`;
+            // Get empty authoritative settings for comparison, but include current hidden posts count
+            const emptyAuth = { hiddenPostsCount: 0 }; // Start with 0 hidden posts
+            const instanceWithHidden = { 
+                ...instance, 
+                hiddenPostsCount: getAuthoritativeSettings().hiddenPostsCount || 0 // Keep current hidden posts
+            };
 
-            // Show detailed differences for subscriptions/filters
-            showDetailedDifferences = cachedSettingsDifferences.some(diff =>
-                ['subscriptions', 'filters', 'followed_users', 'filtered_users'].includes(diff.setting)
-            );
+            // Generate comprehensive summary comparing empty auth vs instance with hidden posts
+            const changeSummary = generateChangeSummary([], 'inherit', emptyAuth, instanceWithHidden);
 
-            if (showDetailedDifferences && differencesContainer) {
-                createDetailedDifferencesTable();
-                differencesContainer.style.display = 'block';
-            } else if (differencesContainer) {
-                differencesContainer.style.display = 'none';
-            }
-        } else {
-            status = `✅ In sync | Last update: ${formatTimestamp(cachedAuthoritative.overall_timestamp)}`;
-            if (differencesContainer) differencesContainer.style.display = 'none';
-        }
-    }
-
-    statusElement.textContent = status;
-}
-
-function createDetailedDifferencesTable() {
-    const tableContainer = document.getElementById('sync-differences-table');
-    if (!tableContainer || !cachedSettingsDifferences) {
-        console.log('[SYNC DEBUG] createDetailedDifferencesTable - missing container or data:', {
-            hasContainer: !!tableContainer,
-            hasCachedDiffs: !!cachedSettingsDifferences,
-            cachedDiffsLength: cachedSettingsDifferences ? cachedSettingsDifferences.length : 0
-        });
-        return;
-    }
-
-    // Filter for only array-type differences (subscriptions, filters, etc.)
-    const arrayDifferences = cachedSettingsDifferences.filter(diff =>
-        diff.type === 'array' && ['subscriptions', 'filters', 'followed_users', 'filtered_users'].includes(diff.setting)
-    );
-
-    if (arrayDifferences.length === 0) {
-        tableContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text); opacity: 0.6;">No subscription/filter differences</div>';
-        return;
-    }
-
-    // Create summary table with fixed column widths - matching the original structure
-    let summaryHtml = '<div class="redlib-merge-summary" style="margin-bottom: 0;">';
-    summaryHtml += '<table style="width: 100%; border-collapse: collapse; background: var(--post); border-radius: 4px 4px 0 0; overflow: hidden; font-family: monospace; font-size: 10px;">';
-    summaryHtml += '<thead><tr>';
-    summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: left; font-weight: bold; width: 33.33%;">Setting</th>';
-    summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: center; font-weight: bold; width: 33.33%;">Inherit from Instance</th>';
-    summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: center; font-weight: bold; width: 33.33%;">Push to Instance</th>';
-    summaryHtml += '</tr></thead><tbody>';
-
-    arrayDifferences.forEach(diff => {
-        const authCount = (cachedAuthoritative[diff.setting] || []).length;
-        const instCount = (cachedInstance[diff.setting] || []).length;
-        const missingCount = diff.missingFromInstance?.length || 0;
-        const extraCount = diff.extraInInstance?.length || 0;
-        const settingName = diff.setting.replace('_', ' ');
-
-        let inheritCell = '';
-        let pushCell = '';
-
-        if (extraCount > 0) {
-            inheritCell = `<div style="color: #4ecdc4; font-weight: bold;">${extraCount} items</div>`;
-            if (extraCount <= 3) {
-                inheritCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${diff.extraInInstance.join(', ')}</div>`;
+            if (changeSummary.details.length === 0) {
+                alert('Inherited settings as authoritative, but no meaningful differences detected.');
             } else {
-                const examples = diff.extraInInstance.slice(0, 2).join(', ');
-                inheritCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${examples}... (+${extraCount - 2} more)</div>`;
+                const message = `Inherited as authoritative:\n${changeSummary.details.join('\n')}`;
+                alert(message);
+            }
+
+            updateSyncStatus();
+
+            // Update export string to reflect new authoritative settings
+            if (typeof SettingsManager !== 'undefined' && SettingsManager.updateExportString) {
+                SettingsManager.updateExportString();
             }
         }
 
-        if (missingCount > 0) {
-            pushCell = `<div style="color: #ff6b6b; font-weight: bold;">${missingCount} items</div>`;
-            if (missingCount <= 3) {
-                pushCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${diff.missingFromInstance.join(', ')}</div>`;
+        async function pushToInstance() {
+            const authoritative = getAuthoritativeSettings();
+
+            // Fix: Check for overall_timestamp, not just timestamp
+            if (!authoritative.overall_timestamp && Object.keys(authoritative).length === 0) {
+                alert('No authoritative settings found. Inherit from an instance first.');
+                return;
+            }
+
+            console.log('[SYNC] Pushing authoritative to instance:', {
+                settingsCount: Object.keys(authoritative).filter(key => !key.includes('timestamp')).length,
+                authoritative: authoritative
+            });
+
+            const settingsUrl = generateSettingsUrl(authoritative);
+            console.log('[SYNC] Generated push URL:', settingsUrl);
+
+            // Show what's being pushed
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+        position: fixed;
+top: 20px;
+right: 20px;
+background: var(--accent);
+color: var(--foreground);
+padding: 12px 20px;
+border-radius: 6px;
+z-index: 90000;
+font-family: sans-serif;
+font-size: 14px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+`;
+
+            const settingsCount = Object.keys(authoritative).filter(key => !key.includes('timestamp')).length;
+            notification.textContent = `Pushing ${settingsCount} authoritative settings to instance...`;
+            document.body.appendChild(notification);
+
+            console.log('[SYNC] Authority restore URL that will be submitted:', settingsUrl);
+
+            try {
+                // Submit the restore URL in the background
+                const response = await fetch(settingsUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                    }
+                });
+
+                console.log('[SYNC] Push submit response:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    url: response.url,
+                    ok: response.ok
+                });
+
+                if (response.ok) {
+                    notification.textContent = `Push completed successfully!`;
+                    notification.style.background = '#28a745';
+
+                    // Update instance timestamp to reflect the sync
+                    const now = Date.now();
+                    GM_setValue(`instance_timestamp_${window.location.hostname}`, now);
+
+                    // Show success message, then reload to refresh cookie state
+                    setTimeout(() => {
+                        notification.textContent = `Reloading page to refresh settings...`;
+                        
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }, 2000); // Show success for 2 seconds first
+                    
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('[SYNC] Push failed:', error);
+                notification.textContent = `Push failed: ${error.message}`;
+                notification.style.background = '#dc3545';
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }
+        }
+
+        // Update the old updateSyncStatus to use cache or refresh if needed
+        async function updateSyncStatus(forceRefresh = false) {
+            if (forceRefresh) {
+                // Only fetch if explicitly requested (refresh button)
+                console.log('[SYNC] Force refreshing sync status...');
+                await performSync();
             } else {
-                const examples = diff.missingFromInstance.slice(0, 2).join(', ');
-                pushCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${examples}... (+${missingCount - 2} more)</div>`;
+                // Use cached data
+                updateSyncStatusFromCache();
             }
+            updateActionPreviews();
         }
 
-        summaryHtml += `<tr>`;
-        summaryHtml += `<td style="padding: 8px; background: var(--highlighted); color: var(--text); font-weight: bold; border-bottom: 1px solid var(--background); width: 33.33%;">`;
-        summaryHtml += `${settingName}<br><span style="font-size: 9px; opacity: 0.7;">${instCount} vs ${authCount} items</span></td>`;
-        summaryHtml += `<td style="padding: 8px; text-align: center; vertical-align: top; border-bottom: 1px solid var(--background); width: 33.33%;">${inheritCell}</td>`;
-        summaryHtml += `<td style="padding: 8px; text-align: center; vertical-align: top; border-bottom: 1px solid var(--background); width: 33.33%;">${pushCell}</td>`;
-        summaryHtml += `</tr>`;
-    });
+        function updateSyncStatusFromCache() {
+            const statusElement = document.getElementById('redlib-sync-status');
+            const differencesContainer = document.getElementById('sync-differences-container');
 
-    summaryHtml += '</tbody></table></div>';
+            if (!statusElement || !cachedAuthoritative || !cachedInstance) {
+                if (statusElement) statusElement.textContent = 'Sync data not available';
+                if (differencesContainer) differencesContainer.style.display = 'none';
+                return;
+            }
 
-    // Create detailed table with clickable subreddit links that work with existing hover popup
-    let tableHtml = `<table class="redlib-sync-differences-table" style="margin-top: 0; border-top: none; border-radius: 0 0 4px 4px;"><thead><tr><th style="width: 33.33%;">Setting</th><th style="width: 66.66%;">Side-by-Side Comparison</th></tr></thead><tbody>`;
+            let status = '';
+            let showDetailedDifferences = false;
 
-    arrayDifferences.forEach(diff => {
-        const settingName = diff.setting.replace('_', ' ');
+            if (!cachedAuthoritative.overall_timestamp) {
+                status = 'No authoritative settings. Use "Inherit" to set this instance as master.';
+                if (differencesContainer) differencesContainer.style.display = 'none';
+            } else {
+                // Use the cached differences from performSync
+                if (cachedSettingsDifferences && cachedSettingsDifferences.length > 0) {
+                    const totalChanges = cachedSettingsDifferences.reduce((total, diff) => {
+                        if (diff.type === 'array') {
+                            return total + (diff.missingFromInstance?.length || 0) + (diff.extraInInstance?.length || 0);
+                        }
+                        return total + 1;
+                    }, 0);
 
-        // Create horizontally aligned view of all items with hover-enabled links
-        const instanceArray = (cachedInstance[diff.setting] || []).slice().sort();
-        const authArray = (cachedAuthoritative[diff.setting] || []).slice().sort();
+                    status = `❌ Out of sync in ${cachedSettingsDifferences.length} settings:\n`;
+                    status += `Total changes needed: ${totalChanges}\n`;
+                    status += `Last update: ${formatTimestamp(cachedAuthoritative.overall_timestamp)}`;
 
-        let contentHtml = '';
+                    // Show detailed differences for subscriptions/filters
+                    showDetailedDifferences = cachedSettingsDifferences.some(diff =>
+                                                                             ['subscriptions', 'filters', 'followed_users', 'filtered_users'].includes(diff.setting)
+                                                                            );
 
-        if (instanceArray.length > 0 || authArray.length > 0) {
-            // Get all unique items from both sides, sorted
-            const allItems = [...new Set([...instanceArray, ...authArray])].sort();
+                    if (showDetailedDifferences && differencesContainer) {
+                        createDetailedDifferencesTable();
+                        differencesContainer.style.display = 'block';
+                    } else if (differencesContainer) {
+                        differencesContainer.style.display = 'none';
+                    }
+                } else {
+                    status = `✅ In sync | Last update: ${formatTimestamp(cachedAuthoritative.overall_timestamp)}`;
+                    if (differencesContainer) differencesContainer.style.display = 'none';
+                }
+            }
 
-            // Build rows for each item with proper hover-enabled links
-            const itemRows = allItems.map(item => {
-                const inInstance = instanceArray.includes(item);
-                const inAuth = authArray.includes(item);
+            statusElement.textContent = status;
+        }
 
-                let instanceCell = '';
-                let authCell = '';
+        function createDetailedDifferencesTable() {
+            const tableContainer = document.getElementById('sync-differences-table');
+            if (!tableContainer || !cachedSettingsDifferences) {
+                console.log('[SYNC DEBUG] createDetailedDifferencesTable - missing container or data:', {
+                    hasContainer: !!tableContainer,
+                    hasCachedDiffs: !!cachedSettingsDifferences,
+                    cachedDiffsLength: cachedSettingsDifferences ? cachedSettingsDifferences.length : 0
+                });
+                return;
+            }
 
-                // Create the subreddit link with proper classes for existing hover system
-                const linkPath = diff.setting === 'subscriptions' ? `/r/${item}` :
-                                diff.setting === 'filters' ? `/r/${item}` :
-                                diff.setting === 'followed_users' ? `/u/${item}` :
-                                diff.setting === 'filtered_users' ? `/u/${item}` : `/r/${item}`;
+            // Filter for only array-type differences (subscriptions, filters, etc.)
+            const arrayDifferences = cachedSettingsDifferences.filter(diff =>
+                                                                      diff.type === 'array' && ['subscriptions', 'filters', 'followed_users', 'filtered_users'].includes(diff.setting)
+                                                                     );
 
-                if (inInstance && inAuth) {
-                    // Item exists in both - show faded with hover-enabled links
-                    instanceCell = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="shared">${item}</a>`;
-                    authCell = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="shared">${item}</a>`;
-                } else if (inInstance && !inAuth) {
-                    // Unique to instance - show in cyan with hover-enabled link, gap on right
-                    instanceCell = `<a href="${linkPath}" style="color: #4ecdc4; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="instance-only">${item}</a>`;
-                    authCell = `<span style="opacity: 0.3;">—</span>`;
-                } else if (!inInstance && inAuth) {
-                    // Unique to authority - show in red with hover-enabled link, gap on left
-                    instanceCell = `<span style="opacity: 0.3;">—</span>`;
-                    authCell = `<a href="${linkPath}" style="color: #ff6b6b; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="authority-only">${item}</a>`;
+            if (arrayDifferences.length === 0) {
+                tableContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text); opacity: 0.6;">No subscription/filter differences</div>';
+                return;
+            }
+
+            // Create summary table with fixed column widths - matching the original structure
+            let summaryHtml = '<div class="redlib-merge-summary" style="margin-bottom: 0;">';
+            summaryHtml += '<table style="width: 100%; border-collapse: collapse; background: var(--post); border-radius: 4px 4px 0 0; overflow: hidden; font-family: monospace; font-size: 10px;">';
+            summaryHtml += '<thead><tr>';
+            summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: left; font-weight: bold; width: 33.33%;">Setting</th>';
+            summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: center; font-weight: bold; width: 33.33%;">Inherit from Instance</th>';
+            summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: center; font-weight: bold; width: 33.33%;">Push to Instance</th>';
+            summaryHtml += '</tr></thead><tbody>';
+
+            arrayDifferences.forEach(diff => {
+                const authCount = (cachedAuthoritative[diff.setting] || []).length;
+                const instCount = (cachedInstance[diff.setting] || []).length;
+                const missingCount = diff.missingFromInstance?.length || 0;
+                const extraCount = diff.extraInInstance?.length || 0;
+                const settingName = diff.setting.replace('_', ' ');
+
+                let inheritCell = '';
+                let pushCell = '';
+
+                if (extraCount > 0) {
+                    inheritCell = `<div style="color: #4ecdc4; font-weight: bold;">${extraCount} items</div>`;
+                    if (extraCount <= 3) {
+                        inheritCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${diff.extraInInstance.join(', ')}</div>`;
+                    } else {
+                        const examples = diff.extraInInstance.slice(0, 2).join(', ');
+                        inheritCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${examples}... (+${extraCount - 2} more)</div>`;
+                    }
                 }
 
-                return `<tr style="border-bottom: 1px solid rgba(255,255,255,0.1);" data-setting="${diff.setting}" data-item="${item}"><td style="padding: 2px 8px; text-align: center; background: var(--post); width: 50%; font-weight: normal !important;">${instanceCell}</td><td style="padding: 2px 8px; text-align: center; background: var(--post); width: 50%; font-weight: normal !important;">${authCell}</td></tr>`;
-            }).join('');
+                if (missingCount > 0) {
+                    pushCell = `<div style="color: #ff6b6b; font-weight: bold;">${missingCount} items</div>`;
+                    if (missingCount <= 3) {
+                        pushCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${diff.missingFromInstance.join(', ')}</div>`;
+                    } else {
+                        const examples = diff.missingFromInstance.slice(0, 2).join(', ');
+                        pushCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${examples}... (+${missingCount - 2} more)</div>`;
+                    }
+                }
 
-            // Calculate summary stats
-            const instanceUnique = instanceArray.filter(item => !authArray.includes(item)).length;
-            const authUnique = authArray.filter(item => !instanceArray.includes(item)).length;
-            const shared = instanceArray.filter(item => authArray.includes(item)).length;
+                summaryHtml += `<tr>`;
+                summaryHtml += `<td style="padding: 8px; background: var(--highlighted); color: var(--text); font-weight: bold; border-bottom: 1px solid var(--background); width: 33.33%;">`;
+                summaryHtml += `${settingName}<br><span style="font-size: 9px; opacity: 0.7;">${instCount} vs ${authCount} items</span></td>`;
+                summaryHtml += `<td style="padding: 8px; text-align: center; vertical-align: top; border-bottom: 1px solid var(--background); width: 33.33%;">${inheritCell}</td>`;
+                summaryHtml += `<td style="padding: 8px; text-align: center; vertical-align: top; border-bottom: 1px solid var(--background); width: 33.33%;">${pushCell}</td>`;
+                summaryHtml += `</tr>`;
+            });
 
-            // Build the summary and detailed table
-            const summaryRow = `
+            summaryHtml += '</tbody></table></div>';
+
+            // Create detailed table with clickable subreddit links that work with existing hover popup
+            let tableHtml = `<table class="redlib-sync-differences-table" style="margin-top: 0; border-top: none; border-radius: 0 0 4px 4px;"><thead><tr><th style="width: 33.33%;">Setting</th><th style="width: 66.66%;">Side-by-Side Comparison</th></tr></thead><tbody>`;
+
+            arrayDifferences.forEach(diff => {
+                const settingName = diff.setting.replace('_', ' ');
+
+                // Create horizontally aligned view of all items with hover-enabled links
+                const instanceArray = (cachedInstance[diff.setting] || []).slice().sort();
+                const authArray = (cachedAuthoritative[diff.setting] || []).slice().sort();
+
+                let contentHtml = '';
+
+                if (instanceArray.length > 0 || authArray.length > 0) {
+                    // Get all unique items from both sides, sorted
+                    const allItems = [...new Set([...instanceArray, ...authArray])].sort();
+
+                    // Build rows for each item with proper hover-enabled links
+                    const itemRows = allItems.map(item => {
+                        const inInstance = instanceArray.includes(item);
+                        const inAuth = authArray.includes(item);
+
+                        let instanceCell = '';
+                        let authCell = '';
+
+                        // Create the subreddit link with proper classes for existing hover system
+                        const linkPath = diff.setting === 'subscriptions' ? `/r/${item}` :
+                        diff.setting === 'filters' ? `/r/${item}` :
+                        diff.setting === 'followed_users' ? `/u/${item}` :
+                        diff.setting === 'filtered_users' ? `/u/${item}` : `/r/${item}`;
+
+                        if (inInstance && inAuth) {
+                            // Item exists in both - show faded with hover-enabled links
+                            instanceCell = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="shared">${item}</a>`;
+                            authCell = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="shared">${item}</a>`;
+                        } else if (inInstance && !inAuth) {
+                            // Unique to instance - show in cyan with hover-enabled link, gap on right
+                            instanceCell = `<a href="${linkPath}" style="color: #4ecdc4; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="instance-only">${item}</a>`;
+                            authCell = `<span style="opacity: 0.3;">—</span>`;
+                        } else if (!inInstance && inAuth) {
+                            // Unique to authority - show in red with hover-enabled link, gap on left
+                            instanceCell = `<span style="opacity: 0.3;">—</span>`;
+                            authCell = `<a href="${linkPath}" style="color: #ff6b6b; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="authority-only">${item}</a>`;
+                        }
+
+                        return `<tr style="border-bottom: 1px solid rgba(255,255,255,0.1);" data-setting="${diff.setting}" data-item="${item}"><td style="padding: 2px 8px; text-align: center; background: var(--post); width: 50%; font-weight: normal !important;">${instanceCell}</td><td style="padding: 2px 8px; text-align: center; background: var(--post); width: 50%; font-weight: normal !important;">${authCell}</td></tr>`;
+                    }).join('');
+
+                    // Calculate summary stats
+                    const instanceUnique = instanceArray.filter(item => !authArray.includes(item)).length;
+                    const authUnique = authArray.filter(item => !instanceArray.includes(item)).length;
+                    const shared = instanceArray.filter(item => authArray.includes(item)).length;
+
+                    // Build the summary and detailed table
+                    const summaryRow = `
                 <tr style="background: var(--highlighted); font-weight: bold;">
                     <td colspan="2" style="padding: 8px; text-align: center;">
                         <span style="color: #4ecdc4;">${instanceUnique} instance-only</span> •
@@ -8151,7 +9009,7 @@ function createDetailedDifferencesTable() {
                 </tr>
             `;
 
-            contentHtml = `
+                    contentHtml = `
                 <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
                     <thead>
                         <tr style="background: var(--post);">
@@ -8165,702 +9023,752 @@ function createDetailedDifferencesTable() {
                     </tbody>
                 </table>
             `;
+                }
+
+                tableHtml += `<tr><td style="vertical-align: top; padding: 8px; font-weight: bold; width: 33.33%;">${settingName}</td><td style="padding: 4px; width: 66.66%;">${contentHtml}</td></tr>`;
+            });
+
+            tableHtml += `</tbody></table>`;
+
+            // Combine summary and detailed table
+            tableContainer.innerHTML = summaryHtml + tableHtml;
+
+            // Add live update functionality and fix z-index issues
+            addLiveDiffTableListeners();
+            fixHoverPopupZIndex();
         }
 
-        tableHtml += `<tr><td style="vertical-align: top; padding: 8px; font-weight: bold; width: 33.33%;">${settingName}</td><td style="padding: 4px; width: 66.66%;">${contentHtml}</td></tr>`;
-    });
+        // Fix z-index issues for hover popup in settings overlay
+        function fixHoverPopupZIndex() {
+            // Find the settings overlay and adjust z-index hierarchy
+            const settingsOverlay = document.querySelector('.redlib-settings-overlay');
+            if (settingsOverlay) {
+                // Ensure settings overlay has a lower z-index than hover popup
+                settingsOverlay.style.zIndex = '9998';
+            }
 
-    tableHtml += `</tbody></table>`;
+            // Ensure any existing hover popups have higher z-index
+            const existingPopups = document.querySelectorAll('.popup, .redlib-popup, [class*="popup"]');
+            existingPopups.forEach(popup => {
+                popup.style.zIndex = '10000';
+            });
 
-    // Combine summary and detailed table
-    tableContainer.innerHTML = summaryHtml + tableHtml;
-
-    // Add live update functionality and fix z-index issues
-    addLiveDiffTableListeners();
-    fixHoverPopupZIndex();
-}
-
-// Fix z-index issues for hover popup in settings overlay
-function fixHoverPopupZIndex() {
-    // Find the settings overlay and adjust z-index hierarchy
-    const settingsOverlay = document.querySelector('.redlib-settings-overlay');
-    if (settingsOverlay) {
-        // Ensure settings overlay has a lower z-index than hover popup
-        settingsOverlay.style.zIndex = '9998';
-    }
-
-    // Ensure any existing hover popups have higher z-index
-    const existingPopups = document.querySelectorAll('.popup, .redlib-popup, [class*="popup"]');
-    existingPopups.forEach(popup => {
-        popup.style.zIndex = '10000';
-    });
-
-    // Set up mutation observer to catch new hover popups and fix their z-index
-    const observer = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-            mutation.addedNodes.forEach(node => {
-                if (node.nodeType === 1) { // Element node
-                    // Check if it's a popup or contains one
-                    if (node.classList?.contains('popup') || node.querySelector?.('.popup')) {
-                        const popup = node.classList?.contains('popup') ? node : node.querySelector('.popup');
-                        if (popup) {
-                            popup.style.zIndex = '10000';
+            // Set up mutation observer to catch new hover popups and fix their z-index
+            const observer = new MutationObserver(mutations => {
+                mutations.forEach(mutation => {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === 1) { // Element node
+                            // Check if it's a popup or contains one
+                            if (node.classList?.contains('popup') || node.querySelector?.('.popup')) {
+                                const popup = node.classList?.contains('popup') ? node : node.querySelector('.popup');
+                                if (popup) {
+                                    popup.style.zIndex = '10000';
+                                }
+                            }
                         }
-                    }
-                }
-            });
-        });
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-}
-
-// Add event listeners for live diff table updates
-function addLiveDiffTableListeners() {
-    // Listen for popup button clicks specifically
-    document.addEventListener('click', function(e) {
-        // Check if it's a popup button click within our diff table area
-        if (e.target.matches('.popup-btn') && e.target.dataset.subreddit) {
-            const subreddit = e.target.dataset.subreddit;
-            const action = e.target.dataset.action;
-
-            console.log('[DIFF TABLE] Popup button clicked:', { subreddit, action });
-
-            // Set up a listener for when the action completes
-            setTimeout(() => {
-                checkForSubredditChange(subreddit, action);
-            }, 1000); // Give time for the server request to complete
-        }
-    });
-
-    // Also listen for the specific sync system events
-    document.addEventListener('click', function(e) {
-        if (e.target.matches('.hover-follow-btn, .hover-unfollow-btn, .hover-filter-btn, .hover-unfilter-btn')) {
-            const subreddit = e.target.dataset.subreddit;
-            let action = '';
-
-            if (e.target.classList.contains('hover-follow-btn')) action = 'subscribe';
-            else if (e.target.classList.contains('hover-unfollow-btn')) action = 'unsubscribe';
-            else if (e.target.classList.contains('hover-filter-btn')) action = 'filter';
-            else if (e.target.classList.contains('hover-unfilter-btn')) action = 'unfilter';
-
-            console.log('[DIFF TABLE] Hover button clicked:', { subreddit, action });
-
-            setTimeout(() => {
-                checkForSubredditChange(subreddit, action);
-            }, 1000);
-        }
-    });
-}
-
-// Check if a subreddit's subscription/filter status changed and update the diff table
-async function checkForSubredditChange(subreddit, action) {
-    console.log('[DIFF TABLE] Checking for changes to:', subreddit, action);
-
-    try {
-        // Make a request to the subreddit page to check current status
-        const response = await fetch(`/r/${subreddit}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'text/html'
-            }
-        });
-
-        if (!response.ok) {
-            console.log('[DIFF TABLE] Failed to fetch subreddit page for status check');
-            return;
-        }
-
-        const html = await response.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        // Check subscription status from the sidebar
-        const subscribeBtn = doc.querySelector('#sub_subscription button');
-        const filterBtn = doc.querySelector('#sub_filter button');
-
-        let isSubscribed = false;
-        let isFiltered = false;
-
-        if (subscribeBtn) {
-            isSubscribed = subscribeBtn.classList.contains('unsubscribe');
-        }
-
-        if (filterBtn) {
-            isFiltered = filterBtn.classList.contains('unfilter');
-        }
-
-        console.log('[DIFF TABLE] Current status:', { subreddit, isSubscribed, isFiltered });
-
-        // Update our cached data based on the current status
-        if (action === 'subscribe' || action === 'unsubscribe') {
-            updateCachedSubscriptions(subreddit, isSubscribed);
-        } else if (action === 'filter' || action === 'unfilter') {
-            updateCachedFilters(subreddit, isFiltered);
-        }
-
-        // Update all overlay components
-        updateDiffTableSummary(); // This now updates everything
-
-    } catch (error) {
-        console.error('[DIFF TABLE] Error checking subreddit status:', error);
-    }
-}
-
-// Update cached instance data when subscriptions change
-function updateCachedSubscriptions(subreddit, isSubscribed) {
-    if (!cachedInstance) return;
-
-    if (!cachedInstance.subscriptions) cachedInstance.subscriptions = [];
-
-    const index = cachedInstance.subscriptions.indexOf(subreddit);
-
-    if (isSubscribed && index === -1) {
-        // Add subscription
-        cachedInstance.subscriptions.push(subreddit);
-        cachedInstance.subscriptions.sort();
-        console.log('[DIFF TABLE] Added subscription:', subreddit);
-    } else if (!isSubscribed && index !== -1) {
-        // Remove subscription
-        cachedInstance.subscriptions.splice(index, 1);
-        console.log('[DIFF TABLE] Removed subscription:', subreddit);
-    }
-}
-
-// Update cached instance data when filters change
-function updateCachedFilters(subreddit, isFiltered) {
-    if (!cachedInstance) return;
-
-    if (!cachedInstance.filters) cachedInstance.filters = [];
-
-    const index = cachedInstance.filters.indexOf(subreddit);
-
-    if (isFiltered && index === -1) {
-        // Add filter
-        cachedInstance.filters.push(subreddit);
-        cachedInstance.filters.sort();
-        console.log('[DIFF TABLE] Added filter:', subreddit);
-    } else if (!isFiltered && index !== -1) {
-        // Remove filter
-        cachedInstance.filters.splice(index, 1);
-        console.log('[DIFF TABLE] Removed filter:', subreddit);
-    }
-}
-
-// Update a specific row in the diff table
-function updateDiffTableRow(subreddit, setting) {
-    const tableRow = document.querySelector(`tr[data-setting="${setting}"][data-item="${subreddit}"]`);
-    if (!tableRow) {
-        console.log('[DIFF TABLE] Row not found for:', subreddit, setting);
-        return;
-    }
-
-    const instanceArray = cachedInstance[setting] || [];
-    const authArray = cachedAuthoritative[setting] || [];
-
-    const inInstance = instanceArray.includes(subreddit);
-    const inAuth = authArray.includes(subreddit);
-
-    console.log('[DIFF TABLE] Updating row:', { subreddit, setting, inInstance, inAuth });
-
-    // Determine the new status
-    let newStatus = '';
-    if (inInstance && inAuth) {
-        newStatus = 'shared';
-    } else if (inInstance && !inAuth) {
-        newStatus = 'instance-only';
-    } else if (!inInstance && inAuth) {
-        newStatus = 'authority-only';
-    } else {
-        // Not in either - remove the row
-        console.log('[DIFF TABLE] Removing row for:', subreddit);
-        tableRow.remove();
-        return;
-    }
-
-    // Update the row styling and links
-    const instanceCell = tableRow.cells[0];
-    const authCell = tableRow.cells[1];
-
-    const linkPath = setting === 'subscriptions' ? `/r/${subreddit}` :
-                    setting === 'filters' ? `/r/${subreddit}` :
-                    setting === 'followed_users' ? `/u/${subreddit}` :
-                    setting === 'filtered_users' ? `/u/${subreddit}` : `/r/${subreddit}`;
-
-    if (newStatus === 'shared') {
-        instanceCell.innerHTML = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="shared">${subreddit}</a>`;
-        authCell.innerHTML = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="shared">${subreddit}</a>`;
-    } else if (newStatus === 'instance-only') {
-        instanceCell.innerHTML = `<a href="${linkPath}" style="color: #4ecdc4; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="instance-only">${subreddit}</a>`;
-        authCell.innerHTML = `<span style="opacity: 0.3;">—</span>`;
-    } else if (newStatus === 'authority-only') {
-        instanceCell.innerHTML = `<span style="opacity: 0.3;">—</span>`;
-        authCell.innerHTML = `<a href="${linkPath}" style="color: #ff6b6b; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="authority-only">${subreddit}</a>`;
-    }
-
-    console.log('[DIFF TABLE] Updated row to status:', newStatus);
-}
-
-// Update the summary counts in the diff table
-function updateDiffTableSummary() {
-    // Recalculate differences and update the summary table
-    if (cachedInstance && cachedAuthoritative) {
-        console.log('[DIFF TABLE] Refreshing summary counts and all overlay components');
-
-        // Update sync status
-        if (typeof updateSyncStatus === 'function') {
-            updateSyncStatus();
-        }
-
-        // Update the inherit/push comparison table
-        if (typeof updateActionPreviews === 'function') {
-            updateActionPreviews();
-        }
-
-        // Trigger a refresh of the detailed diff table to update counts
-        setTimeout(() => {
-            createDetailedDifferencesTable();
-        }, 100);
-    }
-}
-
-// Comprehensive function to refresh all parts of the settings overlay
-async function refreshSettingsOverlay() {
-    console.log('[SYNC] Refreshing entire settings overlay...');
-
-    try {
-        // Re-fetch current instance and authoritative settings
-        if (typeof extractInstanceSettings === 'function') {
-            cachedInstance = await extractInstanceSettings();
-        }
-
-        if (typeof getAuthoritativeSettings === 'function') {
-            cachedAuthoritative = getAuthoritativeSettings();
-        }
-
-        // Update sync status
-        if (typeof updateSyncStatus === 'function') {
-            updateSyncStatus();
-        }
-
-        // Update the inherit/push comparison table
-        if (typeof updateActionPreviews === 'function') {
-            updateActionPreviews();
-        }
-
-        // Update the merge preview section (both summary and detailed diff)
-        if (typeof createDetailedDifferencesTable === 'function') {
-            createDetailedDifferencesTable();
-        }
-
-        console.log('[SYNC] Settings overlay refresh complete');
-    } catch (error) {
-        console.error('[SYNC] Error refreshing settings overlay:', error);
-    }
-}
-
-function updateActionPreviews() {
-    if (!cachedAuthoritative || !cachedInstance) return;
-
-    // Update the unified comparison table
-    const tableContainer = document.getElementById('sync-comparison-table');
-    if (tableContainer) {
-        const comparisonTable = createUnifiedSettingsTable(cachedInstance, cachedAuthoritative);
-        tableContainer.innerHTML = comparisonTable;
-
-// Add header button listeners immediately after creating the table
-setTimeout(() => {
-    if (typeof SettingsManager !== 'undefined' && SettingsManager.addHeaderButtonListeners) {
-        SettingsManager.addHeaderButtonListeners();
-    } else {
-        console.warn('[SYNC] SettingsManager.addHeaderButtonListeners function not found');
-    }
-}, 50);
-    }
-
-    // Update the detailed merge preview table
-    const differencesContainer = document.getElementById('sync-differences-container');
-    if (differencesContainer && cachedSettingsDifferences) {
-        const hasArrayDifferences = cachedSettingsDifferences.some(diff =>
-            diff.type === 'array' && ['subscriptions', 'filters', 'followed_users', 'filtered_users'].includes(diff.setting)
-        );
-
-        if (hasArrayDifferences) {
-            createDetailedDifferencesTable();
-            differencesContainer.style.display = 'block';
-        } else {
-            differencesContainer.style.display = 'none';
-        }
-    }
-}
-
-
-// Helper function to create unified 3-column settings comparison with clickable headers
-function createUnifiedSettingsTable(instanceSettings, authoritySettings) {
-    // Get all unique setting keys from both sources
-    const allSettings = new Set([
-        ...Object.keys(instanceSettings).filter(key => !key.includes('timestamp')),
-        ...Object.keys(authoritySettings).filter(key => !key.includes('timestamp'))
-    ]);
-
-    if (allSettings.size === 0) {
-        return `<div style="text-align: center; color: var(--text); opacity: 0.6;">No settings found</div>`;
-    }
-
-    let html = `<table class="redlib-settings-comparison">`;
-    html += `<thead><tr>
-        <th>Setting</th>
-        <th class="button-header" id="inherit-header" title="Copy this instance's settings to become authoritative across all instances">Inherit</th>
-        <th class="button-header" id="push-header" title="Apply authoritative settings to this instance">Push</th>
-    </tr></thead><tbody>`;
-
-    // Define the order we want to show settings
-    const settingOrder = [
-        'theme', 'front_page', 'layout', 'wide', 'remove_default_feeds',
-        'show_nsfw', 'blur_nsfw', 'blur_spoiler', 'video_quality', 'post_sort', 'comment_sort',
-        'autoplay_videos', 'fixed_navbar', 'hide_sidebar_and_summary', 'use_hls', 'hide_hls_notification',
-        'disable_visit_reddit_confirmation', 'hide_awards', 'hide_score',
-        'subscriptions', 'filters', 'followed_users', 'filtered_users'
-    ];
-
-    // Show settings in preferred order, then any remaining
-    const orderedSettings = [
-        ...settingOrder.filter(setting => allSettings.has(setting)),
-        ...Array.from(allSettings).filter(setting => !settingOrder.includes(setting))
-    ];
-
-    orderedSettings.forEach(setting => {
-        const instanceValue = instanceSettings[setting];
-        const authorityValue = authoritySettings[setting];
-
-        let inheritDisplay = '';
-        let pushDisplay = '';
-
-        if (instanceValue !== undefined) {
-            if (Array.isArray(instanceValue)) {
-                inheritDisplay = `${instanceValue.length} items`;
-            } else {
-                inheritDisplay = String(instanceValue);
-            }
-        }
-
-        if (authorityValue !== undefined) {
-            if (Array.isArray(authorityValue)) {
-                pushDisplay = `${authorityValue.length} items`;
-            } else {
-                pushDisplay = String(authorityValue);
-            }
-        }
-
-        // Determine if values are the same for highlighting
-        let valuesAreSame = false;
-        if (instanceValue !== undefined && authorityValue !== undefined) {
-            if (Array.isArray(instanceValue) && Array.isArray(authorityValue)) {
-                // For arrays, compare lengths and contents
-                valuesAreSame = instanceValue.length === authorityValue.length &&
-                              instanceValue.every(item => authorityValue.includes(item)) &&
-                              authorityValue.every(item => instanceValue.includes(item));
-            } else {
-                // For simple values, direct comparison
-                valuesAreSame = String(instanceValue) === String(authorityValue);
-            }
-        }
-
-        const cellClass = valuesAreSame ? 'value-same' : 'value-different';
-
-        html += `<tr><td>${setting}</td><td class="${cellClass}">${inheritDisplay}</td><td class="${cellClass}">${pushDisplay}</td></tr>`;
-    });
-
-    html += `</tbody></table>`;
-    return html;
-}
-
-    async function mergeAndPushToInstance() {
-        const authoritative = getAuthoritativeSettings();
-        const instance = await extractInstanceSettings();
-        const now = Date.now();
-
-        console.log('[SYNC] Starting merge and push operation...');
-        console.log('[SYNC] Current authoritative:', authoritative);
-        console.log('[SYNC] Current instance:', instance);
-
-        // Create merged authoritative settings
-        const mergedAuthoritative = { ...authoritative };
-        let changesMade = false;
-
-        // Find settings that need merging
-        Object.keys(authoritative).forEach(setting => {
-            if (Array.isArray(authoritative[setting]) && Array.isArray(instance[setting])) {
-                const authArray = authoritative[setting] || [];
-                const instanceArray = instance[setting] || [];
-
-                // Find extras in instance that auth doesn't have
-                const extraInInstance = instanceArray.filter(item => !authArray.includes(item));
-
-                if (extraInInstance.length > 0) {
-                    // Merge: add instance extras to authoritative
-                    mergedAuthoritative[setting] = [...authArray, ...extraInInstance];
-                    changesMade = true;
-
-                    console.log(`[SYNC] Merged ${setting}: inherited ${extraInInstance.length} items from instance:`, extraInInstance);
-                }
-            }
-        });
-
-        if (changesMade) {
-            // Update authoritative with merged data
-            mergedAuthoritative.overall_timestamp = now;
-            saveAuthoritativeSettings(mergedAuthoritative);
-
-            console.log('[SYNC] Updated authoritative with merged data');
-        }
-
-        // Now push the merged result to instance
-        const settingsUrl = generateSettingsUrl(mergedAuthoritative);
-
-        console.log('[SYNC] Merge queued - Authority restore URL that will be submitted:', settingsUrl);
-
-        // Show notification about what's happening
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--accent);
-            color: var(--foreground);
-            padding: 12px 20px;
-            border-radius: 6px;
-            z-index: 90000;
-            font-family: sans-serif;
-            font-size: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        `;
-        notification.textContent = `Submitting merge in background...`;
-        document.body.appendChild(notification);
-
-        try {
-            // Submit the restore URL in the background
-            const response = await fetch(settingsUrl, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-                }
-            });
-
-            console.log('[SYNC] Merge submit response:', {
-                status: response.status,
-                statusText: response.statusText,
-                url: response.url,
-                ok: response.ok
-            });
-
-            if (response.ok) {
-                notification.textContent = `Merge completed successfully!`;
-                notification.style.background = '#28a745';
-
-                // Update instance timestamp to reflect the sync
-                GM_setValue(`instance_timestamp_${window.location.hostname}`, now);
-
-                // Refresh all sync information in-place
-                setTimeout(async () => {
-                    await performSync(); // This updates sync state, differences table, and merge preview
-                    notification.remove();
-                }, 1000);
-            } else {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-        } catch (error) {
-            console.error('[SYNC] Merge failed:', error);
-
-            // Provide more descriptive error messages for network issues
-            let errorMessage = error.message;
-            if (error.message === 'Failed to fetch') {
-                errorMessage = 'Network error (ERR_CONNECTION_CLOSED or similar)';
-            }
-
-            notification.textContent = `Merge failed: ${errorMessage}`;
-            notification.style.background = '#dc3545';
-
-            setTimeout(() => {
-                notification.remove();
-            }, 5000);
-        }
-    }
-
-    async function selectivePushToInstance() {
-        const authoritative = getAuthoritativeSettings();
-        const instance = await extractInstanceSettings();
-        const now = Date.now();
-
-        console.log('[SYNC] Starting selective push operation...');
-
-        const operations = [];
-
-        // Find what needs to be pushed
-        ['subscriptions', 'filters', 'followed_users', 'filtered_users'].forEach(setting => {
-            if (Array.isArray(authoritative[setting]) && Array.isArray(instance[setting])) {
-                const authArray = authoritative[setting] || [];
-                const instanceArray = instance[setting] || [];
-
-                // Items to inherit from instance (not in authority)
-                const extraInInstance = instanceArray.filter(item => !authArray.includes(item));
-                extraInInstance.forEach(item => {
-                    operations.push({
-                        type: 'inherit',
-                        setting: setting,
-                        item: item,
-                        action: getActionForSetting(setting, 'add')
                     });
                 });
+            });
 
-                // Items to push to instance (not in instance)
-                const missingFromInstance = authArray.filter(item => !instanceArray.includes(item));
-                missingFromInstance.forEach(item => {
-                    operations.push({
-                        type: 'push',
-                        setting: setting,
-                        item: item,
-                        action: getActionForSetting(setting, 'add')
-                    });
-                });
-            }
-        });
-
-        if (operations.length === 0) {
-            alert('No selective changes needed.');
-            return;
+            observer.observe(document.body, { childList: true, subtree: true });
         }
 
-        console.log('[SYNC] Selective operations planned:', operations);
+        // Add event listeners for live diff table updates
+        function addLiveDiffTableListeners() {
+            // Listen for popup button clicks specifically
+            document.addEventListener('click', function(e) {
+                // Check if it's a popup button click within our diff table area
+                if (e.target.matches('.popup-btn') && e.target.dataset.subreddit) {
+                    const subreddit = e.target.dataset.subreddit;
+                    const action = e.target.dataset.action;
 
-        // Show confirmation with details
-        const inheritCount = operations.filter(op => op.type === 'inherit').length;
-        const pushCount = operations.filter(op => op.type === 'push').length;
+                    console.log('[DIFF TABLE] Popup button clicked:', { subreddit, action });
 
-        const message = `Selective sync will:\n` +
-                    `• Inherit ${inheritCount} items from this instance\n` +
-                    `• Push ${pushCount} items to this instance\n` +
-                    `This avoids cookie limits. Continue?`;
+                    // Set up a listener for when the action completes
+                    setTimeout(() => {
+                        checkForSubredditChange(subreddit, action);
+                    }, 1000); // Give time for the server request to complete
+                }
+            });
 
-        if (!confirm(message)) return;
+            // Also listen for the specific sync system events
+            document.addEventListener('click', function(e) {
+                if (e.target.matches('.hover-follow-btn, .hover-unfollow-btn, .hover-filter-btn, .hover-unfilter-btn')) {
+                    const subreddit = e.target.dataset.subreddit;
+                    let action = '';
 
-        // Execute operations sequentially
-        await executeSelectiveOperations(operations);
-    }
+                    if (e.target.classList.contains('hover-follow-btn')) action = 'subscribe';
+                    else if (e.target.classList.contains('hover-unfollow-btn')) action = 'unsubscribe';
+                    else if (e.target.classList.contains('hover-filter-btn')) action = 'filter';
+                    else if (e.target.classList.contains('hover-unfilter-btn')) action = 'unfilter';
 
-    function getActionForSetting(setting, operation) {
-        const actionMap = {
-            'subscriptions': operation === 'add' ? 'subscribe' : 'unsubscribe',
-            'filters': operation === 'add' ? 'filter' : 'unfilter',
-            'followed_users': operation === 'add' ? 'follow_user' : 'unfollow_user',
-            'filtered_users': operation === 'add' ? 'filter_user' : 'unfilter_user'
-        };
-        return actionMap[setting] || 'unknown';
-    }
+                    console.log('[DIFF TABLE] Hover button clicked:', { subreddit, action });
 
-    async function executeSelectiveOperations(operations) {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--accent);
-            color: var(--foreground);
-            padding: 12px 20px;
-            border-radius: 6px;
-            z-index: 10000;
-            font-family: sans-serif;
-            font-size: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            min-width: 300px;
-        `;
-        document.body.appendChild(notification);
+                    setTimeout(() => {
+                        checkForSubredditChange(subreddit, action);
+                    }, 1000);
+                }
+            });
+        }
 
-        let completed = 0;
-        const total = operations.length;
-
-        for (const operation of operations) {
-            notification.textContent = `Selective sync: ${completed + 1}/${total} - ${operation.action} ${operation.item}`;
+        // Check if a subreddit's subscription/filter status changed and update the diff table
+        async function checkForSubredditChange(subreddit, action) {
+            console.log('[DIFF TABLE] Checking for changes to:', subreddit, action);
 
             try {
-                if (['subscribe', 'unsubscribe', 'filter', 'unfilter'].includes(operation.action)) {
-                    // Use existing subreddit action logic
-                    await executeSubredditAction(operation.item, operation.action);
-                } else {
-                    // For user actions, we'd need to implement similar logic
-                    console.log(`[SYNC] User action not implemented yet: ${operation.action} ${operation.item}`);
+                // Make a request to the subreddit page to check current status
+                const response = await fetch(`/r/${subreddit}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'text/html'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.log('[DIFF TABLE] Failed to fetch subreddit page for status check');
+                    return;
                 }
 
-                // Update authoritative if this was an inherit operation
-                if (operation.type === 'inherit') {
-                    const authoritative = getAuthoritativeSettings();
-                    if (!authoritative[operation.setting]) {
-                        authoritative[operation.setting] = [];
-                    }
-                    if (!authoritative[operation.setting].includes(operation.item)) {
-                        authoritative[operation.setting].push(operation.item);
-                        authoritative.overall_timestamp = Date.now();
-                        saveAuthoritativeSettings(authoritative);
-                        console.log(`[SYNC] Inherited ${operation.item} into authoritative ${operation.setting}`);
-                    }
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // Check subscription status from the sidebar
+                const subscribeBtn = doc.querySelector('#sub_subscription button');
+                const filterBtn = doc.querySelector('#sub_filter button');
+
+                let isSubscribed = false;
+                let isFiltered = false;
+
+                if (subscribeBtn) {
+                    isSubscribed = subscribeBtn.classList.contains('unsubscribe');
                 }
 
-                completed++;
+                if (filterBtn) {
+                    isFiltered = filterBtn.classList.contains('unfilter');
+                }
 
-                // Small delay between operations to avoid overwhelming the server
-                await new Promise(resolve => setTimeout(resolve, 200));
+                console.log('[DIFF TABLE] Current status:', { subreddit, isSubscribed, isFiltered });
+
+                // Update our cached data based on the current status
+                if (action === 'subscribe' || action === 'unsubscribe') {
+                    updateCachedSubscriptions(subreddit, isSubscribed);
+                } else if (action === 'filter' || action === 'unfilter') {
+                    updateCachedFilters(subreddit, isFiltered);
+                }
+
+                // Update all overlay components
+                updateDiffTableSummary(); // This now updates everything
 
             } catch (error) {
-                console.error(`[SYNC] Failed to execute ${operation.action} on ${operation.item}:`, error);
-                notification.textContent = `Error on ${operation.item} - continuing...`;
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                console.error('[DIFF TABLE] Error checking subreddit status:', error);
             }
         }
 
-        notification.textContent = `Selective sync complete: ${completed}/${total} operations`;
-        setTimeout(() => notification.remove(), 3000);
+        // Update cached instance data when subscriptions change
+        function updateCachedSubscriptions(subreddit, isSubscribed) {
+            if (!cachedInstance) return;
 
-        // Refresh the page to see changes
-        setTimeout(() => window.location.reload(), 3000);
-    }
+            if (!cachedInstance.subscriptions) cachedInstance.subscriptions = [];
 
-    async function executeSubredditAction(subredditName, action) {
-        const actionEndpoints = {
-            'subscribe': `/r/${subredditName}/subscribe`,
-            'unsubscribe': `/r/${subredditName}/unsubscribe`,
-            'filter': `/r/${subredditName}/filter`,
-            'unfilter': `/r/${subredditName}/unfilter`
+            const index = cachedInstance.subscriptions.indexOf(subreddit);
+
+            if (isSubscribed && index === -1) {
+                // Add subscription
+                cachedInstance.subscriptions.push(subreddit);
+                cachedInstance.subscriptions.sort();
+                console.log('[DIFF TABLE] Added subscription:', subreddit);
+            } else if (!isSubscribed && index !== -1) {
+                // Remove subscription
+                cachedInstance.subscriptions.splice(index, 1);
+                console.log('[DIFF TABLE] Removed subscription:', subreddit);
+            }
+        }
+
+        // Update cached instance data when filters change
+        function updateCachedFilters(subreddit, isFiltered) {
+            if (!cachedInstance) return;
+
+            if (!cachedInstance.filters) cachedInstance.filters = [];
+
+            const index = cachedInstance.filters.indexOf(subreddit);
+
+            if (isFiltered && index === -1) {
+                // Add filter
+                cachedInstance.filters.push(subreddit);
+                cachedInstance.filters.sort();
+                console.log('[DIFF TABLE] Added filter:', subreddit);
+            } else if (!isFiltered && index !== -1) {
+                // Remove filter
+                cachedInstance.filters.splice(index, 1);
+                console.log('[DIFF TABLE] Removed filter:', subreddit);
+            }
+        }
+
+        // Update a specific row in the diff table
+        function updateDiffTableRow(subreddit, setting) {
+            const tableRow = document.querySelector(`tr[data-setting="${setting}"][data-item="${subreddit}"]`);
+            if (!tableRow) {
+                console.log('[DIFF TABLE] Row not found for:', subreddit, setting);
+                return;
+            }
+
+            const instanceArray = cachedInstance[setting] || [];
+            const authArray = cachedAuthoritative[setting] || [];
+
+            const inInstance = instanceArray.includes(subreddit);
+            const inAuth = authArray.includes(subreddit);
+
+            console.log('[DIFF TABLE] Updating row:', { subreddit, setting, inInstance, inAuth });
+
+            // Determine the new status
+            let newStatus = '';
+            if (inInstance && inAuth) {
+                newStatus = 'shared';
+            } else if (inInstance && !inAuth) {
+                newStatus = 'instance-only';
+            } else if (!inInstance && inAuth) {
+                newStatus = 'authority-only';
+            } else {
+                // Not in either - remove the row
+                console.log('[DIFF TABLE] Removing row for:', subreddit);
+                tableRow.remove();
+                return;
+            }
+
+            // Update the row styling and links
+            const instanceCell = tableRow.cells[0];
+            const authCell = tableRow.cells[1];
+
+            const linkPath = setting === 'subscriptions' ? `/r/${subreddit}` :
+            setting === 'filters' ? `/r/${subreddit}` :
+            setting === 'followed_users' ? `/u/${subreddit}` :
+            setting === 'filtered_users' ? `/u/${subreddit}` : `/r/${subreddit}`;
+
+            if (newStatus === 'shared') {
+                instanceCell.innerHTML = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="shared">${subreddit}</a>`;
+                authCell.innerHTML = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="shared">${subreddit}</a>`;
+            } else if (newStatus === 'instance-only') {
+                instanceCell.innerHTML = `<a href="${linkPath}" style="color: #4ecdc4; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="instance-only">${subreddit}</a>`;
+                authCell.innerHTML = `<span style="opacity: 0.3;">—</span>`;
+            } else if (newStatus === 'authority-only') {
+                instanceCell.innerHTML = `<span style="opacity: 0.3;">—</span>`;
+                authCell.innerHTML = `<a href="${linkPath}" style="color: #ff6b6b; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="authority-only">${subreddit}</a>`;
+            }
+
+            console.log('[DIFF TABLE] Updated row to status:', newStatus);
+        }
+
+        // Update the summary counts in the diff table
+        function updateDiffTableSummary() {
+            // Recalculate differences and update the summary table
+            if (cachedInstance && cachedAuthoritative) {
+                console.log('[DIFF TABLE] Refreshing summary counts and all overlay components');
+
+                // Update sync status
+                if (typeof updateSyncStatus === 'function') {
+                    updateSyncStatus();
+                }
+
+                // Update the inherit/push comparison table
+                if (typeof updateActionPreviews === 'function') {
+                    updateActionPreviews();
+                }
+
+                // Trigger a refresh of the detailed diff table to update counts
+                setTimeout(() => {
+                    createDetailedDifferencesTable();
+                }, 100);
+            }
+        }
+
+        // Comprehensive function to refresh all parts of the settings overlay
+        async function refreshSettingsOverlay() {
+            console.log('[SYNC] Refreshing entire settings overlay...');
+
+            try {
+                // Re-fetch current instance and authoritative settings
+                if (typeof extractInstanceSettings === 'function') {
+                    cachedInstance = await extractInstanceSettings();
+                }
+
+                if (typeof getAuthoritativeSettings === 'function') {
+                    cachedAuthoritative = getAuthoritativeSettings();
+                }
+
+                // Force a complete sync to recalculate differences
+                await performSync();
+
+                // Update sync status using the fresh data
+                updateSyncStatusFromCache();
+
+                // Update the inherit/push comparison table
+                if (typeof updateActionPreviews === 'function') {
+                    updateActionPreviews();
+                }
+
+                // Update the export string with current settings
+                if (typeof SettingsManager !== 'undefined' && SettingsManager.updateExportString) {
+                    SettingsManager.updateExportString();
+                }
+
+                console.log('[SYNC] Settings overlay refresh completed');
+            } catch (error) {
+                console.error('[SYNC] Error refreshing settings overlay:', error);
+            }
+        }
+
+        // Convert string to Unicode representation using Base64 + Unicode mapping
+        function stringToUnicode(str) {
+            try {
+                // First convert to base64 to handle all characters safely
+                const base64 = btoa(unescape(encodeURIComponent(str)));
+
+                // Then map each base64 character to a safe Unicode range
+                let result = '';
+                for (let i = 0; i < base64.length; i++) {
+                    const char = base64.charCodeAt(i);
+                    // Map to Cyrillic range which is copy/paste safe
+                    result += String.fromCharCode(0x0400 + (char - 32));
+                }
+                return result;
+            } catch (error) {
+                console.error('[RES] String to Unicode conversion failed:', error);
+                return '';
+            }
+        }
+
+        function unicodeToString(unicode) {
+            try {
+                // First convert back from Unicode mapping to base64
+                let base64 = '';
+                for (let i = 0; i < unicode.length; i++) {
+                    const unicodeChar = unicode.charCodeAt(i);
+                    const originalChar = (unicodeChar - 0x0400) + 32;
+                    base64 += String.fromCharCode(originalChar);
+                }
+
+                // Then decode from base64 to original string
+                return decodeURIComponent(escape(atob(base64)));
+            } catch (error) {
+                console.error('[RES] Unicode to string conversion failed:', error);
+                return '';
+            }
+        }
+
+        // Simplified encode function
+        function encodeRESSettings() {
+            try {
+                const settings = {
+                    version: SCRIPT_VERSION,
+                    timestamp: Date.now(),
+                    settings: GM_getValue('redlib_settings', '{}'),
+                    authoritative: GM_getValue('redlib_authoritative_settings', '{}'),
+                    hiddenPosts: GM_getValue('redlib_collapsed_posts', '{}')
+                };
+
+                const jsonString = JSON.stringify(settings);
+                return stringToUnicode(jsonString);
+            } catch (error) {
+                console.error('[RES] Failed to encode settings:', error);
+                return 'Encoding failed - check console for details';
+            }
+        }
+
+        // Simplified decode function with better error handling
+        function decodeRESSettings(encodedString) {
+            try {
+                if (!encodedString || encodedString.trim() === '' || encodedString.includes('Encoding failed')) {
+                    throw new Error('Invalid or empty encoded string');
+                }
+
+                const jsonString = unicodeToString(encodedString);
+
+                if (!jsonString || jsonString.length < 10) {
+                    throw new Error('Decoded string is too short or empty');
+                }
+
+                const parsed = JSON.parse(jsonString);
+
+                // Validate the structure
+                if (typeof parsed !== 'object' || !parsed.version) {
+                    throw new Error('Invalid settings format - missing version');
+                }
+
+                return parsed;
+            } catch (error) {
+                console.error('[RES] Failed to decode settings:', error);
+                console.error('[RES] Encoded string length:', encodedString ? encodedString.length : 'null');
+                console.error('[RES] First 50 chars:', encodedString ? encodedString.substring(0, 50) : 'null');
+                return null;
+            }
+        }
+        
+        function updateActionPreviews() {
+            if (!cachedAuthoritative || !cachedInstance) return;
+
+            // Update the unified comparison table
+            const tableContainer = document.getElementById('sync-comparison-table');
+            if (tableContainer) {
+                const comparisonTable = createUnifiedSettingsTable(cachedInstance, cachedAuthoritative);
+                tableContainer.innerHTML = comparisonTable;
+
+                // Add header button listeners immediately after creating the table
+                setTimeout(() => {
+                    if (typeof SettingsManager !== 'undefined' && SettingsManager.addHeaderButtonListeners) {
+                        SettingsManager.addHeaderButtonListeners();
+                    } else {
+                        console.warn('[SYNC] SettingsManager.addHeaderButtonListeners function not found');
+                    }
+                }, 50);
+            }
+
+            // ALWAYS update the detailed merge preview table
+            const differencesContainer = document.getElementById('sync-differences-container');
+            if (differencesContainer) {
+                if (cachedSettingsDifferences && cachedSettingsDifferences.length > 0) {
+                    const hasArrayDifferences = cachedSettingsDifferences.some(diff =>
+                        diff.type === 'array' && ['subscriptions', 'filters', 'followed_users', 'filtered_users'].includes(diff.setting)
+                    );
+
+                    if (hasArrayDifferences) {
+                        createDetailedDifferencesTable();
+                        differencesContainer.style.display = 'block';
+                    } else {
+                        differencesContainer.style.display = 'none';
+                    }
+                } else {
+                    differencesContainer.style.display = 'none';
+                }
+            }
+        }
+
+        // Update the detailed merge preview table
+        const differencesContainer = document.getElementById('sync-differences-container');
+        if (differencesContainer && cachedSettingsDifferences) {
+            const hasArrayDifferences = cachedSettingsDifferences.some(diff =>
+                                                                        diff.type === 'array' && ['subscriptions', 'filters', 'followed_users', 'filtered_users'].includes(diff.setting)
+                                                                        );
+
+            if (hasArrayDifferences) {
+                createDetailedDifferencesTable();
+                differencesContainer.style.display = 'block';
+            } else {
+                differencesContainer.style.display = 'none';
+            }
+        }
+
+        async function mergeAndPushToInstance() {
+            const authoritative = getAuthoritativeSettings();
+            const instance = await extractInstanceSettings();
+            const now = Date.now();
+
+            console.log('[SYNC] Starting merge and push operation...');
+            console.log('[SYNC] Current authoritative:', authoritative);
+            console.log('[SYNC] Current instance:', instance);
+
+            // Create merged authoritative settings
+            const mergedAuthoritative = { ...authoritative };
+            let changesMade = false;
+
+            // Find settings that need merging
+            Object.keys(instance).forEach(setting => {
+                const authValue = authoritative[setting];
+                const instanceValue = instance[setting];
+                
+                if (Array.isArray(instanceValue) && Array.isArray(authValue)) {
+                    // Handle arrays (existing logic)
+                    const authArray = authValue || [];
+                    const extraInInstance = instanceValue.filter(item => !authArray.includes(item));
+
+                    if (extraInInstance.length > 0) {
+                        // Merge: add instance extras to authoritative
+                        mergedAuthoritative[setting] = [...authArray, ...extraInInstance];
+                        changesMade = true;
+                    }
+                } else if (authValue === undefined || authValue === null || authValue === '') {
+                    // Handle simple values: only inherit if authority doesn't have the setting
+                    if (instanceValue !== undefined && instanceValue !== null && instanceValue !== '') {
+                        mergedAuthoritative[setting] = instanceValue;
+                        changesMade = true;
+                    }
+                }
+            });
+
+            if (changesMade) {
+                // Update authoritative with merged data
+                mergedAuthoritative.overall_timestamp = now;
+                saveAuthoritativeSettings(mergedAuthoritative);
+
+                console.log('[SYNC] Updated authoritative with merged data');
+            }
+
+            // Now push the merged result to instance
+            const settingsUrl = generateSettingsUrl(mergedAuthoritative);
+
+            console.log('[SYNC] Merge queued - Authority restore URL that will be submitted:', settingsUrl);
+
+            // Show notification about what's happening
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--accent);
+                color: var(--foreground);
+                padding: 12px 20px;
+                border-radius: 6px;
+                z-index: 90000;
+                font-family: sans-serif;
+                font-size: 14px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+            notification.textContent = `Submitting merge in background...`;
+            document.body.appendChild(notification);
+
+            try {
+                // Submit the restore URL in the background
+                const response = await fetch(settingsUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                    }
+                });
+
+                console.log('[SYNC] Merge submit response:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    url: response.url,
+                    ok: response.ok
+                });
+
+                if (response.ok) {
+                    notification.textContent = `Merge completed successfully!`;
+                    notification.style.background = '#28a745';
+
+                    // Update instance timestamp to reflect the sync
+                    GM_setValue(`instance_timestamp_${window.location.hostname}`, now);
+
+                    // Show success message, then reload to refresh cookie state
+                    setTimeout(() => {
+                        notification.textContent = `Reloading page to refresh settings...`;
+                        
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }, 2000); // Show success for 2 seconds first
+                    
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('[SYNC] Merge failed:', error);
+
+                // Provide more descriptive error messages for network issues
+                let errorMessage = error.message;
+                if (error.message === 'Failed to fetch') {
+                    errorMessage = 'Network error (ERR_CONNECTION_CLOSED or similar)';
+                }
+
+                notification.textContent = `Merge failed: ${errorMessage}`;
+                notification.style.background = '#dc3545';
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }
+        }
+
+        async function selectivePushToInstance() {
+            const authoritative = getAuthoritativeSettings();
+            const instance = await extractInstanceSettings();
+            const now = Date.now();
+
+            console.log('[SYNC] Starting selective push operation...');
+
+            const operations = [];
+
+            // Find what needs to be pushed
+            ['subscriptions', 'filters', 'followed_users', 'filtered_users'].forEach(setting => {
+                if (Array.isArray(authoritative[setting]) && Array.isArray(instance[setting])) {
+                    const authArray = authoritative[setting] || [];
+                    const instanceArray = instance[setting] || [];
+
+                    // Items to inherit from instance (not in authority)
+                    const extraInInstance = instanceArray.filter(item => !authArray.includes(item));
+                    extraInInstance.forEach(item => {
+                        operations.push({
+                            type: 'inherit',
+                            setting: setting,
+                            item: item,
+                            action: getActionForSetting(setting, 'add')
+                        });
+                    });
+
+                    // Items to push to instance (not in instance)
+                    const missingFromInstance = authArray.filter(item => !instanceArray.includes(item));
+                    missingFromInstance.forEach(item => {
+                        operations.push({
+                            type: 'push',
+                            setting: setting,
+                            item: item,
+                            action: getActionForSetting(setting, 'add')
+                        });
+                    });
+                }
+            });
+
+            if (operations.length === 0) {
+                alert('No selective changes needed.');
+                return;
+            }
+
+            console.log('[SYNC] Selective operations planned:', operations);
+
+            // Show confirmation with details
+            const inheritCount = operations.filter(op => op.type === 'inherit').length;
+            const pushCount = operations.filter(op => op.type === 'push').length;
+
+            const message = `Selective sync will:\n` +
+                `• Inherit ${inheritCount} items from this instance\n` +
+                `• Push ${pushCount} items to this instance\n` +
+                `This avoids cookie limits. Continue?`;
+
+            if (!confirm(message)) return;
+
+            // Execute operations sequentially
+            await executeSelectiveOperations(operations);
+        }
+
+        function getActionForSetting(setting, operation) {
+            const actionMap = {
+                'subscriptions': operation === 'add' ? 'subscribe' : 'unsubscribe',
+                'filters': operation === 'add' ? 'filter' : 'unfilter',
+                'followed_users': operation === 'add' ? 'follow_user' : 'unfollow_user',
+                'filtered_users': operation === 'add' ? 'filter_user' : 'unfilter_user'
+            };
+            return actionMap[setting] || 'unknown';
+        }
+
+        async function executeSelectiveOperations(operations) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--accent);
+                    color: var(--foreground);
+                    padding: 12px 20px;
+                    border-radius: 6px;
+                    z-index: 10000;
+                    font-family: sans-serif;
+                    font-size: 14px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    min-width: 300px;
+                `;
+            document.body.appendChild(notification);
+
+            let completed = 0;
+            const total = operations.length;
+
+            for (const operation of operations) {
+                notification.textContent = `Selective sync: ${completed + 1}/${total} - ${operation.action} ${operation.item}`;
+
+                try {
+                    if (['subscribe', 'unsubscribe', 'filter', 'unfilter'].includes(operation.action)) {
+                        // Use existing subreddit action logic
+                        await executeSubredditAction(operation.item, operation.action);
+                    } else {
+                        // For user actions, we'd need to implement similar logic
+                        console.log(`[SYNC] User action not implemented yet: ${operation.action} ${operation.item}`);
+                    }
+
+                    // Update authoritative if this was an inherit operation
+                    if (operation.type === 'inherit') {
+                        const authoritative = getAuthoritativeSettings();
+                        if (!authoritative[operation.setting]) {
+                            authoritative[operation.setting] = [];
+                        }
+                        if (!authoritative[operation.setting].includes(operation.item)) {
+                            authoritative[operation.setting].push(operation.item);
+                            authoritative.overall_timestamp = Date.now();
+                            saveAuthoritativeSettings(authoritative);
+                            console.log(`[SYNC] Inherited ${operation.item} into authoritative ${operation.setting}`);
+                        }
+                    }
+
+                    completed++;
+
+                    // Small delay between operations to avoid overwhelming the server
+                    await new Promise(resolve => setTimeout(resolve, 200));
+
+                } catch (error) {
+                    console.error(`[SYNC] Failed to execute ${operation.action} on ${operation.item}:`, error);
+                    notification.textContent = `Error on ${operation.item} - continuing...`;
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+
+            notification.textContent = `Selective sync complete: ${completed}/${total} operations`;
+            setTimeout(() => notification.remove(), 3000);
+
+            // Refresh the page to see changes
+            setTimeout(() => window.location.reload(), 3000);
+        }
+
+        async function executeSubredditAction(subredditName, action) {
+            const actionEndpoints = {
+                'subscribe': `/r/${subredditName}/subscribe`,
+                'unsubscribe': `/r/${subredditName}/unsubscribe`,
+                'filter': `/r/${subredditName}/filter`,
+                'unfilter': `/r/${subredditName}/unfilter`
+                };
+
+            const endpoint = actionEndpoints[action];
+            if (!endpoint) {
+                throw new Error(`Unknown action: ${action}`);
+            }
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            console.log(`[SYNC] Successfully executed ${action} on ${subredditName}`);
+        }
+
+        return {
+            init: init,
+            handleUserAction: handleUserAction,
+            performSync: performSync,
+            inheritFromInstance: inheritFromInstance,
+            pushToInstance: pushToInstance,
+            mergeAndPushToInstance: mergeAndPushToInstance,
+            updateSyncStatus: updateSyncStatus,
+            encodeRESSettings: encodeRESSettings,
+            decodeRESSettings: decodeRESSettings,
+            refreshSettingsOverlay: refreshSettingsOverlay,
+            getAuthoritativeSettings: getAuthoritativeSettings,
+            generateChangeSummary: generateChangeSummary,
+            extractInstanceSettings: extractInstanceSettings, // ADD THIS LINE
+            getCachedDifferences: function() {
+                return cachedSettingsDifferences || [];
+            },
+            clearCache: function() {
+                cachedAuthoritative = null;
+                cachedInstance = null;
+                cachedInstanceTimestamp = null;
+                cachedSettingsDifferences = [];
+                console.log('[SYNC] Cache cleared');
+            }
         };
-
-        const endpoint = actionEndpoints[action];
-        if (!endpoint) {
-            throw new Error(`Unknown action: ${action}`);
-        }
-
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-
-        console.log(`[SYNC] Successfully executed ${action} on ${subredditName}`);
-    }
-
-    return {
-        init: init,
-        handleUserAction: handleUserAction,
-        performSync: performSync,
-        inheritFromInstance: inheritFromInstance,
-        pushToInstance: pushToInstance,
-        mergeAndPushToInstance: mergeAndPushToInstance,
-        updateSyncStatus: updateSyncStatus
-    };
-})();
+    })();
 
 // Make sync functionality globally accessible
 window.RedlibSettingsSync = RedlibSettingsSync;
@@ -8943,10 +9851,46 @@ const SettingsFeedCollapsers = (function() {
     };
 })();
 
+// ============================================================================
+// AUTO-RECORD NATIVE SETTINGS CHANGES
+// ============================================================================
+function interceptNativeSettingsForm() {
+    // Only run on settings page
+    if (!window.location.pathname.includes('/settings')) {
+        return;
+    }
 
-    // ============================================================================
-    // MAIN INITIALIZATION
-    // ============================================================================
+    console.log('[Redlib Enhancement Suite] Setting up native settings auto-recording...');
+
+    // Find the main settings form
+    const settingsForm = document.querySelector('form[action="/settings"]');
+    if (!settingsForm) {
+        console.log('[Redlib Enhancement Suite] Settings form not found');
+        return;
+    }
+
+    // Intercept form submission
+    settingsForm.addEventListener('submit', async function(event) {
+        console.log('[Redlib Enhancement Suite] Native settings form submitted - auto-recording...');
+
+        // Let the form submit normally first
+        setTimeout(async () => {
+            try {
+                // Extract and record the settings as authoritative after form submission
+                if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.inheritFromInstance) {
+                    console.log('[Redlib Enhancement Suite] Auto-inheriting settings after native save...');
+                    await RedlibSettingsSync.inheritFromInstance();
+                }
+            } catch (error) {
+                console.warn('[Redlib Enhancement Suite] Failed to auto-record native settings:', error);
+            }
+        }, 1000); // Give time for the page to process the form submission
+    });
+}
+
+// ============================================================================
+// MAIN INITIALIZATION
+// ============================================================================
 async function init() {
     console.log('[Redlib Enhancement Suite] Starting initialization...');
 
@@ -8998,6 +9942,9 @@ async function init() {
     if (window.location.pathname.includes('/settings')) {
         SettingsFeedCollapsers.init();
     }
+
+    // Initialize auto-recording of native settings
+    interceptNativeSettingsForm();
 
     console.log('[Redlib Enhancement Suite] Core modules initialized for ' + (isCommentPage ? 'comment page' : 'post listing page'));
 
