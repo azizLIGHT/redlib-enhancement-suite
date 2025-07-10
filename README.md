@@ -144,6 +144,28 @@ Compact layout with alternating background colors and improved visual hierarchy.
 
 ![Comment Styling](https://github.com/user-attachments/assets/dcc7c292-7342-47a6-b09b-2fe336da96be)
 
+### 🧭 Comment Navigator
+Floating navigation buttons to jump between top-level comments with smooth scrolling and touch-friendly design.
+
+![Comment Navigator](https://github.com/user-attachments/assets/c4e407b2-77cc-4136-820a-1a2608a4b80c)
+
+### 👆 Parent Comment Hover  
+Hover over "parent" links to instantly preview parent comments with full context and chain navigation.
+
+![Direct Parent on Hover](https://github.com/user-attachments/assets/d1ccbffe-5a67-4ee3-a52b-5c57f0f2bc3d)
+
+**Load more parent comments** in the preview:
+![Successive parents on click](https://github.com/user-attachments/assets/35ef3c8f-73ff-4f30-8f53-ee549f398d1c)
+
+### 📁 Settings Feed Collapsers
+Collapsible subscribed and filtered feeds sections with item counts for better settings page organization.
+
+![Settings Feed Collapsers](https://github.com/user-attachments/assets/aef6aa64-8d8a-41d4-82f7-5f7b799c74c4)
+
+**Cycle between** script-only, shared, and instance-only subscriptions/filters
+![Cycle between script-only, shared, and instance-only subscriptions/filters](https://github.com/user-attachments/assets/8e5f8316-0d02-41dc-b1d7-ae3de3f66a8d)
+
+
 ## 🎨 Visual Design & Technical Features
 
 ### Visual Design
@@ -176,7 +198,35 @@ Found a bug or have a feature request?
 
 ## 📝 Version History
 
-### v2.0 - Current
+### v2.066 - Current
+
+🆕 **Major Comment Navigation & Settings Features**
+- **Comment Navigator** - Floating up/down navigation buttons for efficient comment browsing
+  - Fixed positioning navigation buttons with smart scrolling between top-level comments
+  - Touch-friendly 50px buttons optimized for mobile interaction  
+  - Auto-tracking of newly loaded comments via AJAX
+  - Seamless integration with existing comment system
+
+- **Parent Comment Hover** - Instant parent comment context previews
+  - Hover over "parent" links to see full parent comment content in popup
+  - Complete author info, score, timestamp, and comment body display
+  - "Show next parent" navigation for traversing comment chains
+  - Intelligent popup positioning within viewport bounds
+
+- **Settings Feed Collapsers** - Enhanced settings page organization  
+  - Convert subscribed/filtered feeds sections to collapsible format
+  - Display item counts in section headers (e.g., "Subscribed Feeds (47)")
+  - Improve usability for users with extensive subscription lists
+  - Clean, organized settings page interface
+
+🔧 **Additional Improvements**
+- Enhanced error handling and stability in sync operations
+- Better popup z-index management for overlay interactions
+- New settings toggles for all comment navigation features
+- Performance optimizations for comment page interactions
+
+<details>
+<summary><h2>v2.0 - Previous</h2></summary>
 
 🚀 **Major Export/Import System**
 - **Complete redlib-style Backup** - Export all userscript settings, sync settings, and hidden posts in one encoded string
@@ -197,7 +247,7 @@ Found a bug or have a feature request?
 - **Memory Management** - Improved cleanup and caching for export/import operations
 - **Settings Integration** - Export/import functions properly integrated with existing settings management
 - **Performance Optimizations** - Efficient encoding/decoding for large configuration exports
-
+</details>
 <details>
 <summary><h2>v1.91 - Previous</h2></summary>
   
