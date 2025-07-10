@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Redlib Enhancement Suite
 // @namespace    https://github.com/azizLIGHT/redlib-enhancement-suite
-// @version      2.0
+// @version      2.066
 // @description  A comprehensive userscript that supercharges your Redlib experience with RES-style features, smooth animations, and powerful customization options.
 // @author       azizLIGHT
-// @match        https://redlib.something.com/*
+// @match        https://redlib.example.com/*
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_deleteValue
@@ -19,7 +19,7 @@
     'use strict';
 
     // Script version - update this when you change @version above
-    const SCRIPT_VERSION = '2.0';
+    const SCRIPT_VERSION = '2.066';
 
     // ============================================================================
     // PAGE VALIDATION - Must be first
@@ -745,7 +745,8 @@ body:has(.post.highlighted) .post.highlighted.redlib-sticky-mode:hover .post_tit
     border-radius: 4px;
     padding: 0;
     z-index: 9999;
-    max-width: 600px;
+min-width: 320px;
+max-width: 600px;
     max-height: 500px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -1686,26 +1687,6 @@ aside {
     border-bottom: 1px solid var(--background);
 }
 
-/* Make inherit/push headers clickable buttons */
-.redlib-settings-comparison th.button-header {
-    background: var(--highlighted);
-    color: var(--text);
-    border: 1px solid var(--accent);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-}
-
-.redlib-settings-comparison th.button-header:hover {
-    background: var(--accent);
-    color: var(--foreground);
-}
-
-.redlib-settings-comparison th.button-header:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
 .redlib-settings-comparison td {
     font-family: monospace;
     font-size: 10px;
@@ -2146,7 +2127,16 @@ aside {
 .expand-children:active {
     transform: scale(0.95) !important;
 }
+/* Action button hover styles */
+.redlib-sync-action-btn:hover {
+    background: var(--accent) !important;
+    color: var(--foreground) !important;
+}
 
+.redlib-sync-action-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
     `;
         }
         document.head.appendChild(style);
@@ -3444,38 +3434,7 @@ aside {
 
                 } else if (shouldEnableSticky) {
                     post.style.setProperty('top', navHeight + 'px', 'important');
-      instCount = (cachedInstance[diff.setting] || []).length;
-                const missingCount = diff.missingFromInstance?.length || 0;
-                const extraCount = diff.extraInInstance?.length || 0;
-                const settingName = diff.setting.replace('_', ' ');
-
-                let inheritCell = '';
-                let pushCell = '';
-
-                if (extraCount > 0) {
-                    inheritCell = `<div style="color: #4ecdc4; font-weight: bold;">${extraCount} items</div>`;
-                    if (extraCount <= 3) {
-                        inheritCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${diff.extraInInstance.join(', ')}</div>`;
-                    } else {
-                        const examples = diff.extraInInstance.slice(0, 2).join(', ');
-                        inheritCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${examples}... (+${extraCount - 2} more)</div>`;
-                    }
                 }
-
-                if (missingCount > 0) {
-                    pushCell = `<div style="color: #ff6b6b; font-weight: bold;">${missingCount} items</div>`;
-                    if (missingCount <= 3) {
-                        pushCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${diff.missingFromInstance.join(', ')}</div>`;
-                    } else {
-                        const examples = diff.missingFromInstance.slice(0, 2).join(', ');
-                        pushCell += `<div style="color: var(--text); opacity: 0.8; margin-top: 2px;">${examples}... (+${missingCount - 2} more)</div>`;
-                    }
-                }
-
-                summaryHtml += `<tr>`;
-                summaryHtml += `<td style="padding: 8px; background: var(--highlighted); color: var(--text); font-weight: bold; border-bottom: 1px solid var(--background); width: 33.33%;">`;
-                summaryHtml += `${settingName}<br><span style="font-size: 9px; opacity: 0.7;">${instCount} vs ${authCount} items</span></td>`;
-                summaryHtm          }
             };
 
             const handleMouseEnter = () => {
@@ -4557,10 +4516,26 @@ aside {
             });
 
             summary.insertBefore(expandButton, summary.firstChild);
+
+            // Add child count display
+            const childCount = getChildCount(comment);
+            if (childCount > 0) {
+                const childCountDisplay = document.createElement('span');
+                childCountDisplay.className = 'child-count-display';
+                childCountDisplay.textContent = `(${childCount} replies)`;
+                childCountDisplay.style.cssText = 'opacity: 0.5; float: right; font-size: 0.9em; margin-left: auto;';
+                summary.appendChild(childCountDisplay);
+            }
         }
 
+function getChildCount(comment) {
+            const directChildren = comment.querySelectorAll(':scope > .comment_right > .replies > .comment');
+            return directChildren.length;
+        }
+        
         function handleCustomToggle(comment, button) {
             const isExpanded = button.getAttribute('data-expanded') === 'true';
+            const commentDetails = comment.querySelector('.comment_right');
 
             if (isExpanded) {
                 collapseDirectChildren(comment);
@@ -4568,6 +4543,10 @@ aside {
                 button.setAttribute('data-expanded', 'false');
                 button.title = 'Expand direct replies';
             } else {
+                // If this comment itself is collapsed by native redlib, expand it first
+                if (commentDetails && !commentDetails.hasAttribute('open')) {
+                    commentDetails.setAttribute('open', '');
+                }
                 expandDirectChildrenOnly(comment);
                 button.textContent = '[−]';
                 button.setAttribute('data-expanded', 'true');
@@ -4734,6 +4713,20 @@ aside {
             });
         }
 
+function removeDuplicateMoreRepliesLinks(parentContainer) {
+            const seenHrefs = new Set();
+            const allMoreRepliesLinks = parentContainer.querySelectorAll('a.deeper_replies');
+
+            allMoreRepliesLinks.forEach(link => {
+                const href = link.href;
+                if (seenHrefs.has(href)) {
+                    link.remove();
+                } else {
+                    seenHrefs.add(href);
+                }
+            });
+        }
+        
         function loadMoreComments(link) {
             const url = link.href;
             const parentBlockquote = link.closest('blockquote.replies');
@@ -4773,30 +4766,59 @@ aside {
 
                     link.remove();
 
+                    // Check if existing siblings are expanded before processing new comments
+                    const existingSiblings = parentBlockquote.querySelectorAll(':scope > div.comment');
+                    let shouldExpandNewComments = false;
+                    
+                    // Only check if there are existing siblings
+                    if (existingSiblings.length > 0) {
+                        let expandedCount = 0;
+                        
+                        // Check each existing sibling's expand state
+                        existingSiblings.forEach(sibling => {
+                            const commentRight = sibling.querySelector('.comment_right');
+                            const expandButton = sibling.querySelector('.expand-children');
+                            
+                            // Check if expanded via native details (open attribute) OR custom button
+                            const isNativeExpanded = commentRight && commentRight.hasAttribute('open');
+                            const isCustomExpanded = expandButton && expandButton.getAttribute('data-expanded') === 'true';
+                            
+                            if (isNativeExpanded || isCustomExpanded) {
+                                expandedCount++;
+                            }
+                        });
+                        
+                        // If ALL existing siblings are expanded, expand new ones too
+                        shouldExpandNewComments = (expandedCount === existingSiblings.length);
+                    }
+
                     newComments.forEach((comment) => {
                         const clonedComment = comment.cloneNode(true);
+                        
+                        // Always initialize the comment first (this will collapse it)
                         initializeNewComment(clonedComment);
+                        
+                        // If we should expand, do it after initialization
+                        if (shouldExpandNewComments) {
+                            const commentRight = clonedComment.querySelector('.comment_right');
+                            if (commentRight) {
+                                commentRight.setAttribute('open', '');
+                            }
+                        }
+                        
                         parentBlockquote.appendChild(clonedComment);
                     });
 
                     removeDuplicateComments(parentBlockquote);
 
-                    const newMoreRepliesLinks = newRepliesBlockquote.querySelectorAll('a.deeper_replies');
-                    newMoreRepliesLinks.forEach(newLink => {
-                        const clonedLink = newLink.cloneNode(true);
-                        clonedLink.href = newLink.href;
-
-                        const newLinkComment = newLink.closest('div.comment');
-                        if (newLinkComment) {
-                            const correspondingComment = parentBlockquote.querySelector('#' + newLinkComment.id);
-                            if (correspondingComment) {
-                                const correspondingReplies = correspondingComment.querySelector('blockquote.replies');
-                                if (correspondingReplies) {
-                                    correspondingReplies.appendChild(clonedLink);
-                                    attachMoreRepliesListener(clonedLink);
-                                }
-                            }
-                        }
+                    // Remove duplicate "more replies" links from the entire parent container
+                    removeDuplicateMoreRepliesLinks(parentBlockquote);
+                    
+                    // Attach listeners to any new "more replies" links that were added with the new comments
+                    const newlyAddedLinks = parentBlockquote.querySelectorAll('a.deeper_replies:not([data-listener-attached])');
+                    newlyAddedLinks.forEach(link => {
+                        attachMoreRepliesListener(link);
+                        link.setAttribute('data-listener-attached', 'true');
                     });
                 } else {
                     link.remove();
@@ -6279,6 +6301,428 @@ aside {
     })();
 
     // ============================================================================
+    // PARENT COMMENT HOVER MODULE
+    // ============================================================================
+    const ParentCommentHover = (function() {
+        let popup = null;
+        let currentLink = null;
+        let timeoutId = null;
+        let hideTimeoutId = null;
+
+function createPopup() {
+    popup = document.createElement('div');
+popup.className = '_redlib_popup';
+popup.style.position = 'fixed';  // Override the absolute positioning from CSS
+    document.body.appendChild(popup);
+    
+    // Add event listeners to popup
+    popup.addEventListener('mouseenter', clearHideTimeout);
+    popup.addEventListener('mouseleave', hidePopupDelayed);
+    
+    // Add click handler for "show next parent" header
+    popup.addEventListener('click', (event) => {
+        if (event.target.classList.contains('next_comment')) {
+            const parentId = event.target.getAttribute('data-parent-id');
+            const parentComment = document.getElementById(parentId);
+            if (parentComment) {
+                // Get the grandparent's summary and body
+                const grandParentSummary = parentComment.querySelector('summary.comment_data');
+                const grandParentBody = parentComment.querySelector('.comment_body');
+                
+                if (grandParentSummary && grandParentBody) {
+                    // Check if grandparent has its own parent
+                    const greatGrandParent = findParentComment(parentComment);
+                    
+                    // Clone the grandparent content to clean it
+                    const grandSummaryClone = grandParentSummary.cloneNode(true);
+                    const grandBodyClone = grandParentBody.cloneNode(true);
+                    
+                    // Remove expand-children spans from grandparent summary
+                    const grandSummaryExpandChildren = grandSummaryClone.querySelectorAll('.expand-children');
+                    grandSummaryExpandChildren.forEach(span => span.remove());
+                    
+                    // Remove parent-comment-link spans from grandparent summary
+                    const grandSummaryParentLinks = grandSummaryClone.querySelectorAll('.parent-comment-link');
+                    grandSummaryParentLinks.forEach(span => span.remove());
+                    
+// Remove parent-comment-link spans from grandparent body
+const grandBodyParentLinks = grandBodyClone.querySelectorAll('.parent-comment-link');
+grandBodyParentLinks.forEach(span => span.remove());
+                    
+                    // Build new content with grandparent stacked at the top
+                    let newContent = '';
+                    
+                    // Add next parent header for great-grandparent if it exists
+                    if (greatGrandParent) {
+                        newContent += '<div class="next_comment" data-parent-id="' + greatGrandParent.id + '">show next parent</div>';
+                    }
+                    
+// Add grandparent content at the top using formatted structure
+newContent += formatCommentData(grandParentSummary, grandParentBody);
+                    
+                    // Get existing content (remove the old header first)
+                    const existingHeader = popup.querySelector('.next_comment');
+                    if (existingHeader) {
+                        existingHeader.remove();
+                    }
+                    
+                    // Add existing content below
+                    newContent += popup.innerHTML;
+                    
+                    popup.innerHTML = newContent;
+                }
+            }
+        }
+    });
+    
+    // Add close button
+    const closeBtn = document.createElement('div');
+    closeBtn.className = 'popup-close';
+    closeBtn.innerHTML = '×';
+    closeBtn.addEventListener('click', hidePopup);
+    document.body.appendChild(closeBtn);
+}
+
+// Helper function to format comment data consistently
+function formatCommentData(commentSummary, commentBody) {
+    // Parse the comment data to match HoverComments structure
+    const authorLink = commentSummary.querySelector('a[href*="/user/"]');
+    const author = authorLink ? authorLink.textContent.replace('u/', '') : 'Unknown';
+
+    // Look for score in the parent comment element (not just in the summary)
+const commentElement = commentSummary.closest('.comment');
+const scoreElement = commentElement ? commentElement.querySelector('.comment_score') : null;
+    const score = scoreElement ? scoreElement.textContent.trim() : '0';
+
+    const timeElement = commentSummary.querySelector('.created, .live-timestamp');
+    const timeAgo = timeElement ? timeElement.textContent.trim() : '';
+
+    // Clean the body clone
+    const bodyClone = commentBody.cloneNode(true);
+    const bodyExpandChildren = bodyClone.querySelectorAll('.expand-children');
+    bodyExpandChildren.forEach(span => span.remove());
+    const bodyParentLinks = bodyClone.querySelectorAll('.parent-comment-link');
+    bodyParentLinks.forEach(span => span.remove());
+
+    // Build comment HTML with HoverComments structure
+    let commentHTML = '<div class="comment">';
+    commentHTML += '<div class="comment_header">';
+    commentHTML += '<a href="/user/' + author + '" class="comment_author">u/' + author + '</a>';
+    commentHTML += '<span class="comment_meta_separator">•</span>';
+const scoreNumber = parseInt(score) || 0;
+const scoreText = Math.abs(scoreNumber) === 1 ? 'point' : 'points';
+commentHTML += '<span class="comment_points">' + score + ' ' + scoreText + '</span>';
+    if (timeAgo) {
+        commentHTML += '<span class="comment_meta_separator">•</span>';
+        commentHTML += '<span class="comment_time">' + timeAgo + '</span>';
+    }
+
+    commentHTML += '</div>';
+    commentHTML += '<div class="comment_body">' + bodyClone.innerHTML + '</div>';
+    commentHTML += '</div>';
+
+    return commentHTML;
+}
+
+function addStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .parent-comment-link {
+            color: var(--accent) !important;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 12px !important;
+            margin-left: 8px;
+        }
+
+        .parent-comment-link:hover {
+            opacity: 0.8;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+function addParentCommentLinks() {
+    // Find all comments that are not top-level
+    const childComments = document.querySelectorAll('.thread .comment .replies .comment');
+    
+    childComments.forEach((comment) => {
+        // Skip if already has parent link
+        if (comment.querySelector('.parent-comment-link')) {
+            return;
+        }
+
+        // Find the parent comment
+        const parentComment = findParentComment(comment);
+        
+        if (!parentComment) {
+            return;
+        }
+
+        // Add parent link to the comment summary
+        const summary = comment.querySelector('.comment_data');
+        
+        if (summary) {
+            const parentLink = document.createElement('span');
+            parentLink.className = 'parent-comment-link';
+            parentLink.textContent = 'parent';
+            parentLink.setAttribute('data-parent-id', parentComment.id);
+            
+            // Add to the end of the summary
+            summary.appendChild(parentLink);
+        }
+    });
+}
+
+        function findParentComment(comment) {
+    // Navigate up the DOM to find the parent comment
+    const parentReplies = comment.parentElement; // .replies
+    
+    if (!parentReplies || !parentReplies.classList.contains('replies')) {
+        return null;
+    }
+
+    const parentComment = parentReplies.parentElement; // .comment_right
+    
+    if (!parentComment) {
+        return null;
+    }
+
+    const actualParentComment = parentComment.parentElement; // .comment
+    
+    if (!actualParentComment || !actualParentComment.classList.contains('comment')) {
+        return null;
+    }
+
+    return actualParentComment;
+}
+
+function showPopup(link, parentComment) {
+    if (!popup || !parentComment) {
+        return;
+    }
+
+    // Get the comment summary (where the author, score, time are)
+    const parentSummary = parentComment.querySelector('summary.comment_data');
+    if (!parentSummary) {
+        return;
+    }
+
+    // Get the comment body
+    const parentBody = parentComment.querySelector('.comment_body');
+    if (!parentBody) {
+        return;
+    }
+
+    // Check if this parent has its own parent for the "show next parent" header
+    const grandParent = findParentComment(parentComment);
+    
+    // Clone the summary and body to clean them without affecting the original
+    const summaryClone = parentSummary.cloneNode(true);
+    const bodyClone = parentBody.cloneNode(true);
+    
+    // Remove expand-children spans from summary
+    const summaryExpandChildren = summaryClone.querySelectorAll('.expand-children');
+    summaryExpandChildren.forEach(span => span.remove());
+    
+    // Remove parent-comment-link spans from summary
+    const summaryParentLinks = summaryClone.querySelectorAll('.parent-comment-link');
+    summaryParentLinks.forEach(span => span.remove());
+    
+    // Remove expand-children spans from body
+    const bodyExpandChildren = bodyClone.querySelectorAll('.expand-children');
+    bodyExpandChildren.forEach(span => span.remove());
+    
+    // Remove parent-comment-link spans from body
+    const bodyParentLinks = bodyClone.querySelectorAll('.parent-comment-link');
+    bodyParentLinks.forEach(span => span.remove());
+    
+// Build popup content using exact HoverComments structure
+let popupHTML = '';
+
+// Add close button first (like HoverComments does)
+popupHTML += '<button class="popup-close">×</button>';
+
+// Add next parent header at the top if there is a grandparent
+if (grandParent) {
+    popupHTML += '<div class="next_comment" data-parent-id="' + grandParent.id + '">show next parent</div>';
+}
+
+// Add the comment with formatted structure
+popupHTML += formatCommentData(parentSummary, parentBody);
+
+popup.innerHTML = popupHTML;
+
+// Position and show popup
+positionPopup(link);
+popup.style.display = 'block';
+currentLink = link;
+
+// Add close button functionality (like HoverComments does)
+const closeBtn = popup.querySelector('.popup-close');
+if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+        hidePopup();
+    });
+
+    // Position close button relative to popup
+    const rect = popup.getBoundingClientRect();
+    closeBtn.style.position = 'fixed';
+    closeBtn.style.top = (rect.top + 8) + 'px';
+    closeBtn.style.right = (window.innerWidth - rect.right + 8) + 'px';
+    closeBtn.style.zIndex = '1003';
+}
+}
+
+function positionPopup(link) {
+    if (!popup || !link) return;
+
+    const linkRect = link.getBoundingClientRect();
+    const viewport = {
+        width: window.innerWidth,
+        height: window.innerHeight
+    };
+
+    // Position directly below the link
+    let left = linkRect.left;
+    let top = linkRect.bottom + 5;
+
+    // Get popup dimensions after content is set
+    popup.style.visibility = 'hidden';
+    popup.style.display = 'block';
+    popup.style.position = 'fixed';  // Force fixed positioning like hover comments
+    const popupRect = popup.getBoundingClientRect();
+    popup.style.visibility = 'visible';
+
+    // Adjust horizontal position if popup would go off-screen
+    if (left + popupRect.width > viewport.width - 20) {
+        left = viewport.width - popupRect.width - 20;
+    }
+    if (left < 20) {
+        left = 20;
+    }
+
+    // Adjust vertical position if popup would go off-screen
+    if (top + popupRect.height > viewport.height - 20) {
+        top = linkRect.top - popupRect.height - 5;
+    }
+    if (top < 20) {
+        top = 20;
+    }
+
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+}
+
+function hidePopup() {
+    if (popup) {
+        popup.style.display = 'none';
+    }
+    currentLink = null;
+}
+
+        function hidePopupDelayed() {
+            clearTimeout(hideTimeoutId);
+            hideTimeoutId = setTimeout(hidePopup, 150);
+        }
+
+        function clearHideTimeout() {
+            clearTimeout(hideTimeoutId);
+        }
+
+        function handleMouseEnter(event) {
+            const link = event.target;
+            const parentId = link.getAttribute('data-parent-id');
+            const parentComment = document.getElementById(parentId);
+
+            clearTimeout(timeoutId);
+            clearHideTimeout();
+
+            // Show popup after short delay
+            timeoutId = setTimeout(() => {
+                showPopup(link, parentComment);
+            }, 250);
+        }
+
+function handleMouseLeave(event) {
+    clearTimeout(timeoutId);
+
+    // Don't hide if moving to popup
+    if (!popup || !event.relatedTarget || !popup.contains(event.relatedTarget)) {
+        hidePopupDelayed();
+    }
+}
+
+function bindEvents() {
+    console.log('[Parent Comment Hover DEBUG] Binding events...');
+    
+    // Use event delegation for dynamically added links
+    document.addEventListener('mouseover', (event) => {
+        if (event.target && event.target.classList && event.target.classList.contains('parent-comment-link')) {
+            console.log('[Parent Comment Hover DEBUG] Mouse over parent link detected!');
+            handleMouseEnter(event);
+        }
+    });
+
+    document.addEventListener('mouseout', (event) => {
+        if (event.target && event.target.classList && event.target.classList.contains('parent-comment-link')) {
+            console.log('[Parent Comment Hover DEBUG] Mouse out parent link detected!');
+            handleMouseLeave(event);
+        }
+    });
+    
+    console.log('[Parent Comment Hover DEBUG] Events bound successfully');
+}
+
+function init() {
+    console.log('[Parent Comment Hover DEBUG] Starting init...');
+    console.log('[Parent Comment Hover DEBUG] Current pathname:', window.location.pathname);
+    console.log('[Parent Comment Hover DEBUG] Includes /comments/:', window.location.pathname.includes('/comments/'));
+    
+    // Only initialize on comment pages
+    if (!window.location.pathname.includes('/comments/')) {
+        console.log('[Parent Comment Hover DEBUG] Not a comment page, returning');
+        return;
+    }
+
+    console.log('[Parent Comment Hover DEBUG] Checking setting...');
+    const settingEnabled = SettingsManager.getSetting('parentCommentHover', 'enabled');
+    console.log('[Parent Comment Hover DEBUG] Setting enabled:', settingEnabled);
+    
+    // Check if setting is enabled
+    if (!settingEnabled) {
+        console.log('[Parent Comment Hover DEBUG] Setting disabled, returning');
+        return;
+    }
+
+    console.log('[Parent Comment Hover DEBUG] Initializing components...');
+    
+    addStyles();  // ADD this back for parent link styling
+    createPopup();
+    bindEvents();
+
+    // Add parent links to existing comments
+    addParentCommentLinks();
+
+    // Listen for new comments being added (e.g., via AJAX)
+    const observer = new MutationObserver(() => {
+        setTimeout(addParentCommentLinks, 100);
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
+    console.log('[Redlib Enhancement Suite] Parent Comment Hover initialized');
+}
+
+        return {
+            init: init
+        };
+    })();
+    
+    // ============================================================================
     // SETTINGS MANAGER MODULE
     // ============================================================================
     const SettingsManager = (function() {
@@ -6300,6 +6744,12 @@ aside {
             },
             ajaxCommentLoading: {
                 enabled: true
+            },
+            commentNavigator: {
+                enabled: true
+            },
+            parentCommentHover: {
+                enabled: false
             },
             commentStyling: {
                 enabled: true
@@ -6687,7 +7137,45 @@ aside {
           <span class="redlib-settings-slider"></span>
         </label>
       </div>
+      
+      <div class="redlib-settings-option">
+        <div class="redlib-settings-option-info">
+          <div class="redlib-settings-option-title">
+            Comment Navigator
+          </div>
+          <div class="redlib-settings-option-description">
+            Show navigation buttons to jump between top-level comments on comment pages
+          </div>
+        </div>
+        <label class="redlib-settings-toggle">
+          <input
+            type="checkbox"
+            data-module="commentNavigator"
+            data-setting="enabled"
+          />
+          <span class="redlib-settings-slider"></span>
+        </label>
+      </div>
 
+      <div class="redlib-settings-option">
+        <div class="redlib-settings-option-info">
+          <div class="redlib-settings-option-title">
+            Parent Comment Hover
+          </div>
+          <div class="redlib-settings-option-description">
+            Show parent comment preview when hovering over "parent" links in comment threads
+          </div>
+        </div>
+        <label class="redlib-settings-toggle">
+          <input
+            type="checkbox"
+            data-module="parentCommentHover"
+            data-setting="enabled"
+          />
+          <span class="redlib-settings-slider"></span>
+        </label>
+      </div>
+      
       <div class="redlib-settings-option">
         <div class="redlib-settings-option-info">
           <div class="redlib-settings-option-title">Comment Styling</div>
@@ -6861,9 +7349,9 @@ aside {
                     // Get fresh analysis for merge preview
                     const syncResult = await RedlibSettingsSync.performSync();
                     const changeSummary = RedlibSettingsSync.generateChangeSummary(syncResult.differences || [], 'merge');
-                    
+
                     let confirmMessage = 'Perform selective merge?\n\n';
-                    
+
                     if (changeSummary.details.length === 0) {
                         confirmMessage += 'No changes needed - all settings already match.\n\nMerge anyway?';
                     } else {
@@ -6970,15 +7458,15 @@ aside {
                     // DIALOG 1: Show detailed import success summary with full changelog
                     if (decodedSettings.authoritative && Object.keys(decodedSettings.authoritative).length > 0) {
                         const emptySettings = { hiddenPostsCount: 0 };
-                        const importedAuthWithHidden = { 
+                        const importedAuthWithHidden = {
                             ...JSON.parse(decodedSettings.authoritative),
-                            hiddenPostsCount: decodedSettings.hiddenPosts ? 
+                            hiddenPostsCount: decodedSettings.hiddenPosts ?
                                 Object.keys(JSON.parse(decodedSettings.hiddenPosts)).length : 0
                         };
 
                         // Use inherit context like 1.139 to show what was imported into authority
                         const importSummary = RedlibSettingsSync.generateChangeSummary([], 'inherit', emptySettings, importedAuthWithHidden);
-                        
+
                         let importMessage = `Import Successful!`;
                         if (importSummary.details.length > 0) {
                             importMessage += `\n\nImported:\n${importSummary.details.join('\n')}`;
@@ -6988,9 +7476,9 @@ aside {
                         // DIALOG 2: Ask about pushing to instance with detailed changelog
                         const syncResult = await RedlibSettingsSync.performSync();
                         const pushSummary = RedlibSettingsSync.generateChangeSummary(syncResult.differences || [], 'push-organized');
-                        
+
                         const pushMessage = `Apply imported settings to this instance?\n\n${pushSummary.details.join('\n')}\n\nApply these changes now?`;
-                        
+
                         if (confirm(pushMessage)) {
                             try {
                                 if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.pushToInstance) {
@@ -7008,7 +7496,7 @@ aside {
                     alert('Failed to import settings. Please check the encoded string format.');
                 }
             });
-            
+
             // Close on overlay click
             overlay.addEventListener('click', (e) => {
                 if (e.target === overlay) {
@@ -7165,10 +7653,10 @@ aside {
                     // Clear RES-specific storage keys
                     GM_deleteValue('redlib_settings');
                     GM_deleteValue('redlib_authoritative_settings');
-                    
+
                     // Clear hidden posts (collapsed posts)
                     GM_deleteValue('redlib_collapsed_posts');
-                    
+
                     // Clear other related storage keys
                     GM_deleteValue('redlib_sidebar_hidden');
 
@@ -7195,29 +7683,29 @@ aside {
         }
 
 function addHeaderButtonListeners() {
-    const inheritHeader = document.getElementById('inherit-header');
-    const pushHeader = document.getElementById('push-header');
-    
-    if (inheritHeader) {
-        inheritHeader.onclick = async function() {
+    const adoptButton = document.getElementById('adopt-button');
+    const overwriteButton = document.getElementById('overwrite-button');
+
+    if (adoptButton) {
+        adoptButton.onclick = async function() {
             // Get current settings to show what will be inherited
             const instance = await RedlibSettingsSync.extractInstanceSettings();
             const currentAuth = RedlibSettingsSync.getAuthoritativeSettings();
-            
+
             // Generate preview of what will be inherited
             const changeSummary = RedlibSettingsSync.generateChangeSummary([], 'inherit', currentAuth, instance);
-            
+
             const hasAuthoritySettings = Object.keys(currentAuth).length > 0;
-            let confirmMessage = hasAuthoritySettings ? 
-                'Overwrite existing authoritative settings?\n\n' :
-                'Copy this instance\'s settings to become authoritative?\n\n';
-            
+            let confirmMessage = hasAuthoritySettings ?
+                'Overwrite existing master settings?\n\n' :
+                'Adopt this instance\'s settings as master?\n\n';
+
             if (changeSummary.details.length === 0) {
                 confirmMessage += 'No meaningful changes detected.\n\nProceed anyway?';
             } else {
-                confirmMessage += `This will inherit:\n${changeSummary.details.join('\n')}\n\nProceed with inherit?`;
+                confirmMessage += `This will adopt:\n${changeSummary.details.join('\n')}\n\nProceed with adopt?`;
             }
-            
+
             if (confirm(confirmMessage)) {
                 if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.inheritFromInstance) {
                     RedlibSettingsSync.inheritFromInstance();
@@ -7225,21 +7713,21 @@ function addHeaderButtonListeners() {
             }
         };
     }
-    
-    if (pushHeader) {
-        pushHeader.onclick = async function() {
+
+    if (overwriteButton) {
+        overwriteButton.onclick = async function() {
             // Force a fresh analysis to see what would change
             const syncResult = await RedlibSettingsSync.performSync();
             const changeSummary = RedlibSettingsSync.generateChangeSummary(syncResult.differences || [], 'push');
-            
-            let confirmMessage = 'Push authoritative settings to this instance?\n\n';
-            
+
+            let confirmMessage = 'Overwrite this instance with master settings?\n\n';
+
             if (changeSummary.details.length === 0) {
-                confirmMessage += 'No changes needed - settings already match.\n\nPush anyway?';
+                confirmMessage += 'No changes needed - settings already match.\n\nOverwrite anyway?';
             } else {
-                confirmMessage += `This will change:\n${changeSummary.details.join('\n')}\n\nProceed with push?`;
+                confirmMessage += `This will change:\n${changeSummary.details.join('\n')}\n\nProceed with overwrite?`;
             }
-            
+
             if (confirm(confirmMessage)) {
                 if (typeof RedlibSettingsSync !== 'undefined' && RedlibSettingsSync.pushToInstance) {
                     RedlibSettingsSync.pushToInstance();
@@ -7253,7 +7741,7 @@ function updateExportString() {
     const exportTextarea = document.getElementById('res-export-string');
     if (exportTextarea) {
         try {
-            const encodedSettings = RedlibSettingsSync.encodeRESSettings ? 
+            const encodedSettings = RedlibSettingsSync.encodeRESSettings ?
                 RedlibSettingsSync.encodeRESSettings() : 'Export functions not available';
             exportTextarea.value = encodedSettings;
             console.log('[SYNC] Export string updated');
@@ -7285,150 +7773,169 @@ function updateExportString() {
         let cachedInstanceTimestamp = null;
         let cachedSettingsDifferences = []; // Add this line
 
-        // Helper function to create unified 3-column settings comparison with clickable headers
-        const createUnifiedSettingsTable = function(instanceSettings, authoritySettings) {
-        // Get all unique setting keys from both sources, excluding global data
-        const allSettings = new Set([
-            ...Object.keys(instanceSettings).filter(key => !key.includes('timestamp') && key !== 'hiddenPostsCount'),
-            ...Object.keys(authoritySettings).filter(key => !key.includes('timestamp') && key !== 'hiddenPostsCount')
-        ]);
+// Helper function to create unified 3-column settings comparison with clickable headers
+const createUnifiedSettingsTable = function(instanceSettings, authoritySettings) {
+    // Get all unique setting keys from both sources, excluding global data
+    const allSettings = new Set([
+        ...Object.keys(instanceSettings).filter(key => !key.includes('timestamp') && key !== 'hiddenPostsCount'),
+        ...Object.keys(authoritySettings).filter(key => !key.includes('timestamp') && key !== 'hiddenPostsCount')
+    ]);
 
-            if (allSettings.size === 0) {
-                return `<div style="text-align: center; color: var(--text); opacity: 0.6;">No settings found</div>`;
+    if (allSettings.size === 0) {
+        return `<div style="text-align: center; color: var(--text); opacity: 0.6;">No settings found</div>`;
+    }
+
+    let html = `<table class="redlib-settings-comparison">`;
+    html += `<thead><tr>
+        <th>Setting</th>
+        <th title="Overwrite this instance with master settings">Script</th>
+        <th title="Adopt this instance's settings as the master copy">Instance</th>
+    </tr></thead><tbody>`;
+
+    // Define the order we want to show settings
+    const settingOrder = [
+        'theme', 'front_page', 'layout', 'wide', 'remove_default_feeds',
+        'show_nsfw', 'blur_nsfw', 'blur_spoiler', 'video_quality', 'post_sort', 'comment_sort',
+        'autoplay_videos', 'fixed_navbar', 'hide_sidebar_and_summary', 'use_hls', 'hide_hls_notification',
+        'disable_visit_reddit_confirmation', 'hide_awards', 'hide_score',
+        'subscriptions', 'filters', 'followed_users', 'filtered_users'
+    ];
+
+    // Show settings in preferred order, then any remaining
+    const orderedSettings = [
+        ...settingOrder.filter(setting => allSettings.has(setting)),
+        ...Array.from(allSettings).filter(setting => !settingOrder.includes(setting))
+    ];
+
+    orderedSettings.forEach(setting => {
+        const instanceValue = instanceSettings[setting];
+        const authorityValue = authoritySettings[setting];
+
+        let inheritDisplay = '';
+        let pushDisplay = '';
+        let valuesAreSame = false;
+
+        if (instanceValue !== undefined) {
+            if (Array.isArray(instanceValue)) {
+                // Special handling for arrays we want to show counts for
+                if (setting === 'subscriptions') {
+                    inheritDisplay = `${instanceValue.length} subscriptions`;
+                } else if (setting === 'filters') {
+                    inheritDisplay = `${instanceValue.length} filtered subreddits`;
+                } else if (setting === 'followed_users') {
+                    inheritDisplay = `${instanceValue.length} followed users`;
+                } else if (setting === 'filtered_users') {
+                    inheritDisplay = `${instanceValue.length} filtered users`;
+                } else {
+                    inheritDisplay = `${instanceValue.length} items`;
+                }
+            } else {
+                inheritDisplay = String(instanceValue);
             }
+        } else {
+            inheritDisplay = '';
+        }
 
-            let html = `<table class="redlib-settings-comparison">`;
-            html += `<thead><tr>
-                <th>Setting</th>
-                <th class="button-header" id="inherit-header" title="Copy this instance's settings to become authoritative across all instances">Inherit</th>
-                <th class="button-header" id="push-header" title="Apply authoritative settings to this instance">Push</th>
-            </tr></thead><tbody>`;
-
-            // Define the order we want to show settings
-            const settingOrder = [
-                'theme', 'front_page', 'layout', 'wide', 'remove_default_feeds',
-                'show_nsfw', 'blur_nsfw', 'blur_spoiler', 'video_quality', 'post_sort', 'comment_sort',
-                'autoplay_videos', 'fixed_navbar', 'hide_sidebar_and_summary', 'use_hls', 'hide_hls_notification',
-                'disable_visit_reddit_confirmation', 'hide_awards', 'hide_score',
-                'subscriptions', 'filters', 'followed_users', 'filtered_users'
-            ];
-
-            // Show settings in preferred order, then any remaining
-            const orderedSettings = [
-                ...settingOrder.filter(setting => allSettings.has(setting)),
-                ...Array.from(allSettings).filter(setting => !settingOrder.includes(setting))
-            ];
-
-            orderedSettings.forEach(setting => {
-                const instanceValue = instanceSettings[setting];
-                const authorityValue = authoritySettings[setting];
-
-                let inheritDisplay = '';
-                let pushDisplay = '';
-                let valuesAreSame = false; // Declare this variable at the top
-
-                if (instanceValue !== undefined) {
-                    if (Array.isArray(instanceValue)) {
-                        // Special handling for arrays we want to show counts for
-                        if (setting === 'subscriptions') {
-                            inheritDisplay = `${instanceValue.length} subscriptions`;
-                        } else if (setting === 'filters') {
-                            inheritDisplay = `${instanceValue.length} filtered subreddits`;
-                        } else if (setting === 'followed_users') {
-                            inheritDisplay = `${instanceValue.length} followed users`;
-                        } else if (setting === 'filtered_users') {
-                            inheritDisplay = `${instanceValue.length} filtered users`;
-                        } else {
-                            inheritDisplay = `${instanceValue.length} items`;
-                        }
-                    } else {
-                        inheritDisplay = String(instanceValue);
-                    }
+        if (authorityValue !== undefined) {
+            if (Array.isArray(authorityValue)) {
+                // Special handling for arrays we want to show counts for
+                if (setting === 'subscriptions') {
+                    pushDisplay = `${authorityValue.length} subscriptions`;
+                } else if (setting === 'filters') {
+                    pushDisplay = `${authorityValue.length} filtered subreddits`;
+                } else if (setting === 'followed_users') {
+                    pushDisplay = `${authorityValue.length} followed users`;
+                } else if (setting === 'filtered_users') {
+                    pushDisplay = `${authorityValue.length} filtered users`;
                 } else {
-                    inheritDisplay = '';
+                    pushDisplay = `${authorityValue.length} items`;
                 }
+            } else {
+                pushDisplay = String(authorityValue);
+            }
+        } else {
+            pushDisplay = '';
+        }
 
-                if (authorityValue !== undefined) {
-                    if (Array.isArray(authorityValue)) {
-                        // Special handling for arrays we want to show counts for
-                        if (setting === 'subscriptions') {
-                            pushDisplay = `${authorityValue.length} subscriptions`;
-                        } else if (setting === 'filters') {
-                            pushDisplay = `${authorityValue.length} filtered subreddits`;
-                        } else if (setting === 'followed_users') {
-                            pushDisplay = `${authorityValue.length} followed users`;
-                        } else if (setting === 'filtered_users') {
-                            pushDisplay = `${authorityValue.length} filtered users`;
-                        } else {
-                            pushDisplay = `${authorityValue.length} items`;
-                        }
-                    } else {
-                        pushDisplay = String(authorityValue);
-                    }
-                } else {
-                    pushDisplay = '';
-                }
-
-                // Determine if values are the same for highlighting
-                // valuesAreSame is already declared at the top of the forEach
-
-                // Helper function to check if a value represents "empty" state
-                const isEmptyValue = function(value) {
-                    if (value === undefined || value === null) return true;
-                    if (Array.isArray(value) && value.length === 0) return true;
-                    if (typeof value === 'string' && value.trim() === '') return true;
-                    return false;
-                };
-
-                // Compare values considering empty states as equivalent
-                if (isEmptyValue(instanceValue) && isEmptyValue(authorityValue)) {
-                    // Both are empty/undefined - consider them the same
-                    valuesAreSame = true;
-                } else if (!isEmptyValue(instanceValue) && !isEmptyValue(authorityValue)) {
-                    // Both have values - compare them
-                    if (Array.isArray(instanceValue) && Array.isArray(authorityValue)) {
-                        // For arrays, compare lengths and contents
-                        valuesAreSame = instanceValue.length === authorityValue.length &&
-                            instanceValue.every(item => authorityValue.includes(item)) &&
-                            authorityValue.every(item => instanceValue.includes(item));
-                    } else {
-                        // For simple values, direct comparison
-                        valuesAreSame = String(instanceValue) === String(authorityValue);
-                    }
-                } else {
-                    // One has a value, one is empty - they're different
-                    valuesAreSame = false;
-                }
-
-                const cellClass = valuesAreSame ? 'value-same' : 'value-different';
-
-                html += `<tr><td>${setting}</td><td class="${cellClass}">${inheritDisplay}</td><td class="${cellClass}">${pushDisplay}</td></tr>`;
-            });
-
-            html += `</tbody></table>`;
-
-            // Add separate section for global hidden posts (not part of sync comparison)
-            const globalHiddenCount = authoritySettings.hiddenPostsCount || 0;
-            html += `
-            <div style="margin-top: 12px;">
-                <table class="redlib-settings-comparison">
-                    <thead><tr>
-                        <th>Global Data</th>
-                        <th>Info</th>
-                        <th>Count</th>
-                    </tr></thead>
-                    <tbody>
-                        <tr>
-                            <td>Hidden Posts</td>
-                            <td>Shared across all instances</td>
-                            <td class="value-same">${globalHiddenCount} hidden posts</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>`;
-
-            return html;
+        // Helper function to check if a value represents "empty" state
+        const isEmptyValue = function(value) {
+            if (value === undefined || value === null) return true;
+            if (Array.isArray(value) && value.length === 0) return true;
+            if (typeof value === 'string' && value.trim() === '') return true;
+            return false;
         };
+
+        // Compare values considering empty states as equivalent
+        if (isEmptyValue(instanceValue) && isEmptyValue(authorityValue)) {
+            valuesAreSame = true;
+        } else if (!isEmptyValue(instanceValue) && !isEmptyValue(authorityValue)) {
+            if (Array.isArray(instanceValue) && Array.isArray(authorityValue)) {
+                valuesAreSame = instanceValue.length === authorityValue.length &&
+                    instanceValue.every(item => authorityValue.includes(item)) &&
+                    authorityValue.every(item => instanceValue.includes(item));
+            } else {
+                valuesAreSame = String(instanceValue) === String(authorityValue);
+            }
+        } else {
+            valuesAreSame = false;
+        }
+
+        const cellClass = valuesAreSame ? 'value-same' : 'value-different';
+        html += `<tr><td>${setting}</td><td class="${cellClass}">${pushDisplay}</td><td class="${cellClass}">${inheritDisplay}</td></tr>`;
+    });
+
+    // Add button row directly in the same table
+    html += `
+        <tr style="background: transparent;">
+            <td style="border: none; padding: 8px 0;"></td>
+            <td style="border: none; padding: 8px 2px;">
+                <button id="overwrite-button" class="redlib-sync-action-btn" style="
+                    width: 100%;
+                    background: var(--highlighted);
+                    color: var(--text);
+                    border: 1px solid var(--accent);
+                    padding: 8px 4px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    font-weight: bold;
+                    transition: all 0.2s ease;
+                    text-align: center;
+                " title="Overwrite this instance with master settings">
+                    Overwrite Instance
+                </button>
+            </td>
+            <td style="border: none; padding: 8px 2px;">
+                <button id="adopt-button" class="redlib-sync-action-btn" style="
+                    width: 100%;
+                    background: var(--highlighted);
+                    color: var(--text);
+                    border: 1px solid var(--accent);
+                    padding: 8px 4px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    font-weight: bold;
+                    transition: all 0.2s ease;
+                    text-align: center;
+                " title="Adopt this instance's settings as the master copy">
+                    Adopt Instance
+                </button>
+            </td>
+        </tr>`;
+
+    // Add Global Data row directly in the same table
+    const globalHiddenCount = authoritySettings.hiddenPostsCount || 0;
+    html += `
+        <tr style="border-top: 2px solid var(--accent);">
+            <td style="background: var(--post); font-weight: bold; color: var(--text); text-align: left;">Global Data</td>
+            <td class="value-same">${globalHiddenCount} hidden posts</td>
+            <td class="value-same">Shared across all instances</td>
+        </tr>`;
+
+    html += `</tbody></table>`;
+    return html;
+};
 
         // Timestamp formatting helpers
         function formatTimestamp(timestamp) {
@@ -7462,21 +7969,21 @@ function updateExportString() {
         function getAuthoritativeSettings() {
             const storedJson = GM_getValue('redlib_authoritative_settings', '{}');
             const settings = JSON.parse(storedJson);
-            
+
             // Add hidden posts count - they're actually stored in redlib_collapsed_posts
             const collapsedPostsData = GM_getValue('redlib_collapsed_posts', '{}');
             const collapsedPosts = JSON.parse(collapsedPostsData || '{}');
-            
+
             // Count posts that are collapsed (hidden)
             const hiddenCount = Object.keys(collapsedPosts).filter(postId => {
                 const post = collapsedPosts[postId];
                 return post && post.collapsed === true;
             }).length;
-            
+
             settings.hiddenPostsCount = hiddenCount;
-            
+
             console.log(`[HIDDEN POSTS DEBUG] Found ${hiddenCount} hidden posts in redlib_collapsed_posts`);
-            
+
             return settings;
         }
 
@@ -7490,9 +7997,9 @@ function updateExportString() {
                 // Define all possible native redlib settings
                 const nativeSettings = [
                     'theme', 'front_page', 'layout', 'wide', 'remove_default_feeds',
-                    'show_nsfw', 'blur_nsfw', 'blur_spoiler', 'video_quality', 'post_sort', 
-                    'comment_sort', 'autoplay_videos', 'fixed_navbar', 'hide_sidebar_and_summary', 
-                    'use_hls', 'hide_hls_notification', 'disable_visit_reddit_confirmation', 
+                    'show_nsfw', 'blur_nsfw', 'blur_spoiler', 'video_quality', 'post_sort',
+                    'comment_sort', 'autoplay_videos', 'fixed_navbar', 'hide_sidebar_and_summary',
+                    'use_hls', 'hide_hls_notification', 'disable_visit_reddit_confirmation',
                     'hide_awards', 'hide_score'
                 ];
 
@@ -7503,21 +8010,21 @@ function updateExportString() {
                     details.push(`• Hidden posts: ${beforeHiddenCount} → ${afterHiddenCount}`);
                     totalChanges += Math.abs(afterHiddenCount - beforeHiddenCount);
                 }
-                
+
                 // Check each native setting for changes
                 nativeSettings.forEach(setting => {
                     const beforeValue = beforeSettings[setting];
                     const afterValue = afterSettings[setting];
-                    
+
                     // Helper function to check if a value is effectively empty/not set
                     const isEmptyValue = (value) => {
                         return value === undefined || value === null || value === '' || value === 'not set';
                     };
-                    
+
                     // Only show if there's a meaningful change (not both empty, and after value is not empty)
                     const beforeIsEmpty = isEmptyValue(beforeValue);
                     const afterIsEmpty = isEmptyValue(afterValue);
-                    
+
                     // Skip if both are empty, or if after value is empty (going from something to nothing is usually not interesting for inherit)
                     if (beforeIsEmpty && afterIsEmpty) return; // Both empty - no change
                     if (!beforeIsEmpty && afterIsEmpty) return; // Going from value to empty - not shown in inherit
@@ -7546,7 +8053,7 @@ function updateExportString() {
 
                         const beforeDisplay = 'not set';
                         const afterDisplay = afterValue;
-                        
+
                         details.push(`• ${settingName}: ${beforeDisplay} → ${afterDisplay}`);
                         totalChanges += 1;
                     } else if (!beforeIsEmpty && !afterIsEmpty && beforeValue !== afterValue) {
@@ -7557,7 +8064,7 @@ function updateExportString() {
 
                         const beforeDisplay = beforeValue;
                         const afterDisplay = afterValue;
-                        
+
                         details.push(`• ${settingName}: ${beforeDisplay} → ${afterDisplay}`);
                         totalChanges += 1;
                     }
@@ -7568,40 +8075,40 @@ function updateExportString() {
                     // Insert REDLIB SETTINGS header before existing settings
                     const settingsDetails = [...details];
                     details.length = 0; // Clear array
-                    
+
                     if (beforeHiddenCount !== afterHiddenCount) {
                         details.push('GLOBAL DATA:');
                         details.push(`• Hidden posts: ${beforeHiddenCount} → ${afterHiddenCount}`);
                         details.push('');
                     }
-                    
+
                     details.push('RES MODULES:');
                     details.push('• Enhancement modules imported and enabled');
                     details.push('');
-                    
+
                     if (settingsDetails.length > 0) {
                         details.push('REDLIB SETTINGS:');
                         details.push(...settingsDetails);
                         details.push('');
                     }
                 }
-                
+
                 // LISTS section
-                if (['subscriptions', 'filters', 'followed_users', 'filtered_users'].some(setting => 
+                if (['subscriptions', 'filters', 'followed_users', 'filtered_users'].some(setting =>
                     (afterSettings[setting] || []).length > 0)) {
                     details.push('LISTS:');
                 }
-                
+
                 ['subscriptions', 'filters', 'followed_users', 'filtered_users'].forEach(setting => {
                     const beforeArray = beforeSettings[setting] || [];
                     const afterArray = afterSettings[setting] || [];
-                    
+
                     if (afterArray.length > 0) {
                         const settingName = setting === 'subscriptions' ? 'subscriptions' :
                                         setting === 'filters' ? 'filtered subreddits' :
                                         setting === 'followed_users' ? 'followed users' :
                                         setting === 'filtered_users' ? 'filtered users' : setting;
-                        
+
                         details.push(`• ${beforeArray.length} → ${afterArray.length} ${settingName}`);
                         totalChanges += afterArray.length;
                     }
@@ -7626,7 +8133,7 @@ function updateExportString() {
             if (contextType === 'import-success' && beforeSettings && afterSettings) {
                 const details = [];
                 let totalChanges = 0;
-                
+
                 // GLOBAL DATA section
                 const beforeHidden = beforeSettings.hiddenPostsCount || 0;
                 const afterHidden = afterSettings.hiddenPostsCount || 0;
@@ -7635,30 +8142,30 @@ function updateExportString() {
                     details.push(`• Hidden posts: ${beforeHidden} → ${afterHidden}`);
                     details.push('');
                 }
-                
-                // RES MODULES section  
+
+                // RES MODULES section
                 details.push(`RES MODULES:`);
                 details.push(`• Enhancement modules imported and enabled`);
                 details.push('');
-                
+
                 // REDLIB SETTINGS section
                 details.push(`REDLIB SETTINGS:`);
                 const nativeSettings = [
                     'theme', 'front_page', 'layout', 'wide', 'remove_default_feeds',
-                    'show_nsfw', 'blur_nsfw', 'blur_spoiler', 'video_quality', 'post_sort', 
-                    'comment_sort', 'autoplay_videos', 'fixed_navbar', 'hide_sidebar_and_summary', 
-                    'use_hls', 'hide_hls_notification', 'disable_visit_reddit_confirmation', 
+                    'show_nsfw', 'blur_nsfw', 'blur_spoiler', 'video_quality', 'post_sort',
+                    'comment_sort', 'autoplay_videos', 'fixed_navbar', 'hide_sidebar_and_summary',
+                    'use_hls', 'hide_hls_notification', 'disable_visit_reddit_confirmation',
                     'hide_awards', 'hide_score'
                 ];
-                
+
                 nativeSettings.forEach(setting => {
                     const beforeValue = beforeSettings[setting];
                     const afterValue = afterSettings[setting];
-                    
+
                     const isEmptyValue = (value) => value === undefined || value === null || value === '' || value === 'not set';
                     const beforeIsEmpty = isEmptyValue(beforeValue);
                     const afterIsEmpty = isEmptyValue(afterValue);
-                    
+
                     if (beforeIsEmpty && !afterIsEmpty) {
                         const settingName = setting === 'theme' ? 'Theme' :
                                         setting === 'front_page' ? 'Front page' :
@@ -7679,25 +8186,25 @@ function updateExportString() {
                                         setting === 'disable_visit_reddit_confirmation' ? 'No Reddit confirmation' :
                                         setting === 'hide_awards' ? 'Hide awards' :
                                         setting === 'hide_score' ? 'Hide score' : setting;
-                        
+
                         details.push(`• ${settingName}: → ${afterValue}`);
                     }
                 });
-                
+
                 details.push('');
-                
+
                 // LISTS section
                 details.push(`LISTS:`);
                 ['subscriptions', 'filters', 'followed_users', 'filtered_users'].forEach(setting => {
                     const beforeArray = beforeSettings[setting] || [];
                     const afterArray = afterSettings[setting] || [];
-                    
+
                     if (afterArray.length > 0) {
                         const settingName = setting === 'subscriptions' ? 'subscriptions' :
                                         setting === 'filters' ? 'filtered subreddits' :
                                         setting === 'followed_users' ? 'followed users' :
                                         setting === 'filtered_users' ? 'filtered users' : setting;
-                        
+
                         details.push(`• Add ${afterArray.length} ${settingName}`);
                         totalChanges += afterArray.length;
                     }
@@ -7710,18 +8217,18 @@ function updateExportString() {
                 };
             }
 
-            // For push confirmation after import - organized sections  
+            // For push confirmation after import - organized sections
             if (contextType === 'push-organized') {
                 const details = [];
-                
+
                 if (!settingsDifferences || settingsDifferences.length === 0) {
                     return { summary: 'No changes needed', details: ['• All settings already match'] };
                 }
-                
+
                 // Group by type for better organization
                 const simpleValueChanges = [];
                 const listChanges = [];
-                
+
                 settingsDifferences.forEach(diff => {
                     if (diff.type === 'array') {
                         const missing = diff.missingFromInstance?.length || 0;
@@ -7752,26 +8259,26 @@ function updateExportString() {
                                         diff.setting === 'disable_visit_reddit_confirmation' ? 'No Reddit confirmation' :
                                         diff.setting === 'hide_awards' ? 'Hide awards' :
                                         diff.setting === 'hide_score' ? 'Hide score' : diff.setting;
-                        
+
                         simpleValueChanges.push(`• ${settingName}: → ${diff.authValue}`);
                     }
                 });
-                
+
                 // Add sections
                 if (simpleValueChanges.length > 0) {
                     details.push('REDLIB SETTINGS:');
                     details.push(...simpleValueChanges);
                     details.push('');
                 }
-                
+
                 if (listChanges.length > 0) {
                     details.push('LISTS:');
                     details.push(...listChanges);
                 }
-                
+
                 return { summary: `${settingsDifferences.length} changes to apply`, details, totalChanges: settingsDifferences.length };
             }
-            
+
             if (contextType === 'merge') {
                 // For merge operations, only show what will be inherited from instance
                 settingsDifferences.forEach(diff => {
@@ -7790,7 +8297,7 @@ function updateExportString() {
                         totalChanges += 1;
                     }
                 });
-                
+
                 if (details.length === 0) {
                     details.push('• No settings to inherit - authority already has all instance settings');
                 }
@@ -7800,7 +8307,7 @@ function updateExportString() {
                     if (diff.type === 'array') {
                         const missing = diff.missingFromInstance?.length || 0;
                         const extra = diff.extraInInstance?.length || 0;
-                        
+
                         if (missing > 0 || extra > 0) {
                             const settingName = diff.setting === 'subscriptions' ? 'subscriptions' :
                                             diff.setting === 'filters' ? 'filtered subreddits' :
@@ -7830,10 +8337,10 @@ function updateExportString() {
                         const isEmptyValue = (value) => {
                             return value === undefined || value === null || value === '' || value === 'not set';
                         };
-                        
+
                         const authIsEmpty = isEmptyValue(diff.authValue);
                         const instIsEmpty = isEmptyValue(diff.instanceValue);
-                        
+
                         // Only show meaningful changes (skip if both empty)
                         if (!(authIsEmpty && instIsEmpty)) {
                             const settingName = diff.setting === 'theme' ? 'Theme' :
@@ -7856,7 +8363,7 @@ function updateExportString() {
                                             diff.setting === 'hide_awards' ? 'Hide awards' :
                                             diff.setting === 'hide_score' ? 'Hide score' :
                                             diff.setting;
-                            
+
                             if (contextType === 'push') {
                                 details.push(`• ${settingName}: → ${diff.authValue}`);
                                 totalChanges += 1;
@@ -7872,19 +8379,19 @@ function updateExportString() {
             }
 
             // Filter out meaningless entries
-            const meaningfulDetails = details.filter(detail => 
-                !detail.includes('0 ') && 
+            const meaningfulDetails = details.filter(detail =>
+                !detail.includes('0 ') &&
                 !detail.includes('not set → not set') &&
                 !detail.includes(': 0 → 0')
             );
 
-            const summary = meaningfulDetails.length > 0 ? 
+            const summary = meaningfulDetails.length > 0 ?
                 `${meaningfulDetails.length} types of changes (${totalChanges} total items)` :
                 'No meaningful changes detected';
 
             return { summary, details: meaningfulDetails, totalChanges };
         };
-        
+
         // Save authoritative settings
         function saveAuthoritativeSettings(settings) {
             GM_setValue('redlib_authoritative_settings', JSON.stringify(settings));
@@ -8382,11 +8889,11 @@ function updateExportString() {
 
             console.log('[SYNC] === SYNC CHECK END ===');
 
-            return { 
-                action, 
-                reason, 
+            return {
+                action,
+                reason,
                 differences: settingsDifferences,
-                totalDifferences: settingsDifferences.length 
+                totalDifferences: settingsDifferences.length
             };
         }
 
@@ -8662,8 +9169,8 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 
             // Get empty authoritative settings for comparison, but include current hidden posts count
             const emptyAuth = { hiddenPostsCount: 0 }; // Start with 0 hidden posts
-            const instanceWithHidden = { 
-                ...instance, 
+            const instanceWithHidden = {
+                ...instance,
                 hiddenPostsCount: getAuthoritativeSettings().hiddenPostsCount || 0 // Keep current hidden posts
             };
 
@@ -8751,23 +9258,31 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                     // Show success message, then reload to refresh cookie state
                     setTimeout(() => {
                         notification.textContent = `Reloading page to refresh settings...`;
-                        
+
                         setTimeout(() => {
                             window.location.reload();
                         }, 1000);
                     }, 2000); // Show success for 2 seconds first
-                    
+
                 } else {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
             } catch (error) {
-                console.error('[SYNC] Push failed:', error);
-                notification.textContent = `Push failed: ${error.message}`;
-                notification.style.background = '#dc3545';
+                console.error('[SYNC] Bulk push failed, falling back to one-by-one method:', error);
 
-                setTimeout(() => {
-                    notification.remove();
-                }, 5000);
+                // Update notification to show fallback
+                notification.textContent = `Bulk push failed, trying one-by-one method...`;
+                notification.style.background = '#ffc107';
+
+                try {
+                    // Fallback to one-by-one method
+                    await fallbackToOneByOne(authoritative, notification);
+                } catch (fallbackError) {
+                    console.error('[SYNC] One-by-one fallback also failed:', fallbackError);
+                    notification.textContent = `Both bulk and one-by-one push failed: ${fallbackError.message}`;
+                    notification.style.background = '#dc3545';
+                    setTimeout(() => notification.remove(), 5000);
+                }
             }
         }
 
@@ -8860,7 +9375,7 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             summaryHtml += '<table style="width: 100%; border-collapse: collapse; background: var(--post); border-radius: 4px 4px 0 0; overflow: hidden; font-family: monospace; font-size: 10px;">';
             summaryHtml += '<thead><tr>';
             summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: left; font-weight: bold; width: 33.33%;">Setting</th>';
-            summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: center; font-weight: bold; width: 33.33%;">Inherit from Instance</th>';
+            summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: center; font-weight: bold; width: 33.33%;">Merge into Script</th>';
             summaryHtml += '<th style="background: var(--highlighted); color: var(--accent); padding: 8px; text-align: center; font-weight: bold; width: 33.33%;">Push to Instance</th>';
             summaryHtml += '</tr></thead><tbody>';
 
@@ -8896,8 +9411,17 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 
                 summaryHtml += `<tr>`;
                 summaryHtml += `<td style="padding: 8px; background: var(--highlighted); color: var(--text); font-weight: bold; border-bottom: 1px solid var(--background); width: 33.33%;">`;
-                summaryHtml += `${settingName}<br><span style="font-size: 9px; opacity: 0.7;">${instCount} vs ${authCount} items</span></td>`;
-                summaryHtml += `<td style="padding: 8px; text-align: center; vertical-align: top; border-bottom: 1px solid var(--background); width: 33.33%;">${inheritCell}</td>`;
+                // Calculate unique counts for better display
+const totalUniqueItems = extraCount + missingCount;
+const instanceUniqueItems = extraCount; // Items only in instance
+const authorityUniqueItems = missingCount; // Items only in authority
+
+// Create improved summary text
+const uniqueCountText = totalUniqueItems > 0 ?
+    `${totalUniqueItems} = ${instanceUniqueItems} + ${authorityUniqueItems} unique items` :
+    `${instCount} vs ${authCount} items (all shared)`;
+
+summaryHtml += `${settingName}<br><span style="font-size: 9px; opacity: 0.7;">${uniqueCountText}</span></td>`;                summaryHtml += `<td style="padding: 8px; text-align: center; vertical-align: top; border-bottom: 1px solid var(--background); width: 33.33%;">${inheritCell}</td>`;
                 summaryHtml += `<td style="padding: 8px; text-align: center; vertical-align: top; border-bottom: 1px solid var(--background); width: 33.33%;">${pushCell}</td>`;
                 summaryHtml += `</tr>`;
             });
@@ -8905,28 +9429,37 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             summaryHtml += '</tbody></table></div>';
 
             // Create detailed table with clickable subreddit links that work with existing hover popup
-            let tableHtml = `<table class="redlib-sync-differences-table" style="margin-top: 0; border-top: none; border-radius: 0 0 4px 4px;"><thead><tr><th style="width: 33.33%;">Setting</th><th style="width: 66.66%;">Side-by-Side Comparison</th></tr></thead><tbody>`;
-
+            // Create detailed table with clickable subreddit links that work with existing hover popup
+let tableHtml = `<table class="redlib-sync-differences-table" style="margin-top: 0; border-top: none; border-radius: 0 0 4px 4px;"><thead><tr><th style="width: 33.33%;">Setting</th><th style="width: 66.66%;">Side-by-Side Comparison</th></tr></thead><tbody>`;
             arrayDifferences.forEach(diff => {
                 const settingName = diff.setting.replace('_', ' ');
+                const isSubscriptionsOrFilters = diff.setting === 'subscriptions' || diff.setting === 'filters';
 
-                // Create horizontally aligned view of all items with hover-enabled links
-                const instanceArray = (cachedInstance[diff.setting] || []).slice().sort();
-                const authArray = (cachedAuthoritative[diff.setting] || []).slice().sort();
+const instanceArray = (cachedInstance[diff.setting] || []).slice().sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+const authArray = (cachedAuthoritative[diff.setting] || []).slice().sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 
                 let contentHtml = '';
 
                 if (instanceArray.length > 0 || authArray.length > 0) {
                     // Get all unique items from both sides, sorted
-                    const allItems = [...new Set([...instanceArray, ...authArray])].sort();
-
-                    // Build rows for each item with proper hover-enabled links
+                    const allItems = [...new Set([...instanceArray, ...authArray])].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+                    // Build rows for each item with proper hover-enabled links and filter classes
                     const itemRows = allItems.map(item => {
                         const inInstance = instanceArray.includes(item);
                         const inAuth = authArray.includes(item);
 
                         let instanceCell = '';
                         let authCell = '';
+                        let rowClass = '';
+
+                        // Determine row type for filtering
+                        if (inInstance && inAuth) {
+                            rowClass = 'filter-shared';
+                        } else if (inInstance && !inAuth) {
+                            rowClass = 'filter-instance-only';
+                        } else if (!inInstance && inAuth) {
+                            rowClass = 'filter-authority-only';
+                        }
 
                         // Create the subreddit link with proper classes for existing hover system
                         const linkPath = diff.setting === 'subscriptions' ? `/r/${item}` :
@@ -8934,21 +9467,31 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                         diff.setting === 'followed_users' ? `/u/${item}` :
                         diff.setting === 'filtered_users' ? `/u/${item}` : `/r/${item}`;
 
-                        if (inInstance && inAuth) {
-                            // Item exists in both - show faded with hover-enabled links
-                            instanceCell = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="shared">${item}</a>`;
-                            authCell = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="shared">${item}</a>`;
-                        } else if (inInstance && !inAuth) {
-                            // Unique to instance - show in cyan with hover-enabled link, gap on right
-                            instanceCell = `<a href="${linkPath}" style="color: #4ecdc4; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="instance-only">${item}</a>`;
-                            authCell = `<span style="opacity: 0.3;">—</span>`;
-                        } else if (!inInstance && inAuth) {
-                            // Unique to authority - show in red with hover-enabled link, gap on left
-                            instanceCell = `<span style="opacity: 0.3;">—</span>`;
-                            authCell = `<a href="${linkPath}" style="color: #ff6b6b; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${diff.setting}" data-item="${item}" data-status="authority-only">${item}</a>`;
+                        // Check if item is shared (in both columns)
+                        const isShared = inInstance && inAuth;
+                        const sharedColor = isShared ? 'var(--text); opacity: 0.7' : '';
+
+                        if (inInstance) {
+                            if (isShared) {
+                                instanceCell = `<a href="${linkPath}" class="redlib-subreddit-link" style="color: ${sharedColor}; text-decoration: none;">${item}</a>`;
+                            } else {
+                                instanceCell = `<a href="${linkPath}" class="redlib-subreddit-link" style="color: #4ecdc4; text-decoration: none;">${item}</a>`;
+                            }
+                        } else {
+                            instanceCell = `<span style="color: var(--text); opacity: 0.3;">-</span>`;
                         }
 
-                        return `<tr style="border-bottom: 1px solid rgba(255,255,255,0.1);" data-setting="${diff.setting}" data-item="${item}"><td style="padding: 2px 8px; text-align: center; background: var(--post); width: 50%; font-weight: normal !important;">${instanceCell}</td><td style="padding: 2px 8px; text-align: center; background: var(--post); width: 50%; font-weight: normal !important;">${authCell}</td></tr>`;
+                        if (inAuth) {
+                            if (isShared) {
+                                authCell = `<a href="${linkPath}" class="redlib-subreddit-link" style="color: ${sharedColor}; text-decoration: none;">${item}</a>`;
+                            } else {
+                                authCell = `<a href="${linkPath}" class="redlib-subreddit-link" style="color: #ff6b6b; text-decoration: none;">${item}</a>`;
+                            }
+                        } else {
+                            authCell = `<span style="color: var(--text); opacity: 0.3;">-</span>`;
+                        }
+
+                        return `<tr class="item-row ${rowClass}" data-setting="${diff.setting}"><td style="padding: 2px 8px; text-align: center; background: var(--post); width: 50%; font-weight: normal !important;">${authCell}</td><td style="padding: 2px 8px; text-align: center; background: var(--post); width: 50%; font-weight: normal !important;">${instanceCell}</td></tr>`;
                     }).join('');
 
                     // Calculate summary stats
@@ -8956,45 +9499,278 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                     const authUnique = authArray.filter(item => !instanceArray.includes(item)).length;
                     const shared = instanceArray.filter(item => authArray.includes(item)).length;
 
-                    // Build the summary and detailed table
+                    // Build the summary and detailed table with clickable filter
+                    const filterId = `filter-${diff.setting}`;
                     const summaryRow = `
-                <tr style="background: var(--highlighted); font-weight: bold;">
-                    <td colspan="2" style="padding: 8px; text-align: center;">
-                        <span style="color: #4ecdc4;">${instanceUnique} instance-only</span> •
-                        <span style="color: var(--text);">${shared} shared</span> •
-                        <span style="color: #ff6b6b;">${authUnique} authority-only</span>
-                        <br><small style="opacity: 0.7;">Total: ${instanceArray.length} instance, ${authArray.length} authority</small>
-                    </td>
-                </tr>
-            `;
+                                    <tr style="background: var(--highlighted); font-weight: bold;">
+                                        <td colspan="2" style="padding: 8px; text-align: center;">
+                                            <span class="summary-filter-toggle" data-setting="${diff.setting}" data-filter="all" style="cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background-color 0.2s;" title="Click to cycle through filters">
+                                                <span style="color: #ff6b6b;">${authUnique} script-only</span> •
+                                                <span style="color: var(--text); opacity: 0.7;">${shared} shared</span> •
+                                                <span style="color: #4ecdc4;">${instanceUnique} instance-only</span>
+                                            </span>
+                                            <br><small style="opacity: 0.7;">Total: ${authArray.length} script, ${instanceArray.length} instance</small>
+                                        </td>
+                                    </tr>
+                                `;
+
+                    const collapsibleId = `collapse-${diff.setting}`;
+                    const itemTableId = `item-table-${diff.setting}`;
 
                     contentHtml = `
-                <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
-                    <thead>
-                        <tr style="background: var(--post);">
-                            <th style="padding: 4px 8px; text-align: center; font-size: 10px; color: #4ecdc4; background: var(--post); width: 50%;">Instance</th>
-                            <th style="padding: 4px 8px; text-align: center; font-size: 10px; color: #ff6b6b; background: var(--post); width: 50%;">Authority</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${summaryRow}
-                        ${itemRows}
-                    </tbody>
-                </table>
-            `;
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
+                                <thead>
+                                    <tr style="background: var(--post);">
+                                        <th style="padding: 4px 8px; text-align: center; font-size: 10px; color: #ff6b6b; background: var(--post); width: 50%;">Script</th>
+                                        <th style="padding: 4px 8px; text-align: center; font-size: 10px; color: #4ecdc4; background: var(--post); width: 50%;">Instance</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="${itemTableId}">
+                                    ${summaryRow}
+                                    ${itemRows}
+                                </tbody>
+                            </table>
+                        `;
                 }
 
-                tableHtml += `<tr><td style="vertical-align: top; padding: 8px; font-weight: bold; width: 33.33%;">${settingName}</td><td style="padding: 4px; width: 66.66%;">${contentHtml}</td></tr>`;
-            });
+                // Add clickable header with expand/collapse for subscriptions and filters
+                let settingHeader = settingName;
+                if (isSubscriptionsOrFilters) {
+                    const collapsibleId = `collapse-${diff.setting}`;
+settingHeader = `<span class="setting-collapse-toggle" data-target="${collapsibleId}" style="cursor: pointer; user-select: none;">
+    <span class="collapse-icon" style="display: inline-block; width: 12px;">▶</span> ${settingName}
+</span>`;
+                }
+
+                // Start with collapsed state - show placeholder text
+const placeholderText = `<div style="text-align: center; padding: 20px; color: var(--text); opacity: 0.6; font-style: italic;">Click "${settingName}" on the left to expand the side-by-side comparison</div>`;
+tableHtml += `<tr><td style="vertical-align: top; padding: 8px; font-weight: bold; width: 33.33%;">${settingHeader}</td><td style="padding: 4px; width: 66.66%;" id="collapse-${diff.setting}" data-collapsed="true" data-content="${encodeURIComponent(contentHtml)}">${placeholderText}</td></tr>`;            });
 
             tableHtml += `</tbody></table>`;
 
             // Combine summary and detailed table
             tableContainer.innerHTML = summaryHtml + tableHtml;
 
+            // Add expand/collapse functionality
+            addExpandCollapseListeners();
+
             // Add live update functionality and fix z-index issues
             addLiveDiffTableListeners();
             fixHoverPopupZIndex();
+        }
+
+// Add expand/collapse functionality and filter cycling for settings table
+function addExpandCollapseListeners() {
+    // Handle expand/collapse toggles
+    const toggles = document.querySelectorAll('.setting-collapse-toggle');
+
+    toggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const targetId = this.dataset.target;
+            const targetElement = document.getElementById(targetId);
+            const icon = this.querySelector('.collapse-icon');
+
+            if (!targetElement || !icon) return;
+
+            const isCollapsed = targetElement.dataset.collapsed === 'true';
+
+            if (isCollapsed) {
+                // EXPAND: Show the actual content
+                const contentHtml = decodeURIComponent(targetElement.dataset.content || '');
+                targetElement.innerHTML = contentHtml;
+                targetElement.dataset.collapsed = 'false';
+                icon.textContent = '▼';
+
+                // Re-add filter cycling listeners for this expanded section
+                addFilterCyclingForSection(targetId);
+            } else {
+// COLLAPSE: Show placeholder text
+const settingName = this.textContent.replace(/^[▼▶]\s*/, '').trim();
+const placeholderText = `<div style="text-align: center; padding: 20px; color: var(--text); opacity: 0.6; font-style: italic;">Click "${settingName}" on the left to expand the side-by-side comparison</div>`;
+                targetElement.innerHTML = placeholderText;
+                targetElement.dataset.collapsed = 'true';
+                icon.textContent = '▶';
+            }
+        });
+    });
+}
+// Helper function to add filter cycling to a specific expanded section
+function addFilterCyclingForSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+
+    // Add filter cycling functionality for summary filter toggles in this section
+    const filterToggles = section.querySelectorAll('.summary-filter-toggle');
+    filterToggles.forEach(filterToggle => {
+        filterToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const setting = this.dataset.setting;
+            const currentFilter = this.dataset.filter;
+
+            // Cycle through filters: all -> script-only -> shared -> instance-only -> all
+            const nextFilter = {
+                'all': 'script-only',
+                'script-only': 'shared',
+                'shared': 'instance-only',
+                'instance-only': 'all'
+            }[currentFilter];
+
+            this.dataset.filter = nextFilter;
+
+            // Apply the filter to the table rows
+            const tableId = `item-table-${setting}`;
+            const table = document.getElementById(tableId);
+            if (table) {
+                const rows = table.querySelectorAll('tr');
+
+                rows.forEach(row => {
+                    if (row.classList.contains('filter-shared') ||
+                        row.classList.contains('filter-instance-only') ||
+                        row.classList.contains('filter-authority-only')) {
+
+                        switch(nextFilter) {
+                            case 'all':
+                                row.style.display = '';
+                                break;
+                            case 'script-only':
+                                row.style.display = row.classList.contains('filter-authority-only') ? '' : 'none';
+                                break;
+                            case 'shared':
+                                row.style.display = row.classList.contains('filter-shared') ? '' : 'none';
+                                break;
+                            case 'instance-only':
+                                row.style.display = row.classList.contains('filter-instance-only') ? '' : 'none';
+                                break;
+                        }
+                    }
+                });
+            }
+
+// Update visual indication - highlight only the active filter type
+const allSpans = this.querySelectorAll('span');
+let scriptSpan = null;
+let sharedSpan = null;
+let instanceSpan = null;
+
+// Find spans by their text content instead of style attributes
+allSpans.forEach(span => {
+    const text = span.textContent.trim();
+    if (text.includes('script-only')) {
+        scriptSpan = span;
+    } else if (text.includes('shared')) {
+        sharedSpan = span;
+    } else if (text.includes('instance-only')) {
+        instanceSpan = span;
+    }
+});
+
+// Reset ALL span backgrounds
+allSpans.forEach(span => {
+    span.style.backgroundColor = 'transparent';
+});
+this.style.backgroundColor = 'transparent';
+this.style.color = 'var(--text)';
+
+// Highlight only the active filter
+switch(nextFilter) {
+    case 'script-only':
+        if (scriptSpan) scriptSpan.style.backgroundColor = 'rgba(255, 107, 107, 0.3)';
+        break;
+    case 'shared':
+        if (sharedSpan) sharedSpan.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+        break;
+    case 'instance-only':
+        if (instanceSpan) instanceSpan.style.backgroundColor = 'rgba(78, 205, 196, 0.3)';
+        break;
+    case 'all':
+        // No highlighting for "all" - already reset above
+        break;
+}
+        });
+    });
+}
+        // Apply row filtering based on selected filter type
+        function applyRowFilter(setting, filterType) {
+            const rows = document.querySelectorAll(`.item-row[data-setting="${setting}"]`);
+
+            rows.forEach(row => {
+                let shouldShow = true;
+
+                switch (filterType) {
+                    case 'instance-only':
+                        shouldShow = row.classList.contains('filter-instance-only');
+                        break;
+                    case 'shared':
+                        shouldShow = row.classList.contains('filter-shared');
+                        break;
+                    case 'authority-only':
+                        shouldShow = row.classList.contains('filter-authority-only');
+                        break;
+                    case 'all':
+                        shouldShow = true;
+                        break;
+                }
+
+                row.style.display = shouldShow ? '' : 'none';
+            });
+        }
+
+        // Update the visual style of the filter toggle
+        function updateFilterToggleStyle(toggle, filterType) {
+            const spans = toggle.querySelectorAll('span');
+
+            // Reset all spans to normal style
+            spans.forEach(span => {
+                span.style.fontWeight = 'normal';
+                span.style.backgroundColor = 'transparent';
+                span.style.padding = '0';
+                span.style.borderRadius = '0';
+            });
+
+            // Apply highlighting based on active filter
+            switch (filterType) {
+                case 'instance-only':
+                    // Highlight the instance-only span (now the third span)
+                    const instanceSpan = spans[2];
+                    if (instanceSpan) {
+                        instanceSpan.style.fontWeight = 'bold';
+                        instanceSpan.style.backgroundColor = 'rgba(78, 205, 196, 0.2)';
+                        instanceSpan.style.padding = '2px 4px';
+                        instanceSpan.style.borderRadius = '3px';
+                    }
+                    break;
+                case 'shared':
+                    // Highlight the shared span (still middle span)
+                    const sharedSpan = spans[1];
+                    if (sharedSpan) {
+                        sharedSpan.style.fontWeight = 'bold';
+                        sharedSpan.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                        sharedSpan.style.padding = '2px 4px';
+                        sharedSpan.style.borderRadius = '3px';
+                    }
+                    break;
+                case 'authority-only':
+                    // Highlight the authority-only span (now the first span)
+                    const authSpan = spans[0];
+                    if (authSpan) {
+                        authSpan.style.fontWeight = 'bold';
+                        authSpan.style.backgroundColor = 'rgba(255, 107, 107, 0.2)';
+                        authSpan.style.padding = '2px 4px';
+                        authSpan.style.borderRadius = '3px';
+                    }
+                    break;
+                case 'all':
+                    // Highlight the entire toggle to show all items are visible
+                    toggle.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    setTimeout(() => {
+                        toggle.style.backgroundColor = 'transparent';
+                    }, 200);
+                    break;
+            }
         }
 
         // Fix z-index issues for hover popup in settings overlay
@@ -9205,8 +9981,8 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             setting === 'filtered_users' ? `/u/${subreddit}` : `/r/${subreddit}`;
 
             if (newStatus === 'shared') {
-                instanceCell.innerHTML = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="shared">${subreddit}</a>`;
-                authCell.innerHTML = `<a href="${linkPath}" style="color: var(--text); opacity: 0.6; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="shared">${subreddit}</a>`;
+                instanceCell.innerHTML = `<a href="${linkPath}" style="color: var(--text); opacity: 0.7; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="shared">${subreddit}</a>`;
+                authCell.innerHTML = `<a href="${linkPath}" style="color: var(--text); opacity: 0.7; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="shared">${subreddit}</a>`;
             } else if (newStatus === 'instance-only') {
                 instanceCell.innerHTML = `<a href="${linkPath}" style="color: #4ecdc4; font-weight: bold; text-decoration: none;" class="redlib-diff-link" data-setting="${setting}" data-item="${subreddit}" data-status="instance-only">${subreddit}</a>`;
                 authCell.innerHTML = `<span style="opacity: 0.3;">—</span>`;
@@ -9362,7 +10138,7 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                 return null;
             }
         }
-        
+
         function updateActionPreviews() {
             if (!cachedAuthoritative || !cachedInstance) return;
 
@@ -9434,7 +10210,7 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             Object.keys(instance).forEach(setting => {
                 const authValue = authoritative[setting];
                 const instanceValue = instance[setting];
-                
+
                 if (Array.isArray(instanceValue) && Array.isArray(authValue)) {
                     // Handle arrays (existing logic)
                     const authArray = authValue || [];
@@ -9486,6 +10262,16 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             document.body.appendChild(notification);
 
             try {
+                // BACKUP current instance state before attempting bulk operation
+                console.log('[SYNC] Backing up current instance state before bulk attempt...');
+                const backupInstance = await extractInstanceSettings();
+                const backupUrl = generateSettingsUrl(backupInstance);
+                console.log('[SYNC] Instance backup created:', {
+                    subscriptions: backupInstance.subscriptions?.length || 0,
+                    filters: backupInstance.filters?.length || 0,
+                    backupUrlLength: backupUrl.length
+                });
+
                 // Submit the restore URL in the background
                 const response = await fetch(settingsUrl, {
                     method: 'GET',
@@ -9511,32 +10297,612 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                     // Show success message, then reload to refresh cookie state
                     setTimeout(() => {
                         notification.textContent = `Reloading page to refresh settings...`;
-                        
+
                         setTimeout(() => {
                             window.location.reload();
                         }, 1000);
                     }, 2000); // Show success for 2 seconds first
-                    
+
                 } else {
+                    // RESTORE instance state since bulk failed
+                    console.log('[SYNC] Bulk operation failed, restoring instance backup...');
+                    notification.textContent = `Bulk failed, restoring original state...`;
+                    notification.style.background = '#ffc107';
+
+                    try {
+                        const restoreResponse = await fetch(backupUrl, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                            }
+                        });
+
+                        if (restoreResponse.ok) {
+                            console.log('[SYNC] Instance backup restored successfully');
+                            notification.textContent = `Original state restored, trying alternative method...`;
+                        } else {
+                            console.error('[SYNC] Failed to restore backup:', restoreResponse.status);
+                            notification.textContent = `Backup restore failed, proceeding with caution...`;
+                        }
+
+                        // Small delay to let the restore settle
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    } catch (restoreError) {
+                        console.error('[SYNC] Error during backup restore:', restoreError);
+                        notification.textContent = `Backup restore error, proceeding with fallback...`;
+                    }
+
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
             } catch (error) {
-                console.error('[SYNC] Merge failed:', error);
+                console.error('[SYNC] Bulk merge failed, falling back to one-by-one method:', error);
 
-                // Provide more descriptive error messages for network issues
-                let errorMessage = error.message;
-                if (error.message === 'Failed to fetch') {
-                    errorMessage = 'Network error (ERR_CONNECTION_CLOSED or similar)';
+                // Update notification to show fallback
+                notification.textContent = `Bulk merge failed, trying one-by-one method...`;
+                notification.style.background = '#ffc107';
+
+                try {
+                    // Fallback to one-by-one method using merged settings
+                    await fallbackToOneByOne(mergedAuthoritative, notification);
+                } catch (fallbackError) {
+                    console.error('[SYNC] One-by-one fallback also failed:', fallbackError);
+                    notification.textContent = `Both bulk and one-by-one merge failed: ${fallbackError.message}`;
+                    notification.style.background = '#dc3545';
+                    setTimeout(() => notification.remove(), 5000);
                 }
-
-                notification.textContent = `Merge failed: ${errorMessage}`;
-                notification.style.background = '#dc3545';
-
-                setTimeout(() => {
-                    notification.remove();
-                }, 5000);
             }
         }
+
+        // Enhanced progressive fallback method with multiple tiers
+        async function fallbackToOneByOne(targetSettings, notification) {
+            console.log('[SYNC] Starting progressive fallback method');
+
+    // BACKUP original instance before ANY tier attempts
+    console.log('[SYNC] Creating master backup before all tier attempts...');
+    const masterBackup = await extractInstanceSettings();
+    const masterBackupUrl = generateSettingsUrl(masterBackup);
+    console.log('[SYNC] Master backup created:', {
+        subscriptions: masterBackup.subscriptions?.length || 0,
+        filters: masterBackup.filters?.length || 0
+    });
+
+            // Tier 2: Try without subscriptions (settings + filters only)
+            try {
+                notification.textContent = `Tier 2: Trying settings + filters only...`;
+                notification.style.background = '#ffc107';
+
+                const settingsOnlyUrl = generateSettingsUrl({
+                    ...targetSettings,
+                    subscriptions: [] // Remove subscriptions
+                });
+
+                const response = await fetch(settingsOnlyUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                    }
+                });
+
+                if (response.ok) {
+                    console.log('[SYNC] Tier 2 successful - settings + filters worked');
+
+// Now handle subscriptions progressively if needed
+if (targetSettings.subscriptions && targetSettings.subscriptions.length > 0) {
+    await handleSubscriptionsProgressive(targetSettings.subscriptions, notification);
+} else {
+                        notification.textContent = `Tier 2 completed successfully!`;
+                        notification.style.background = '#28a745';
+                        GM_setValue(`instance_timestamp_${window.location.hostname}`, Date.now());
+                        setTimeout(() => {
+                            notification.textContent = `Reloading page to refresh settings...`;
+                            setTimeout(() => window.location.reload(), 1000);
+                        }, 2000);
+                    }
+                    return;
+} else {
+    // RESTORE master backup since Tier 2 failed
+    console.log('[SYNC] Tier 2 failed, restoring master backup...');
+    await fetch(masterBackupUrl, { method: 'GET' });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+}
+            } catch (error) {
+                console.log('[SYNC] Tier 2 failed:', error);
+            }
+
+            // Tier 3-4: Progressive filter reduction
+            await progressiveFilterReduction(targetSettings, notification, masterBackupUrl);
+        }
+
+        // Handle progressive filter reduction (Tiers 3-4)
+        async function progressiveFilterReduction(targetSettings, notification, masterBackupUrl) {
+            console.log('[SYNC] Starting progressive filter reduction');
+
+            if (!targetSettings.filters || targetSettings.filters.length === 0) {
+                // No filters to reduce, go straight to one-by-one
+                await finalOneByOneMethod(targetSettings, notification);
+                return;
+            }
+
+            let remainingFilters = [...targetSettings.filters];
+            let removedFilters = [];
+            let tierNumber = 3;
+
+            while (remainingFilters.length > 0) {
+                notification.textContent = `Tier ${tierNumber}: Trying with ${remainingFilters.length} filters...`;
+
+                // Randomly remove 30-50% of remaining filters
+                const removeCount = Math.max(1, Math.floor(remainingFilters.length * (0.3 + Math.random() * 0.2)));
+                const toRemove = [];
+
+                for (let i = 0; i < removeCount && remainingFilters.length > 0; i++) {
+                    const randomIndex = Math.floor(Math.random() * remainingFilters.length);
+                    toRemove.push(remainingFilters.splice(randomIndex, 1)[0]);
+                }
+
+                removedFilters.push(...toRemove);
+                console.log(`[SYNC] Tier ${tierNumber}: Removed ${toRemove.length} filters, ${remainingFilters.length} remaining`);
+
+                try {
+                    const reducedSettingsUrl = generateSettingsUrl({
+                        ...targetSettings,
+                        filters: remainingFilters,
+                        subscriptions: [] // Keep subscriptions empty for these tiers
+                    });
+
+                    const response = await fetch(reducedSettingsUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                        }
+                    });
+
+                    if (response.ok) {
+                        console.log(`[SYNC] Tier ${tierNumber} successful with ${remainingFilters.length} filters`);
+
+                        // Now handle the removed filters and subscriptions one-by-one
+                        await handleRemainingItemsOneByOne(removedFilters, targetSettings.subscriptions || [], notification);
+                        return;
+} else {
+    // RESTORE master backup since this tier failed
+    console.log(`[SYNC] Tier ${tierNumber} failed, restoring master backup...`);
+    await fetch(masterBackupUrl, { method: 'GET' });
+    await new Promise(resolve => setTimeout(resolve, 500));
+}
+                } catch (error) {
+                    console.log(`[SYNC] Tier ${tierNumber} failed:`, error);
+                }
+
+                tierNumber++;
+
+                // Safety break - if we've tried too many tiers, go to one-by-one
+                if (tierNumber > 10) {
+                    console.log('[SYNC] Too many tier attempts, going to final one-by-one method');
+                    break;
+                }
+            }
+
+            // All tiers failed, go to final one-by-one method
+            await finalOneByOneMethod(targetSettings, notification);
+        }
+
+        // Handle remaining filters and subscriptions one-by-one (Tier 5)
+        async function handleRemainingItemsOneByOne(remainingFilters, targetSubscriptions, notification) {
+            console.log('[SYNC] Tier 5: Processing remaining items one-by-one');
+
+            // Get current instance to calculate subscription differences
+            const instance = await extractInstanceSettings();
+            const instanceSubs = instance.subscriptions || [];
+
+            // Only process subscriptions that are missing from instance
+            const missingSubs = targetSubscriptions.filter(sub => !instanceSubs.includes(sub));
+
+            console.log(`[SYNC] Tier 5 differences: ${remainingFilters.length} filters, ${targetSubscriptions.length} total subs (${missingSubs.length} missing)`);
+
+            const allItems = [
+                ...remainingFilters.map(filter => ({ type: 'filter', action: 'filter', subreddit: filter, priority: 1 })),
+                ...missingSubs.map(sub => ({ type: 'subscription', action: 'subscribe', subreddit: sub, priority: 2 }))
+            ];
+
+            if (allItems.length === 0) {
+                notification.textContent = `Progressive fallback completed - all items already match!`;
+                notification.style.background = '#28a745';
+                GM_setValue(`instance_timestamp_${window.location.hostname}`, Date.now());
+                setTimeout(() => {
+                    notification.textContent = `Reloading page to refresh settings...`;
+                    setTimeout(() => window.location.reload(), 1000);
+                }, 2000);
+                return;
+            }
+
+            await processItemsOneByOne(allItems, notification, 'Progressive fallback');
+        }
+
+        // Handle subscriptions only one-by-one
+        async function handleSubscriptionsOneByOne(targetSubscriptions, notification) {
+            console.log('[SYNC] Processing subscriptions one-by-one after successful settings+filters');
+
+            // Get current instance to calculate differences
+            const instance = await extractInstanceSettings();
+            const instanceSubs = instance.subscriptions || [];
+
+            // Only process subscriptions that are missing from instance
+            const missingSubs = targetSubscriptions.filter(sub => !instanceSubs.includes(sub));
+
+            console.log(`[SYNC] Subscription difference: ${targetSubscriptions.length} total, ${instanceSubs.length} in instance, ${missingSubs.length} missing`);
+
+            if (missingSubs.length === 0) {
+                notification.textContent = `All subscriptions already match - no changes needed`;
+                notification.style.background = '#28a745';
+                GM_setValue(`instance_timestamp_${window.location.hostname}`, Date.now());
+                setTimeout(() => {
+                    notification.textContent = `Reloading page to refresh settings...`;
+                    setTimeout(() => window.location.reload(), 1000);
+                }, 2000);
+                return;
+            }
+
+            const subItems = missingSubs.map(sub => ({
+                type: 'subscription',
+                action: 'subscribe',
+                subreddit: sub,
+                priority: 1
+            }));
+
+            await processItemsOneByOne(subItems, notification, 'Subscription processing');
+        }
+
+// Progressive subscription processing with multireddit support
+async function handleSubscriptionsProgressive(targetSubscriptions, notification) {
+    console.log('[SYNC] Starting progressive subscription processing');
+
+    const instance = await extractInstanceSettings();
+    const instanceSubs = instance.subscriptions || [];
+    const missingSubs = targetSubscriptions.filter(sub => !instanceSubs.includes(sub));
+
+    console.log(`[SYNC] Progressive subscriptions: ${missingSubs.length} missing subscriptions to process`);
+
+    if (missingSubs.length === 0) {
+        notification.textContent = `All subscriptions already match`;
+        notification.style.background = '#28a745';
+        return;
+    }
+
+    let remainingSubs = [...missingSubs];
+
+    // Step 1: Try bulk subscription fallback (progressive size reduction)
+    let tierNumber = 1;
+    while (remainingSubs.length > 50) { // Only try bulk if substantial number
+        notification.textContent = `Subscription Tier ${tierNumber}: Trying ${remainingSubs.length} subscriptions...`;
+
+        try {
+            const subscriptionOnlyUrl = generateSettingsUrl({
+                ...await extractInstanceSettings(), // Keep current settings
+                subscriptions: remainingSubs.slice(0, Math.floor(remainingSubs.length * 0.7)) // Try 70% of remaining
+            });
+
+            const response = await fetch(subscriptionOnlyUrl, {
+                method: 'GET',
+                headers: { 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
+            });
+
+            if (response.ok) {
+                const processed = Math.floor(remainingSubs.length * 0.7);
+                remainingSubs = remainingSubs.slice(processed);
+                console.log(`[SYNC] Subscription Tier ${tierNumber} successful, ${remainingSubs.length} remaining`);
+                break;
+            }
+        } catch (error) {
+            console.log(`[SYNC] Subscription Tier ${tierNumber} failed:`, error);
+        }
+
+        // Reduce size for next tier
+        remainingSubs = remainingSubs.slice(0, Math.floor(remainingSubs.length * 0.8));
+        tierNumber++;
+
+        if (tierNumber > 5) break; // Safety limit
+    }
+
+    // Step 2: Multireddit batch processing
+    if (remainingSubs.length > 5) {
+        notification.textContent = `Processing ${remainingSubs.length} subscriptions via multireddit batches...`;
+
+        const multiredditResult = await executeMultiredditAction(remainingSubs, 'subscribe', 15);
+        remainingSubs = multiredditResult.failed;
+
+        console.log(`[SYNC] Multireddit subscriptions: ${multiredditResult.successful.length} successful, ${remainingSubs.length} remaining`);
+    }
+
+    // Step 3: Parallelized one-by-one for remaining
+    if (remainingSubs.length > 0) {
+        const subItems = remainingSubs.map(sub => ({
+            type: 'subscription',
+            action: 'subscribe',
+            subreddit: sub,
+            priority: 1
+        }));
+
+        await processItemsOneByOne(subItems, notification, 'Final subscription processing', 3);
+    }
+}
+
+        // Final fallback method when all tiers fail (Tier 6)
+        async function finalOneByOneMethod(targetSettings, notification) {
+            console.log('[SYNC] Tier 6: Final one-by-one method - all bulk attempts failed');
+
+            const instance = await extractInstanceSettings();
+            const operations = [];
+
+            console.log('[SYNC] Calculating differences:', {
+                targetSubs: targetSettings.subscriptions?.length || 0,
+                instanceSubs: instance.subscriptions?.length || 0,
+                targetFilters: targetSettings.filters?.length || 0,
+                instanceFilters: instance.filters?.length || 0
+            });
+
+            // Priority 1: Filters (as requested)
+            if (targetSettings.filters && instance.filters) {
+                const targetFilters = targetSettings.filters || [];
+                const instanceFilters = instance.filters || [];
+
+                // Filters to add
+                targetFilters.forEach(filter => {
+                    if (!instanceFilters.includes(filter)) {
+                        operations.push({
+                            type: 'filter',
+                            action: 'filter',
+                            subreddit: filter,
+                            priority: 1
+                        });
+                    }
+                });
+
+                // Filters to remove (lower priority)
+                instanceFilters.forEach(filter => {
+                    if (!targetFilters.includes(filter)) {
+                        operations.push({
+                            type: 'filter',
+                            action: 'unfilter',
+                            subreddit: filter,
+                            priority: 3
+                        });
+                    }
+                });
+            }
+
+            // Priority 2: Subscriptions
+            if (targetSettings.subscriptions && instance.subscriptions) {
+                const targetSubs = targetSettings.subscriptions || [];
+                const instanceSubs = instance.subscriptions || [];
+
+                // Subscriptions to add
+                targetSubs.forEach(sub => {
+                    if (!instanceSubs.includes(sub)) {
+                        operations.push({
+                            type: 'subscription',
+                            action: 'subscribe',
+                            subreddit: sub,
+                            priority: 2
+                        });
+                    }
+                });
+
+                // Subscriptions to remove (lower priority)
+                instanceSubs.forEach(sub => {
+                    if (!targetSubs.includes(sub)) {
+                        operations.push({
+                            type: 'subscription',
+                            action: 'unsubscribe',
+                            subreddit: sub,
+                            priority: 4
+                        });
+                    }
+                });
+            }
+
+            // Sort by priority (filters first, then subscriptions)
+            operations.sort((a, b) => a.priority - b.priority);
+
+            await processItemsOneByOne(operations, notification, 'Final one-by-one');
+        }
+
+// Core one-by-one processing with enhanced error detection
+async function processItemsOneByOne(operations, notification, context) {
+    console.log(`[SYNC] ${context}: Processing ${operations.length} operations`);
+
+    if (operations.length === 0) {
+        notification.textContent = `${context} completed - no operations needed`;
+        notification.style.background = '#28a745';
+        GM_setValue(`instance_timestamp_${window.location.hostname}`, Date.now());
+        setTimeout(() => {
+            notification.textContent = `Reloading page to refresh settings...`;
+            setTimeout(() => window.location.reload(), 1000);
+        }, 2000);
+        return;
+    }
+
+    let completed = 0;
+    let failed = 0;
+    let bannedSubreddits = [];
+    let privateSubreddits = [];
+    let notFoundSubreddits = [];
+    let otherErrors = [];
+
+    for (const operation of operations) {
+        try {
+            notification.textContent = `${context}: ${operation.subreddit} (${completed + 1}/${operations.length})`;
+
+            await executeSubredditActionWithErrorDetection(operation.subreddit, operation.action);
+            completed++;
+            console.log(`[SYNC] Success: ${operation.action} ${operation.subreddit}`);
+
+            // Small delay to prevent overwhelming the server
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+        } catch (error) {
+            failed++;
+            console.error(`[SYNC] Failed: ${operation.action} ${operation.subreddit}:`, error);
+
+            // Categorize errors for better reporting
+            const errorMessage = error.message.toLowerCase();
+            if (errorMessage.includes('banned') || errorMessage.includes('ban')) {
+                bannedSubreddits.push(operation.subreddit);
+            } else if (errorMessage.includes('private')) {
+                privateSubreddits.push(operation.subreddit);
+            } else if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+                notFoundSubreddits.push(operation.subreddit);
+            } else {
+                otherErrors.push({ subreddit: operation.subreddit, error: error.message });
+            }
+        }
+    }
+
+    // Final status report
+    const successRate = operations.length > 0 ? Math.round((completed / operations.length) * 100) : 100;
+
+    if (failed === 0) {
+        notification.textContent = `${context} completed: ${completed}/${operations.length} successful (${successRate}%)`;
+        notification.style.background = '#28a745';
+    } else {
+        const errorSummary = [];
+        if (bannedSubreddits.length > 0) errorSummary.push(`${bannedSubreddits.length} banned`);
+        if (privateSubreddits.length > 0) errorSummary.push(`${privateSubreddits.length} private`);
+        if (notFoundSubreddits.length > 0) errorSummary.push(`${notFoundSubreddits.length} not found`);
+        if (otherErrors.length > 0) errorSummary.push(`${otherErrors.length} other errors`);
+
+        notification.textContent = `${context} partial: ${completed}/${operations.length} (${successRate}%) - ${errorSummary.join(', ')}`;
+        notification.style.background = completed > failed ? '#ffc107' : '#dc3545';
+    }
+
+    // Update timestamp if we made any progress
+    if (completed > 0) {
+        GM_setValue(`instance_timestamp_${window.location.hostname}`, Date.now());
+
+        setTimeout(() => {
+            notification.textContent = `Reloading page to refresh settings...`;
+            setTimeout(() => window.location.reload(), 1000);
+        }, completed === operations.length ? 2000 : 3000);
+    } else {
+        setTimeout(() => notification.remove(), 5000);
+    }
+}
+
+// Helper function to categorize errors
+function categorizeError(error, subreddit, results) {
+    const errorMsg = error.message.toLowerCase();
+    if (errorMsg.includes('banned from reddit')) {
+        results.bannedSubreddits.push(subreddit);
+        console.log(`[SYNC] BANNED: r/${subreddit} has been banned from Reddit`);
+    } else if (errorMsg.includes('private community')) {
+        results.privateSubreddits.push(subreddit);
+        console.log(`[SYNC] PRIVATE: r/${subreddit} is a private community`);
+    } else if (error.message.includes('HTTP 404')) {
+        results.notFoundSubreddits.push(subreddit);
+        console.log(`[SYNC] NOT FOUND: r/${subreddit} does not exist (404)`);
+    } else {
+        results.otherErrors.push({ subreddit, error: error.message });
+        console.error(`[SYNC] ERROR: ${subreddit}:`, error);
+    }
+}
+
+        // Enhanced executeSubredditAction with better error detection
+        async function executeSubredditActionWithErrorDetection(subredditName, action) {
+            const actionEndpoints = {
+                'subscribe': `/r/${subredditName}/subscribe`,
+                'unsubscribe': `/r/${subredditName}/unsubscribe`,
+                'filter': `/r/${subredditName}/filter`,
+                'unfilter': `/r/${subredditName}/unfilter`
+            };
+
+            const endpoint = actionEndpoints[action];
+            if (!endpoint) {
+                throw new Error(`Unknown action: ${action}`);
+            }
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+
+            if (!response.ok) {
+                // Try to get more specific error information
+                let errorMessage = `HTTP ${response.status}`;
+
+                try {
+                    const responseText = await response.text();
+
+                    // Check for specific error patterns in the response
+                    if (responseText.includes('banned from Reddit')) {
+                        errorMessage = `r/${subredditName} has been banned from Reddit`;
+                    } else if (responseText.includes('private community')) {
+                        errorMessage = `r/${subredditName} is a private community`;
+                    } else if (response.status === 404) {
+                        errorMessage = `HTTP 404 - r/${subredditName} not found`;
+                    } else {
+                        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                } catch (parseError) {
+                    // If we can't parse the response, use the status code
+                    errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                }
+
+                throw new Error(errorMessage);
+            }
+        }
+
+// Enhanced multireddit batch processing
+async function executeMultiredditAction(subredditList, action, maxBatchSize = 20) {
+    if (subredditList.length === 0) return { successful: [], failed: [] };
+
+    const successful = [];
+    const failed = [];
+
+    // Process in batches to avoid URL length limits
+    for (let i = 0; i < subredditList.length; i += maxBatchSize) {
+        const batch = subredditList.slice(i, i + maxBatchSize);
+        const multiredditName = batch.join('+');
+
+        const actionEndpoints = {
+            'subscribe': `/r/${multiredditName}/subscribe`,
+            'unsubscribe': `/r/${multiredditName}/unsubscribe`,
+            'filter': `/r/${multiredditName}/filter`,
+            'unfilter': `/r/${multiredditName}/unfilter`
+        };
+
+        const endpoint = actionEndpoints[action];
+        if (!endpoint) {
+            failed.push(...batch);
+            continue;
+        }
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+
+            if (response.ok) {
+                successful.push(...batch);
+                console.log(`[SYNC] Multireddit ${action} successful for ${batch.length} subreddits:`, batch.slice(0, 3).join(', '));
+            } else {
+                failed.push(...batch);
+                console.log(`[SYNC] Multireddit ${action} failed for batch:`, batch.slice(0, 3).join(', '));
+            }
+        } catch (error) {
+            failed.push(...batch);
+            console.error(`[SYNC] Multireddit ${action} error:`, error);
+        }
+
+        // Small delay between batches
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    return { successful, failed };
+}
 
         async function selectivePushToInstance() {
             const authoritative = getAuthoritativeSettings();
@@ -9848,6 +11214,282 @@ function interceptNativeSettingsForm() {
 }
 
 // ============================================================================
+    // COMMENT NAVIGATOR MODULE
+    // ============================================================================
+    const CommentNavigator = (function() {
+        let navContainer = null;
+        let currentTopLevelIndex = 0;
+        let topLevelComments = [];
+
+        function createNavigationButtons() {
+            navContainer = document.createElement('div');
+            navContainer.className = 'comment-nav-buttons';
+            navContainer.style.cssText = `
+                position: fixed;
+                left: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 1000;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            `;
+
+            // Up button
+            const upButton = document.createElement('button');
+            upButton.className = 'comment-nav-btn comment-nav-up';
+            upButton.innerHTML = '▲';
+            upButton.title = 'Previous top-level comment';
+            upButton.style.cssText = `
+                background: var(--background);
+                border: 1px solid var(--highlighted);
+                color: var(--text);
+                width: 50px;
+                height: 50px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 18px;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+                touch-action: manipulation;
+            `;
+
+            // Down button
+            const downButton = document.createElement('button');
+            downButton.className = 'comment-nav-btn comment-nav-down';
+            downButton.innerHTML = '▼';
+            downButton.title = 'Next top-level comment';
+            downButton.style.cssText = upButton.style.cssText;
+
+            // Hover effects
+            [upButton, downButton].forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    btn.style.background = 'var(--highlighted)';
+                    btn.style.borderColor = 'var(--accent)';
+                });
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.background = 'var(--background)';
+                    btn.style.borderColor = 'var(--highlighted)';
+                });
+            });
+
+            // Event listeners - FIXED: up goes to previous, down goes to next
+            upButton.addEventListener('click', () => navigateToPrevious());
+            downButton.addEventListener('click', () => navigateToNext());
+
+            navContainer.appendChild(upButton);
+            navContainer.appendChild(downButton);
+
+            return navContainer;
+        }
+
+        function updateTopLevelComments() {
+            // Get all top-level comments in document order
+            const newCount = document.querySelectorAll('.thread > .comment').length;
+            const oldCount = topLevelComments.length;
+            
+            topLevelComments = Array.from(document.querySelectorAll('.thread > .comment'));
+            
+            // Only log if the count actually changed
+            if (newCount !== oldCount) {
+                console.log('[Comment Navigator] Updated comment list:', oldCount, '→', newCount, 'comments');
+            }
+        }
+
+        function navigateToNext() {
+            if (topLevelComments.length === 0) {
+                updateTopLevelComments();
+                if (topLevelComments.length === 0) return;
+            }
+
+            // Simply increment by 1
+            currentTopLevelIndex++;
+            
+            // Wrap around to beginning if at end
+            if (currentTopLevelIndex >= topLevelComments.length) {
+                currentTopLevelIndex = 0;
+            }
+            
+            scrollToComment(currentTopLevelIndex);
+            console.log('[Comment Navigator] Navigated to comment', currentTopLevelIndex + 1, 'of', topLevelComments.length);
+        }
+
+        function navigateToPrevious() {
+            if (topLevelComments.length === 0) {
+                updateTopLevelComments();
+                if (topLevelComments.length === 0) return;
+            }
+
+            // Simply decrement by 1
+            currentTopLevelIndex--;
+            
+            // Wrap around to end if at beginning
+            if (currentTopLevelIndex < 0) {
+                currentTopLevelIndex = topLevelComments.length - 1;
+            }
+            
+            scrollToComment(currentTopLevelIndex);
+            console.log('[Comment Navigator] Navigated to comment', currentTopLevelIndex + 1, 'of', topLevelComments.length);
+        }
+
+function scrollToComment(index) {
+            if (index >= 0 && index < topLevelComments.length) {
+                const targetComment = topLevelComments[index];
+                
+                // Calculate initial offset
+                let offset = 80; // Base offset
+                
+                // Check if sticky post mode is enabled
+                const isStickyModeEnabled = SettingsManager.getSetting('postCollapser', 'stickyMode');
+                
+                if (isStickyModeEnabled) {
+                    // Always assume sticky mode will be active when scrolling to comments
+                    // This prevents the timing issue where sticky activates after scroll
+                    const nav = document.querySelector('nav');
+                    const navHeight = nav ? nav.offsetHeight : (window.innerWidth <= 800 ? 100 : 60);
+                    
+                    // Estimate sticky post height (it's compact in sticky mode)
+                    // Based on the CSS: padding 4px 16px, compact header, no footer
+                    const estimatedStickyHeight = window.innerWidth <= 800 ? 80 : 60;
+                    
+                    offset = navHeight + estimatedStickyHeight + 20;
+                    console.log('[Comment Navigator] Using sticky-aware offset:', offset);
+                }
+                
+                // First scroll to position
+                const rect = targetComment.getBoundingClientRect();
+                window.scrollTo({
+                    top: window.pageYOffset + rect.top - offset,
+                    behavior: 'smooth'
+                });
+
+                // Wait for scroll to complete, then highlight
+                setTimeout(() => {
+                    highlightComment(targetComment);
+                }, 500); // Wait for smooth scroll to finish
+            }
+        }
+
+        function highlightComment(comment) {
+            // Create a temporary highlight overlay instead of changing background
+            const highlightOverlay = document.createElement('div');
+            highlightOverlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: var(--accent);
+                opacity: 0.3;
+                pointer-events: none;
+                z-index: 999;
+                transition: opacity 0.3s ease;
+            `;
+            
+            // Make sure the comment has relative positioning for the overlay
+            const originalPosition = comment.style.position;
+            comment.style.position = 'relative';
+            comment.appendChild(highlightOverlay);
+            
+            // Fade out and remove
+            setTimeout(() => {
+                highlightOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    if (highlightOverlay.parentNode) {
+                        highlightOverlay.parentNode.removeChild(highlightOverlay);
+                    }
+                    // Restore original position
+                    comment.style.position = originalPosition;
+                }, 300);
+            }, 300);
+        }
+
+        function findCurrentCommentIndex() {
+            // Find which comment is currently most visible in viewport
+            const viewportTop = window.pageYOffset;
+            const viewportMiddle = viewportTop + (window.innerHeight / 2);
+
+            let closestIndex = 0;
+            let closestDistance = Infinity;
+
+            topLevelComments.forEach((comment, index) => {
+                const rect = comment.getBoundingClientRect();
+                const commentTop = rect.top + window.pageYOffset;
+                const distance = Math.abs(commentTop - viewportMiddle);
+
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestIndex = index;
+                }
+            });
+
+            return closestIndex;
+        }
+
+        function init() {
+            // Only initialize on comment pages
+            if (!window.location.pathname.includes('/comments/')) {
+                return;
+            }
+
+            // Check if setting is enabled
+            if (!SettingsManager.getSetting('commentNavigator', 'enabled')) {
+                return;
+            }
+
+            // Create and add navigation buttons
+            const navButtons = createNavigationButtons();
+            document.body.appendChild(navButtons);
+
+            // Initialize comment list
+            updateTopLevelComments();
+
+            // Set initial position to 0 (first comment)
+            currentTopLevelIndex = -1; // Start at -1 so first click goes to comment 1
+
+            // Listen for new comments being added (e.g., via AJAX) - but be more selective
+            const observer = new MutationObserver((mutations) => {
+                let shouldUpdate = false;
+                
+                mutations.forEach(mutation => {
+                    // Only update if we detect actual comment additions
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            // Check if a top-level comment was added
+                            if (node.matches && (node.matches('.thread > .comment') || node.querySelector('.thread > .comment'))) {
+                                shouldUpdate = true;
+                            }
+                        }
+                    });
+                });
+                
+                if (shouldUpdate) {
+                    setTimeout(() => {
+                        console.log('[Comment Navigator] Detected new comments, updating list...');
+                        updateTopLevelComments();
+                    }, 200);
+                }
+            });
+
+            // Only observe the main content area, not the entire body
+            const mainContent = document.querySelector('main') || document.body;
+            observer.observe(mainContent, {
+                childList: true,
+                subtree: true
+            });
+
+            console.log('[Redlib Enhancement Suite] Comment Navigator initialized');
+        }
+
+        return {
+            init: init
+        };
+    })();
+
+// ============================================================================
 // MAIN INITIALIZATION
 // ============================================================================
 async function init() {
@@ -9884,6 +11526,10 @@ async function init() {
     if (isCommentPage && SettingsManager.getSetting('ajaxCommentLoading', 'enabled')) {
         AjaxCommentLoader.init();
     }
+    
+    if (isCommentPage && SettingsManager.getSetting('commentNavigator', 'enabled')) {
+        CommentNavigator.init();
+    }
 
     if (SettingsManager.getSetting('sidebarToggle', 'enabled')) {
         SidebarToggle.init();
@@ -9897,6 +11543,10 @@ async function init() {
         UsernameHover.init();
     }
 
+    if (isCommentPage && SettingsManager.getSetting('parentCommentHover', 'enabled')) {
+        ParentCommentHover.init();
+    }
+    
     // Initialize settings feed collapsers
     if (window.location.pathname.includes('/settings')) {
         SettingsFeedCollapsers.init();
