@@ -1,10 +1,53 @@
 // ==UserScript==
 // @name         Redlib Enhancement Suite
 // @namespace    https://github.com/azizLIGHT/redlib-enhancement-suite
-// @version      2.066
+// @version      2.140-enable-commentspage-post-hidesave-07-fix-sticky-mode-15-debug
 // @description  A comprehensive userscript that supercharges your Redlib experience with RES-style features, smooth animations, and powerful customization options.
 // @author       azizLIGHT
-// @match        https://redlib.example.com/*
+// @match        https://redlib.catsarch.com/*
+// @match        https://redlib.freedit.eu/*
+// @match        https://red.artemislena.eu/*
+// @match        https://redlib.privacyredirect.com/*
+// @match        https://r.darklab.sh/*
+// @match        https://redlib.minihoot.site/*
+// @match        https://rl.blitzw.in/*
+// @match        https://redlib.nohost.network/*
+// @match        https://redlib.jaydenha.uk/*
+// @match        https://redlib.private.coffee/*
+// @match        https://redlib.einfachzocken.eu/*
+// @match        https://redlib.astrial.org/*
+// @match        https://libreddit.privacydev.net/*
+// @match        https://rl.bloat.cat/*
+// @match        https://redlib.ducks.party/*
+// @match        https://redlib.nadeko.net/*
+// @match        https://redlib.4o1x5.dev/*
+// @match        https://redlib.zaggy.nl/*
+// @match        https://libreddit.kavin.rocks/*
+// @match        https://libreddit.bus-hit.me/*
+// @match        https://redlib.seasi.dev/*
+// @match        https://rl.citw.lgbt/*
+// @match        https://reddit.rtrace.io/*
+// @match        https://lr.ggtyler.dev/*
+// @match        https://red.arancia.click/*
+// @match        https://redlib.privacy.com.de/*
+// @match        https://redlib.kylrth.com/*
+// @match        https://libreddit.eu.org/*
+// @match        https://nyc1.lr.ggtyler.dev/*
+// @match        https://l.opnxng.com/*
+// @match        https://reddit.idevicehacked.com/*
+// @match        https://redlib.privadency.com/*
+// @match        https://redlib.thebunny.zone/*
+// @match        https://redlib.perennialte.ch/*
+// @match        https://redlib.r4fo.com/*
+// @match        https://red.ngn.tf/*
+// @match        https://reddit.nerdvpn.de/*
+// @match        https://redlib.reallyaweso.me/*
+// @match        https://safereddit.com/*
+// @match        https://redlib.baczek.me/*
+// @match        https://lr.ptr.moe/*
+// @match        https://libreddit.diffraction.dev/*
+// @match        https://redlib.jeikobu.net/*
+// @match        https://pirate.vodka/*
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_deleteValue
@@ -19,7 +62,7 @@
     'use strict';
 
     // Script version - update this when you change @version above
-    const SCRIPT_VERSION = '2.066';
+    const SCRIPT_VERSION = '2.140-enable-commentspage-post-hidesave-07-fix-sticky-mode-15-debug';
 
     // ============================================================================
     // PAGE VALIDATION - Must be first
@@ -204,12 +247,12 @@
                 object-fit: cover !important;
             }
 
-            /* Comment page posts stay normal when collapsed - you came here to see this specific post */
-            .redlib-collapsed.highlighted {
-                opacity: 1;
-                filter: none;
-                transform: none;
-            }
+/* Comment page posts should show collapsed state but less dramatically */
+.redlib-collapsed.highlighted {
+    opacity: 0.7 !important;
+    filter: grayscale(0.2) blur(0.1px) !important;
+    transform: scale(0.99) !important;
+}
 
             .redlib-collapse-btn {
                 position: absolute !important;
@@ -567,11 +610,6 @@ body:has(.post.highlighted) .post.highlighted.redlib-sticky-mode:hover .post_tit
                 min-width: 30px !important;
             }
 
-            /* Hide collapse button on comment pages - only auto-collapse via scroll */
-            body:has(.post.highlighted) .post.highlighted .redlib-collapse-btn {
-                display: none !important;
-            }
-
             /* Hover effect for sticky mode */
             body:has(.post.highlighted) .post.highlighted.redlib-sticky-mode:hover {
                 box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
@@ -746,7 +784,7 @@ body:has(.post.highlighted) .post.highlighted.redlib-sticky-mode:hover .post_tit
     padding: 0;
     z-index: 9999;
 min-width: 320px;
-max-width: 600px;
+max-width: none;
     max-height: 500px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -1661,6 +1699,478 @@ aside {
                 pointer-events: none;
             }
 
+/* ========== HIDDEN POSTS STYLES ========== */
+
+.redlib-hidden-posts-collapsible {
+    border: 1px solid var(--highlighted);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 12px 0;
+}
+
+.redlib-hidden-posts-summary {
+    background: var(--post);
+    color: var(--accent);
+    padding: 12px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none;
+    border-bottom: 1px solid var(--highlighted);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.redlib-hidden-posts-summary:hover {
+    background: var(--highlighted);
+}
+
+.redlib-hidden-posts-summary::before {
+    content: "▶";
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+.redlib-hidden-posts-collapsible[open] .redlib-hidden-posts-summary::before {
+    transform: rotate(90deg);
+}
+
+.redlib-hidden-posts-content {
+    padding: 16px;
+    background: var(--highlighted);
+}
+
+.redlib-hidden-posts-table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--background);
+    border-radius: 4px;
+    position: relative;
+}
+
+.redlib-hidden-posts-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--post);
+    font-size: 11px;
+    table-layout: fixed !important;
+}
+
+.redlib-hidden-posts-table th {
+    background: var(--highlighted);
+    color: var(--accent);
+    padding: 4px 6px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 2px solid var(--background);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    line-height: 1.1;
+    font-size: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.redlib-hidden-posts-table th:hover {
+    background: var(--accent);
+    color: var(--foreground);
+}
+
+.redlib-hidden-posts-table td {
+    padding: 3px 6px;
+    border-bottom: 1px solid var(--background);
+    color: var(--text);
+    vertical-align: middle;
+    line-height: 1.2;
+}
+
+.redlib-hidden-posts-table th,
+.redlib-hidden-posts-table td {
+    box-sizing: border-box;
+}
+
+.redlib-hidden-posts-table tr:hover {
+    background: var(--highlighted);
+}
+
+.redlib-hidden-posts-table .post-title-link {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.redlib-hidden-posts-table .post-title-link:hover {
+    text-decoration: underline;
+}
+
+.redlib-hidden-posts-table .post-subreddit-link {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.redlib-hidden-posts-table .post-subreddit-link:hover {
+    text-decoration: underline;
+}
+
+.redlib-hidden-posts-table .post-author-link {
+    color: var(--text);
+    text-decoration: none;
+    opacity: 0.8;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.redlib-hidden-posts-table .post-author-link:hover {
+    text-decoration: underline;
+    opacity: 1;
+}
+
+.redlib-hidden-posts-table .post-title span,
+.redlib-hidden-posts-table .post-subreddit span,
+.redlib-hidden-posts-table .post-author span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+    opacity: 0.6;
+    font-style: italic;
+}
+
+.redlib-hidden-posts-unhide {
+    background: var(--highlighted);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 2px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+    line-height: 1;
+}
+
+.redlib-hidden-posts-unhide:hover {
+    background: var(--accent);
+    color: var(--foreground);
+}
+
+.redlib-hidden-posts-empty {
+    text-align: center;
+    color: var(--text);
+    opacity: 0.6;
+    font-style: italic;
+    padding: 20px;
+}
+
+.redlib-hidden-posts-table .current-post-row {
+    background: var(--accent) !important;
+    color: var(--foreground) !important;
+}
+
+.redlib-hidden-posts-table .current-post-row td {
+    background: var(--accent) !important;
+    color: var(--foreground) !important;
+}
+
+.redlib-hidden-posts-table .current-post-row a {
+    color: var(--foreground) !important;
+    font-weight: bold !important;
+}
+
+.redlib-hidden-posts-table .current-post-row .redlib-hidden-posts-fix,
+.redlib-hidden-posts-table .current-post-row .redlib-hidden-posts-unhide {
+    background: var(--foreground) !important;
+    color: var(--accent) !important;
+    border-color: var(--foreground) !important;
+}
+
+.redlib-hidden-posts-table th.sortable::after {
+    content: " ↕";
+    opacity: 0.5;
+    font-size: 8px;
+}
+
+.redlib-hidden-posts-table th.sorted-asc::after {
+    content: " ↑";
+    opacity: 1;
+    color: var(--accent);
+}
+
+.redlib-hidden-posts-table th.sorted-desc::after {
+    content: " ↓";
+    opacity: 1;
+    color: var(--accent);
+}
+
+/* ========== SAVED POSTS STYLES ========== */
+
+.redlib-saved-posts-collapsible {
+    border: 1px solid var(--highlighted);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 12px 0;
+}
+
+.redlib-saved-posts-summary {
+    background: var(--post);
+    color: var(--accent);
+    padding: 12px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none;
+    border-bottom: 1px solid var(--highlighted);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.redlib-saved-posts-summary:hover {
+    background: var(--highlighted);
+}
+
+.redlib-saved-posts-summary::before {
+    content: "▶";
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+.redlib-saved-posts-collapsible[open] .redlib-saved-posts-summary::before {
+    transform: rotate(90deg);
+}
+
+.redlib-saved-posts-content {
+    padding: 16px;
+    background: var(--highlighted);
+}
+
+.redlib-saved-posts-table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--background);
+    border-radius: 4px;
+    position: relative;
+}
+
+.redlib-saved-posts-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--post);
+    font-size: 11px;
+    table-layout: fixed !important;
+}
+
+
+
+.redlib-saved-posts-table th {
+    background: var(--highlighted);
+    color: var(--accent);
+    padding: 4px 6px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 2px solid var(--background);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    line-height: 1.1;
+    font-size: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.redlib-saved-posts-table th:hover {
+    background: var(--accent);
+    color: var(--foreground);
+}
+
+.redlib-saved-posts-table th.sortable::after {
+    content: " ↕";
+    opacity: 0.5;
+    font-size: 8px;
+}
+
+.redlib-saved-posts-table th.sorted-asc::after {
+    content: " ↑";
+    opacity: 1;
+    color: var(--accent);
+}
+
+.redlib-saved-posts-table th.sorted-desc::after {
+    content: " ↓";
+    opacity: 1;
+    color: var(--accent);
+}
+
+.redlib-saved-posts-table td {
+    padding: 3px 6px;
+    border-bottom: 1px solid var(--background);
+    color: var(--text);
+    vertical-align: middle;
+    line-height: 1.2;
+}
+
+.redlib-saved-posts-table th,
+.redlib-saved-posts-table td {
+    box-sizing: border-box;
+}
+
+.redlib-saved-posts-table tr:hover {
+    background: var(--highlighted);
+}
+
+.redlib-saved-posts-table .post-title-link {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.redlib-saved-posts-table .post-title-link:hover {
+    text-decoration: underline;
+}
+
+.redlib-saved-posts-table .post-subreddit-link {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.redlib-saved-posts-table .post-subreddit-link:hover {
+    text-decoration: underline;
+}
+
+.redlib-saved-posts-table .post-author-link {
+    color: var(--text);
+    text-decoration: none;
+    opacity: 0.8;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.redlib-saved-posts-table .post-author-link:hover {
+    text-decoration: underline;
+    opacity: 1;
+}
+
+.redlib-saved-posts-unsave {
+    background: var(--accent);
+    color: var(--foreground);
+    border: 1px solid var(--accent);
+    padding: 2px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+    line-height: 1;
+}
+.redlib-saved-posts-unsave:hover {
+    background: var(--highlighted);
+    color: var(--accent);
+}
+
+.redlib-saved-posts-empty {
+    text-align: center;
+    color: var(--text);
+    opacity: 0.6;
+    font-style: italic;
+    padding: 20px;
+}
+
+.redlib-saved-posts-table .current-post-row {
+    background: var(--accent) !important;
+    color: var(--foreground) !important;
+}
+
+.redlib-saved-posts-table .current-post-row td {
+    background: var(--accent) !important;
+    color: var(--foreground) !important;
+}
+
+.redlib-saved-posts-table .current-post-row a {
+    color: var(--foreground) !important;
+    font-weight: bold !important;
+}
+
+.redlib-saved-posts-table .current-post-row .redlib-saved-posts-unsave {
+    background: var(--foreground) !important;
+    color: var(--accent) !important;
+    border-color: var(--foreground) !important;
+}
+
+/* Saved post highlight */
+.post.redlib-saved-post {
+    border: 2px solid var(--accent) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.3) !important;
+}
+/* ========== END SAVED POSTS STYLES ========== */
+
+/* Force table column widths */
+/* ========== UNIFIED TABLE COLUMN WIDTHS ========== */
+.redlib-saved-posts-table col:nth-child(1),
+.redlib-hidden-posts-table col:nth-child(1) { width: 38% !important; }
+
+.redlib-saved-posts-table col:nth-child(2),
+.redlib-hidden-posts-table col:nth-child(2) { width: 17% !important; }
+
+.redlib-saved-posts-table col:nth-child(3),
+.redlib-hidden-posts-table col:nth-child(3) { width: 15% !important; }
+
+.redlib-saved-posts-table col:nth-child(4),
+.redlib-hidden-posts-table col:nth-child(4) { width: 10% !important; }
+
+.redlib-saved-posts-table col:nth-child(5),
+.redlib-hidden-posts-table col:nth-child(5) { width: 13% !important; }
+
+.redlib-saved-posts-table col:nth-child(6),
+.redlib-hidden-posts-table col:nth-child(6) { width: 7% !important; }
+
+/* Center align score and date columns for both tables */
+.redlib-saved-posts-table th:nth-child(4),
+.redlib-saved-posts-table td:nth-child(4),
+.redlib-hidden-posts-table th:nth-child(4),
+.redlib-hidden-posts-table td:nth-child(4),
+.redlib-saved-posts-table th:nth-child(5),
+.redlib-saved-posts-table td:nth-child(5),
+.redlib-hidden-posts-table th:nth-child(5),
+.redlib-hidden-posts-table td:nth-child(5) {
+    text-align: center !important;
+}
+
+/* Fix table container overflow */
+.redlib-saved-posts-table-container,
+.redlib-hidden-posts-table-container {
+    overflow-x: hidden !important;
+}
+
+
 /* ========== SYNC STYLES ========== */
 
 /* Sync table container */
@@ -1884,6 +2394,13 @@ aside {
 }
 
 /* ========== END SYNC STYLES ========== */
+
+/* Boost hover popup z-index to appear above settings overlay */
+._redlib_subreddit_popup,
+._redlib_username_popup,
+._redlib_popup {
+    z-index: 10002 !important;
+}
 
             /* Mobile responsive */
             @media screen and (max-width: 600px) {
@@ -2142,6 +2659,148 @@ aside {
         document.head.appendChild(style);
     }
 
+// ============================================================================
+// EXTRACT POST METADATA HELPER FUNCTION - Must be defined before modules that use it
+// ============================================================================
+function extractPostMetadata(postElement) {
+    // Extract title - specifically target the title link, not the flair
+    let title = 'Unknown Title';
+
+    // Check if we're on a comments page (different structure)
+    const isCommentPage = window.location.pathname.includes('/comments/');
+
+    if (isCommentPage) {
+        // On comments page, title is in h1.post_title and might have flair
+        const postTitleElement = postElement.querySelector('h1.post_title');
+        if (postTitleElement) {
+            // Clone the element to safely manipulate it
+            const titleClone = postTitleElement.cloneNode(true);
+
+            // Remove all flair links (entire <a class="post_flair"> elements)
+            const flairLinks = titleClone.querySelectorAll('a.post_flair');
+            flairLinks.forEach(flair => flair.remove());
+
+            // Get the remaining text content (which is the title)
+            title = titleClone.textContent.trim();
+        }
+    } else {
+        // Original logic for post listing pages
+        // First try to find the actual title link (not the flair link)
+        const titleLink = postElement.querySelector('.post_title a[href*="/comments/"]');
+        if (titleLink) {
+            title = titleLink.textContent.trim();
+        } else {
+            // Fallback: try h2 a or other selectors but exclude flair
+            const titleElement = postElement.querySelector('h2.post_title a:not(.post_flair)');
+            if (titleElement) {
+                title = titleElement.textContent.trim();
+            } else {
+                // Last fallback: try to get the title from comments link text
+                const commentsLink = postElement.querySelector('a[href*="/comments/"]');
+                if (commentsLink && commentsLink.textContent && !commentsLink.textContent.includes('comments')) {
+                    title = commentsLink.textContent.trim();
+                }
+            }
+        }
+    }
+
+    // Extract subreddit
+    let subreddit = 'Unknown';
+    const subredditLink = postElement.querySelector('a[href*="/r/"]:not(.post_flair)');
+    if (subredditLink) {
+        const match = subredditLink.href.match(/\/r\/([^\/\?]+)/);
+        if (match) subreddit = match[1];
+    }
+
+    // Extract author
+    let author = 'Unknown';
+    const authorLink = postElement.querySelector('a[href*="/u/"], a[href*="/user/"]');
+    if (authorLink) {
+        const match = authorLink.href.match(/\/u(?:ser)?\/([^\/\?]+)/);
+        if (match) author = match[1];
+    }
+
+    // Extract score
+    let score = '0';
+    const scoreElement = postElement.querySelector('.post_score, .comment_score');
+    if (scoreElement) {
+        score = scoreElement.textContent.trim();
+    }
+
+    // Extract comments URL
+    let commentsUrl = '#';
+    const commentsLink = postElement.querySelector('a[href*="/comments/"]');
+    if (commentsLink) {
+        commentsUrl = commentsLink.href;
+    } else if (isCommentPage) {
+        commentsUrl = window.location.href;
+    }
+
+    return {
+        title: title,
+        subreddit: subreddit,
+        author: author,
+        score: score,
+        commentsUrl: commentsUrl
+    };
+}
+function extractPostId(postElement) {
+    // Try to get post ID from various possible sources
+
+    // Method 1: From comments link
+    const commentsLink = postElement.querySelector('a[href*="/comments/"]');
+    if (commentsLink) {
+        const match = commentsLink.href.match(/\/comments\/([^\/]+)/);
+        if (match) return match[1];
+    }
+
+    // Method 2: From post element ID if it exists
+    if (postElement.id) {
+        return postElement.id.replace('post_', '');
+    }
+
+    // Method 3: From URL if we're on a comment page
+    if (window.location.pathname.includes('/comments/')) {
+        const match = window.location.pathname.match(/\/comments\/([^\/]+)/);
+        if (match) return match[1];
+    }
+
+    // Method 4: Try to extract from any link in the post
+    const allLinks = postElement.querySelectorAll('a');
+    for (const link of allLinks) {
+        const match = link.href.match(/\/comments\/([^\/]+)/);
+        if (match) return match[1];
+    }
+
+    return null;
+}
+// Clean up any thumbnail-related artifacts that might persist from posts list pages
+function cleanupThumbnailArtifacts(postElement) {
+    // Remove any thumbnail links that shouldn't exist on comments pages
+    const thumbnailLinks = postElement.querySelectorAll('.video-thumbnail-link, .image-thumbnail-link');
+    thumbnailLinks.forEach(link => link.remove());
+
+    // Clean up video thumbnail data attributes
+    const videos = postElement.querySelectorAll('.post_media_video[data-original-poster]');
+    videos.forEach(video => {
+        video.removeAttribute('data-original-poster');
+        video.removeAttribute('data-original-src');
+        video.removeAttribute('data-original-controls');
+    });
+
+    // Clean up image thumbnail data attributes
+    const images = postElement.querySelectorAll('.post_media_image[data-original-href]');
+    images.forEach(image => {
+        image.removeAttribute('data-original-href');
+    });
+
+    // Clean up hidden media containers
+    const hiddenMedia = postElement.querySelectorAll('[data-hidden-for-thumbnail]');
+    hiddenMedia.forEach(media => {
+        media.style.display = '';
+        media.removeAttribute('data-hidden-for-thumbnail');
+    });
+}
     // ============================================================================
     // POST COLLAPSER MODULE
     // ============================================================================
@@ -2540,6 +3199,59 @@ aside {
             return postElement.querySelector('.post_media_video') !== null;
         }
 
+// UNIFIED COLLAPSE FUNCTION - All collapse operations should use this
+        function collapsePostUnified(postElement, postId, collapsedPosts, isCommentPage, options = {}) {
+            const { skipAnimation = false, skipMetadata = false } = options;
+
+            // Apply collapsed visual state
+            postElement.classList.add('redlib-collapsed');
+
+            // Extract metadata unless explicitly skipped
+            let postData = {
+                collapsed: true,
+                timestamp: Date.now()
+            };
+
+            if (!skipMetadata) {
+                const metadata = window.extractPostMetadata(postElement);
+
+                postData = {
+                    collapsed: true,
+                    timestamp: Date.now(),
+                    title: metadata.title,
+                    subreddit: metadata.subreddit,
+                    author: metadata.author,
+                    commentsUrl: metadata.commentsUrl,
+                    score: metadata.score
+                };
+            }
+
+            // Save to storage
+            collapsedPosts[postId] = postData;
+            saveCollapsedPosts(collapsedPosts);
+
+            // Apply visual changes
+            if (!isCommentPage) {
+                convertVideoToThumbnail(postElement);
+                convertImageToThumbnail(postElement);
+            }
+
+            // Hide collapsible elements
+            const collapsibleElements = postElement.querySelectorAll('.redlib-collapsible');
+            collapsibleElements.forEach(el => {
+                el.style.display = 'none';
+                el.style.height = '0';
+                el.style.overflow = 'hidden';
+            });
+
+            // Update button
+            const button = postElement.querySelector('.redlib-collapse-btn');
+            if (button) {
+                button.innerHTML = '↶';
+                button.title = 'Unhide post';
+            }
+        }
+
         function togglePost(postElement, postId) {
             const isCollapsed = postElement.classList.contains('redlib-collapsed');
             const collapsedPosts = getCollapsedPosts();
@@ -2644,34 +3356,7 @@ aside {
         }
 
         function applyCollapseStateDirectly(postElement, postId, collapsedPosts, isCommentPage) {
-            // Collapse post
-            postElement.classList.add('redlib-collapsed');
-            collapsedPosts[postId] = {
-                collapsed: true,
-                timestamp: Date.now()
-            };
-
-            // Only convert to thumbnails on post listing pages, not comment pages
-            if (!isCommentPage) {
-                convertVideoToThumbnail(postElement);
-                convertImageToThumbnail(postElement);
-            }
-
-            // Hide all collapsible elements
-            const collapsibleElements = postElement.querySelectorAll('.redlib-collapsible');
-            collapsibleElements.forEach(el => {
-                el.style.display = 'none';
-                el.style.height = '0';
-                el.style.overflow = 'hidden';
-            });
-
-            const button = postElement.querySelector('.redlib-collapse-btn');
-            if (button) {
-                button.innerHTML = '↶';
-                button.title = 'Unhide post';
-            }
-
-            saveCollapsedPosts(collapsedPosts);
+            collapsePostUnified(postElement, postId, collapsedPosts, isCommentPage);
         }
 
         // Add hover effects to collapsed posts
@@ -2961,11 +3646,22 @@ aside {
                 }, 300);
             });
 
-            collapsedPosts[postId] = {
-                collapsed: true,
-                timestamp: Date.now()
-            };
-            saveCollapsedPosts(collapsedPosts);
+            // Use unified collapse function for consistent metadata
+            collapsePostUnified(postElement, postId, collapsedPosts, isCommentPage);
+
+            // Debug metadata extraction
+            console.log(`[POST COLLAPSE DEBUG] Post ID: ${postId}`);
+            console.log(`[POST COLLAPSE DEBUG] Title: "${title}"`);
+            console.log(`[POST COLLAPSE DEBUG] Subreddit: "${subreddit}"`);
+            console.log(`[POST COLLAPSE DEBUG] Author: "${author}"`);
+            console.log(`[POST COLLAPSE DEBUG] Score: "${score}"`);
+            console.log(`[POST COLLAPSE DEBUG] Comments URL: "${commentsUrl}"`);
+            console.log(`[POST COLLAPSE DEBUG] Post element:`, postElement);
+
+
+
+            // Debug what was actually saved
+            console.log(`[POST COLLAPSE DEBUG] Saved data:`, collapsedPosts[postId]);
         }
 
         function convertVideoToThumbnail(postElement) {
@@ -3198,8 +3894,8 @@ aside {
 
             const isCommentPage = window.location.pathname.includes('/comments/');
 
-            // Only add collapse button on post listing pages, not comment pages
-            if (!isCommentPage && !postElement.querySelector('.redlib-collapse-btn')) {
+            // Add collapse button on both post listing pages and comment pages for highlighted posts
+            if ((!isCommentPage || postElement.classList.contains('highlighted')) && !postElement.querySelector('.redlib-collapse-btn')) {
                 markCollapsibleElements(postElement);
 
                 const postHeader = postElement.querySelector('.post_header');
@@ -3245,8 +3941,8 @@ aside {
                     }
 
                 }
-            } else if (isCommentPage) {
-                // On comment pages, just mark collapsible elements but don't add manual controls
+            } else if (isCommentPage && !postElement.classList.contains('highlighted')) {
+                // On comment pages, mark collapsible elements for non-highlighted posts but don't add manual controls
                 markCollapsibleElements(postElement);
             }
         }
@@ -3303,7 +3999,11 @@ aside {
                         el.style.overflow = 'hidden';
                     });
                     const button = postElement.querySelector('.redlib-collapse-btn');
-                    if (button) button.textContent = '[+]';
+                    if (button) {
+                        // Don't change the hide/unhide button state during visual toggle
+                        // The button state should only be changed by permanent hide/unhide operations
+                        // Keep the current button state unchanged
+                    }
                 } else {
                     postElement.classList.remove('redlib-collapsed');
 
@@ -3319,9 +4019,78 @@ aside {
                         el.style.overflow = '';
                     });
                     const button = postElement.querySelector('.redlib-collapse-btn');
-                    if (button) button.textContent = '[-]';
+                    if (button) {
+                        // Maintain hide/unhide button state based on permanent hidden status, not visual sticky state
+                        const hiddenPostsData = GM_getValue('redlib_collapsed_posts', '{}');
+                        const hiddenPosts = JSON.parse(hiddenPostsData || '{}');
+                        const postId = extractPostId(postElement);
+                        const isActuallyHidden = hiddenPosts[postId] && (hiddenPosts[postId] === true || (hiddenPosts[postId].collapsed && hiddenPosts[postId].timestamp));
+
+                        if (isActuallyHidden) {
+                            button.innerHTML = '↶';
+                            button.title = 'Unhide post';
+                        } else {
+                            button.innerHTML = '✕';
+                            button.title = 'Hide post';
+                        }
+                    }
                 }
                 forceLayoutRecalculation();
+            };
+
+// Permanent hide/unhide functionality for sticky mode hide button
+            const permanentTogglePost = (postElement, shouldHide) => {
+                const postId = getPostId();
+                if (!postId) return;
+
+                const collapsedPosts = getCollapsedPosts();
+
+                if (shouldHide) {
+                    // Permanently hide the post
+                    const metadata = extractPostMetadata(postElement);
+                    collapsedPosts[postId] = {
+                        collapsed: true,
+                        timestamp: Date.now(),
+                        title: metadata.title,
+                        subreddit: metadata.subreddit,
+                        author: metadata.author,
+                        commentsUrl: metadata.commentsUrl,
+                        score: metadata.score
+                    };
+                    saveCollapsedPosts(collapsedPosts);
+
+                    // In sticky mode, DON'T call visualTogglePost - let hover behavior handle visual state
+                    // Just update the CSS class to match permanent state
+                    postElement.classList.add('redlib-collapsed');
+
+                    // Update button to show unhide
+                    const button = postElement.querySelector('.redlib-collapse-btn');
+                    if (button) {
+                        button.innerHTML = '↶';
+                        button.title = 'Unhide post';
+                    }
+                } else {
+                    // Permanently unhide the post
+                    delete collapsedPosts[postId];
+                    saveCollapsedPosts(collapsedPosts);
+
+                    // In sticky mode, DON'T call visualTogglePost - let hover behavior handle visual state
+                    // Just update the CSS class to match permanent state
+                    postElement.classList.remove('redlib-collapsed');
+
+                    // Update button to show hide
+                    const button = postElement.querySelector('.redlib-collapse-btn');
+                    if (button) {
+                        button.innerHTML = '✕';
+                        button.title = 'Hide post';
+                    }
+                }
+
+                // Refresh the hidden posts table if settings overlay is open
+                const settingsOverlay = document.querySelector('.redlib-settings-overlay');
+                if (settingsOverlay && settingsOverlay.style.display === 'block') {
+                    populateHiddenPosts();
+                }
             };
 
             const handleScroll = () => {
@@ -3441,8 +4210,18 @@ aside {
                 if (!isInStickyMode) return;
 
                 isHovering = true;
-                if (post.classList.contains('redlib-collapsed')) {
-                    visualTogglePost(post, false);
+
+                // Only check permanent hidden state, ignore visual CSS class
+                const postId = getPostId();
+                if (postId) {
+                    const hiddenPostsData = GM_getValue('redlib_collapsed_posts', '{}');
+                    const hiddenPosts = JSON.parse(hiddenPostsData || '{}');
+                    const isPermanentlyHidden = hiddenPosts[postId] && (hiddenPosts[postId] === true || (hiddenPosts[postId].collapsed && hiddenPosts[postId].timestamp));
+
+                    // If permanently hidden, expand visually on hover
+                    if (isPermanentlyHidden) {
+                        visualTogglePost(post, false);
+                    }
                 }
 
                 const postBody = post.querySelector('.post_body');
@@ -3463,7 +4242,18 @@ aside {
 
                 setTimeout(() => {
                     if (!isHovering && isInStickyMode) {
-                        visualTogglePost(post, true);
+                        // Only check permanent hidden state, ignore visual CSS class
+                        const postId = getPostId();
+                        if (postId) {
+                            const hiddenPostsData = GM_getValue('redlib_collapsed_posts', '{}');
+                            const hiddenPosts = JSON.parse(hiddenPostsData || '{}');
+                            const isPermanentlyHidden = hiddenPosts[postId] && (hiddenPosts[postId] === true || (hiddenPosts[postId].collapsed && hiddenPosts[postId].timestamp));
+
+                            // If permanently hidden, collapse visually on mouse leave
+                            if (isPermanentlyHidden) {
+                                visualTogglePost(post, true);
+                            }
+                        }
                     }
                 }, 100);
             };
@@ -3589,7 +4379,8 @@ aside {
             convertVideoToThumbnail: convertVideoToThumbnail,
             convertImageToThumbnail: convertImageToThumbnail,
             restoreVideoFromThumbnail: restoreVideoFromThumbnail,
-            restoreImageFromThumbnail: restoreImageFromThumbnail
+            restoreImageFromThumbnail: restoreImageFromThumbnail,
+            extractPostMetadata: extractPostMetadata  // Make it accessible
         };
     })();
 
@@ -4532,7 +5323,7 @@ function getChildCount(comment) {
             const directChildren = comment.querySelectorAll(':scope > .comment_right > .replies > .comment');
             return directChildren.length;
         }
-        
+
         function handleCustomToggle(comment, button) {
             const isExpanded = button.getAttribute('data-expanded') === 'true';
             const commentDetails = comment.querySelector('.comment_right');
@@ -4726,7 +5517,7 @@ function removeDuplicateMoreRepliesLinks(parentContainer) {
                 }
             });
         }
-        
+
         function loadMoreComments(link) {
             const url = link.href;
             const parentBlockquote = link.closest('blockquote.replies');
@@ -4769,35 +5560,35 @@ function removeDuplicateMoreRepliesLinks(parentContainer) {
                     // Check if existing siblings are expanded before processing new comments
                     const existingSiblings = parentBlockquote.querySelectorAll(':scope > div.comment');
                     let shouldExpandNewComments = false;
-                    
+
                     // Only check if there are existing siblings
                     if (existingSiblings.length > 0) {
                         let expandedCount = 0;
-                        
+
                         // Check each existing sibling's expand state
                         existingSiblings.forEach(sibling => {
                             const commentRight = sibling.querySelector('.comment_right');
                             const expandButton = sibling.querySelector('.expand-children');
-                            
+
                             // Check if expanded via native details (open attribute) OR custom button
                             const isNativeExpanded = commentRight && commentRight.hasAttribute('open');
                             const isCustomExpanded = expandButton && expandButton.getAttribute('data-expanded') === 'true';
-                            
+
                             if (isNativeExpanded || isCustomExpanded) {
                                 expandedCount++;
                             }
                         });
-                        
+
                         // If ALL existing siblings are expanded, expand new ones too
                         shouldExpandNewComments = (expandedCount === existingSiblings.length);
                     }
 
                     newComments.forEach((comment) => {
                         const clonedComment = comment.cloneNode(true);
-                        
+
                         // Always initialize the comment first (this will collapse it)
                         initializeNewComment(clonedComment);
-                        
+
                         // If we should expand, do it after initialization
                         if (shouldExpandNewComments) {
                             const commentRight = clonedComment.querySelector('.comment_right');
@@ -4805,7 +5596,7 @@ function removeDuplicateMoreRepliesLinks(parentContainer) {
                                 commentRight.setAttribute('open', '');
                             }
                         }
-                        
+
                         parentBlockquote.appendChild(clonedComment);
                     });
 
@@ -4813,7 +5604,7 @@ function removeDuplicateMoreRepliesLinks(parentContainer) {
 
                     // Remove duplicate "more replies" links from the entire parent container
                     removeDuplicateMoreRepliesLinks(parentBlockquote);
-                    
+
                     // Attach listeners to any new "more replies" links that were added with the new comments
                     const newlyAddedLinks = parentBlockquote.querySelectorAll('a.deeper_replies:not([data-listener-attached])');
                     newlyAddedLinks.forEach(link => {
@@ -6314,11 +7105,11 @@ function createPopup() {
 popup.className = '_redlib_popup';
 popup.style.position = 'fixed';  // Override the absolute positioning from CSS
     document.body.appendChild(popup);
-    
+
     // Add event listeners to popup
     popup.addEventListener('mouseenter', clearHideTimeout);
     popup.addEventListener('mouseleave', hidePopupDelayed);
-    
+
     // Add click handler for "show next parent" header
     popup.addEventListener('click', (event) => {
         if (event.target.classList.contains('next_comment')) {
@@ -6328,53 +7119,64 @@ popup.style.position = 'fixed';  // Override the absolute positioning from CSS
                 // Get the grandparent's summary and body
                 const grandParentSummary = parentComment.querySelector('summary.comment_data');
                 const grandParentBody = parentComment.querySelector('.comment_body');
-                
+
                 if (grandParentSummary && grandParentBody) {
                     // Check if grandparent has its own parent
                     const greatGrandParent = findParentComment(parentComment);
-                    
+
                     // Clone the grandparent content to clean it
                     const grandSummaryClone = grandParentSummary.cloneNode(true);
                     const grandBodyClone = grandParentBody.cloneNode(true);
-                    
+
                     // Remove expand-children spans from grandparent summary
                     const grandSummaryExpandChildren = grandSummaryClone.querySelectorAll('.expand-children');
                     grandSummaryExpandChildren.forEach(span => span.remove());
-                    
+
                     // Remove parent-comment-link spans from grandparent summary
                     const grandSummaryParentLinks = grandSummaryClone.querySelectorAll('.parent-comment-link');
                     grandSummaryParentLinks.forEach(span => span.remove());
-                    
+
 // Remove parent-comment-link spans from grandparent body
 const grandBodyParentLinks = grandBodyClone.querySelectorAll('.parent-comment-link');
 grandBodyParentLinks.forEach(span => span.remove());
-                    
+
                     // Build new content with grandparent stacked at the top
                     let newContent = '';
-                    
+
                     // Add next parent header for great-grandparent if it exists
                     if (greatGrandParent) {
                         newContent += '<div class="next_comment" data-parent-id="' + greatGrandParent.id + '">show next parent</div>';
                     }
-                    
+
 // Add grandparent content at the top using formatted structure
 newContent += formatCommentData(grandParentSummary, grandParentBody);
-                    
+
                     // Get existing content (remove the old header first)
                     const existingHeader = popup.querySelector('.next_comment');
                     if (existingHeader) {
                         existingHeader.remove();
                     }
-                    
+
                     // Add existing content below
                     newContent += popup.innerHTML;
-                    
+
                     popup.innerHTML = newContent;
+
+                    // Re-apply positioning constraints after content change
+                    positionPopup(currentLink);
+
+// Re-attach close button functionality after content update
+const closeBtn = popup.querySelector('.popup-close');
+if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+        hidePopup();
+    });
+}
                 }
             }
         }
     });
-    
+
     // Add close button
     const closeBtn = document.createElement('div');
     closeBtn.className = 'popup-close';
@@ -6426,26 +7228,44 @@ commentHTML += '<span class="comment_points">' + score + ' ' + scoreText + '</sp
 
 function addStyles() {
     const style = document.createElement('style');
-    style.textContent = `
-        .parent-comment-link {
-            color: var(--accent) !important;
-            text-decoration: underline;
-            cursor: pointer;
-            font-size: 12px !important;
-            margin-left: 8px;
-        }
+style.textContent = `
+    /* Style parent comment links in comment body */
+    .parent-comment-link {
+        color: var(--accent) !important;
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 11px !important;
+        white-space: nowrap;
+        display: inline-block !important;
+        margin-top: 8px !important;
+        float: right !important;
+        clear: both !important;
+        opacity: 0.7 !important;
+    }
 
-        .parent-comment-link:hover {
-            opacity: 0.8;
-        }
-    `;
+    .parent-comment-link:hover {
+        opacity: 1 !important;
+    }
+
+    .parent-comment-link:before {
+        content: "↗ " !important;
+        font-size: 10px !important;
+    }
+
+    /* Popup styling with container width constraints */
+    ._redlib_popup {
+        box-sizing: border-box !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+`;
     document.head.appendChild(style);
 }
 
 function addParentCommentLinks() {
     // Find all comments that are not top-level
     const childComments = document.querySelectorAll('.thread .comment .replies .comment');
-    
+
     childComments.forEach((comment) => {
         // Skip if already has parent link
         if (comment.querySelector('.parent-comment-link')) {
@@ -6454,22 +7274,22 @@ function addParentCommentLinks() {
 
         // Find the parent comment
         const parentComment = findParentComment(comment);
-        
+
         if (!parentComment) {
             return;
         }
 
-        // Add parent link to the comment summary
-        const summary = comment.querySelector('.comment_data');
-        
-        if (summary) {
-            const parentLink = document.createElement('span');
+        // Add parent link to the comment body instead of metadata
+        const commentBody = comment.querySelector('.comment_body');
+
+        if (commentBody) {
+            const parentLink = document.createElement('div');
             parentLink.className = 'parent-comment-link';
             parentLink.textContent = 'parent';
             parentLink.setAttribute('data-parent-id', parentComment.id);
-            
-            // Add to the end of the summary
-            summary.appendChild(parentLink);
+
+            // Append parent link to the end of the comment body
+            commentBody.appendChild(parentLink);
         }
     });
 }
@@ -6477,19 +7297,19 @@ function addParentCommentLinks() {
         function findParentComment(comment) {
     // Navigate up the DOM to find the parent comment
     const parentReplies = comment.parentElement; // .replies
-    
+
     if (!parentReplies || !parentReplies.classList.contains('replies')) {
         return null;
     }
 
     const parentComment = parentReplies.parentElement; // .comment_right
-    
+
     if (!parentComment) {
         return null;
     }
 
     const actualParentComment = parentComment.parentElement; // .comment
-    
+
     if (!actualParentComment || !actualParentComment.classList.contains('comment')) {
         return null;
     }
@@ -6516,27 +7336,27 @@ function showPopup(link, parentComment) {
 
     // Check if this parent has its own parent for the "show next parent" header
     const grandParent = findParentComment(parentComment);
-    
+
     // Clone the summary and body to clean them without affecting the original
     const summaryClone = parentSummary.cloneNode(true);
     const bodyClone = parentBody.cloneNode(true);
-    
+
     // Remove expand-children spans from summary
     const summaryExpandChildren = summaryClone.querySelectorAll('.expand-children');
     summaryExpandChildren.forEach(span => span.remove());
-    
+
     // Remove parent-comment-link spans from summary
     const summaryParentLinks = summaryClone.querySelectorAll('.parent-comment-link');
     summaryParentLinks.forEach(span => span.remove());
-    
+
     // Remove expand-children spans from body
     const bodyExpandChildren = bodyClone.querySelectorAll('.expand-children');
     bodyExpandChildren.forEach(span => span.remove());
-    
+
     // Remove parent-comment-link spans from body
     const bodyParentLinks = bodyClone.querySelectorAll('.parent-comment-link');
     bodyParentLinks.forEach(span => span.remove());
-    
+
 // Build popup content using exact HoverComments structure
 let popupHTML = '';
 
@@ -6578,36 +7398,57 @@ function positionPopup(link) {
     if (!popup || !link) return;
 
     const linkRect = link.getBoundingClientRect();
+
+    // Find the top-level comment container to constrain popup width
+    const topLevelComment = link.closest('.thread > .comment') ||
+                           link.closest('.comment:not(.comment .comment)') ||
+                           document.querySelector('.thread .comment');
+
+    let containerRect;
+    if (topLevelComment) {
+        containerRect = topLevelComment.getBoundingClientRect();
+    } else {
+        // Fallback to a reasonable default width
+        containerRect = {
+            left: 20,
+            right: window.innerWidth - 20,
+            width: window.innerWidth - 40
+        };
+    }
+
     const viewport = {
         width: window.innerWidth,
         height: window.innerHeight
     };
 
-    // Position directly below the link
-    let left = linkRect.left;
+    // Position directly below the link, but constrain to container width
+    let left = Math.max(containerRect.left, linkRect.left);
     let top = linkRect.bottom + 5;
 
     // Get popup dimensions after content is set
-    popup.style.visibility = 'hidden';
     popup.style.display = 'block';
-    popup.style.position = 'fixed';  // Force fixed positioning like hover comments
+    popup.style.visibility = 'hidden';
+
+    // Set max-width to container width before measuring
+    popup.style.maxWidth = containerRect.width + 'px';
+
     const popupRect = popup.getBoundingClientRect();
     popup.style.visibility = 'visible';
 
-    // Adjust horizontal position if popup would go off-screen
-    if (left + popupRect.width > viewport.width - 20) {
-        left = viewport.width - popupRect.width - 20;
+    // Adjust horizontal position to stay within container bounds
+    if (left + popupRect.width > containerRect.right) {
+        left = containerRect.right - popupRect.width;
     }
-    if (left < 20) {
-        left = 20;
+    if (left < containerRect.left) {
+        left = containerRect.left;
     }
 
-    // Adjust vertical position if popup would go off-screen
-    if (top + popupRect.height > viewport.height - 20) {
+    // Adjust vertical position if popup would go off screen
+    if (top + popupRect.height > viewport.height - 10) {
         top = linkRect.top - popupRect.height - 5;
     }
-    if (top < 20) {
-        top = 20;
+    if (top < 10) {
+        top = 10;
     }
 
     popup.style.left = left + 'px';
@@ -6655,7 +7496,7 @@ function handleMouseLeave(event) {
 
 function bindEvents() {
     console.log('[Parent Comment Hover DEBUG] Binding events...');
-    
+
     // Use event delegation for dynamically added links
     document.addEventListener('mouseover', (event) => {
         if (event.target && event.target.classList && event.target.classList.contains('parent-comment-link')) {
@@ -6670,7 +7511,7 @@ function bindEvents() {
             handleMouseLeave(event);
         }
     });
-    
+
     console.log('[Parent Comment Hover DEBUG] Events bound successfully');
 }
 
@@ -6678,7 +7519,7 @@ function init() {
     console.log('[Parent Comment Hover DEBUG] Starting init...');
     console.log('[Parent Comment Hover DEBUG] Current pathname:', window.location.pathname);
     console.log('[Parent Comment Hover DEBUG] Includes /comments/:', window.location.pathname.includes('/comments/'));
-    
+
     // Only initialize on comment pages
     if (!window.location.pathname.includes('/comments/')) {
         console.log('[Parent Comment Hover DEBUG] Not a comment page, returning');
@@ -6688,7 +7529,7 @@ function init() {
     console.log('[Parent Comment Hover DEBUG] Checking setting...');
     const settingEnabled = SettingsManager.getSetting('parentCommentHover', 'enabled');
     console.log('[Parent Comment Hover DEBUG] Setting enabled:', settingEnabled);
-    
+
     // Check if setting is enabled
     if (!settingEnabled) {
         console.log('[Parent Comment Hover DEBUG] Setting disabled, returning');
@@ -6696,7 +7537,7 @@ function init() {
     }
 
     console.log('[Parent Comment Hover DEBUG] Initializing components...');
-    
+
     addStyles();  // ADD this back for parent link styling
     createPopup();
     bindEvents();
@@ -6721,7 +7562,7 @@ function init() {
             init: init
         };
     })();
-    
+
     // ============================================================================
     // SETTINGS MANAGER MODULE
     // ============================================================================
@@ -7137,7 +7978,7 @@ function init() {
           <span class="redlib-settings-slider"></span>
         </label>
       </div>
-      
+
       <div class="redlib-settings-option">
         <div class="redlib-settings-option-info">
           <div class="redlib-settings-option-title">
@@ -7175,7 +8016,7 @@ function init() {
           <span class="redlib-settings-slider"></span>
         </label>
       </div>
-      
+
       <div class="redlib-settings-option">
         <div class="redlib-settings-option-info">
           <div class="redlib-settings-option-title">Comment Styling</div>
@@ -7193,6 +8034,80 @@ function init() {
           <span class="redlib-settings-slider"></span>
         </label>
       </div>
+    </div>
+
+    <div class="redlib-settings-section">
+    <h3 class="redlib-settings-section-title">Saved Posts</h3>
+
+    <details class="redlib-saved-posts-collapsible" id="saved-posts-section">
+        <summary class="redlib-saved-posts-summary">
+            <span id="saved-posts-count">0</span> saved posts
+        </summary>
+        <div class="redlib-saved-posts-content">
+            <div class="redlib-saved-posts-table-container">
+<table class="redlib-saved-posts-table">
+    <colgroup>
+        <col style="width: 40%;">
+        <col style="width: 12%;">
+        <col style="width: 9%;">
+        <col style="width: 13%;">
+        <col style="width: 13%;">
+        <col style="width: 13%;">
+    </colgroup>
+    <thead>
+        <tr>
+            <th class="sortable" data-sort="title">Title</th>
+            <th class="sortable" data-sort="subreddit">Subreddit</th>
+            <th class="sortable" data-sort="author">Author</th>
+            <th class="sortable" data-sort="score">Pts</th>
+            <th class="sortable" data-sort="date">Date</th>
+            <th>×</th>
+        </tr>
+    </thead>
+    <tbody id="saved-posts-table-body">
+        <!-- Saved posts will be populated here -->
+    </tbody>
+</table>
+            </div>
+        </div>
+    </details>
+</div>
+
+    <div class="redlib-settings-section">
+        <h3 class="redlib-settings-section-title">Hidden Posts</h3>
+
+        <details class="redlib-hidden-posts-collapsible" id="hidden-posts-section">
+            <summary class="redlib-hidden-posts-summary">
+                <span id="hidden-posts-count">0</span> hidden posts
+            </summary>
+            <div class="redlib-hidden-posts-content">
+                <div class="redlib-hidden-posts-table-container">
+<table class="redlib-hidden-posts-table">
+    <colgroup>
+        <col style="width: 40%;">
+        <col style="width: 12%;">
+        <col style="width: 9%;">
+        <col style="width: 13%;">
+        <col style="width: 13%;">
+        <col style="width: 13%;">
+    </colgroup>
+    <thead>
+        <tr>
+            <th class="sortable" data-sort="title">Title</th>
+            <th class="sortable" data-sort="subreddit">Subreddit</th>
+            <th class="sortable" data-sort="author">Author</th>
+            <th class="sortable" data-sort="score">Pts</th>
+            <th class="sortable" data-sort="date">Date</th>
+            <th>×</th>
+        </tr>
+    </thead>
+    <tbody id="hidden-posts-table-body">
+        <!-- Hidden posts will be populated here -->
+    </tbody>
+</table>
+                </div>
+            </div>
+        </details>
     </div>
 
     <div class="redlib-settings-section">
@@ -7504,6 +8419,14 @@ function init() {
                 }
             });
 
+            // Handle hidden posts buttons
+            overlay.addEventListener('click', (e) => {
+                if (e.target.classList.contains('redlib-hidden-posts-unhide')) {
+                    const postId = e.target.getAttribute('data-post-id');
+                    unhidePost(postId);
+                }
+            });
+
             // Add toggle event listeners
             const toggles = overlay.querySelectorAll('.redlib-settings-toggle input:not([disabled])');
             toggles.forEach(toggle => {
@@ -7598,6 +8521,14 @@ function init() {
                 setTimeout(() => {
                     addHeaderButtonListeners();
                 }, 100);
+
+// Update hidden posts table
+setTimeout(() => {
+    populateHiddenPosts();
+    setupHiddenPostsTableSorting();
+    populateSavedPosts();
+    setupSavedPostsTableSorting();
+}, 150);
 
             }
 
@@ -7752,13 +8683,858 @@ function updateExportString() {
     }
 }
 
+function populateHiddenPosts() {
+            const hiddenPostsData = GM_getValue('redlib_collapsed_posts', '{}');
+            const hiddenPosts = JSON.parse(hiddenPostsData || '{}');
+
+            // Filter for only hidden posts
+            const hiddenPostsList = Object.entries(hiddenPosts).filter(([postId, post]) => {
+                return post && post.collapsed === true;
+            });
+
+            const countElement = document.getElementById('hidden-posts-count');
+            const tableBody = document.getElementById('hidden-posts-table-body');
+
+            if (countElement) {
+                countElement.textContent = hiddenPostsList.length;
+            }
+
+            if (!tableBody) return;
+
+            if (hiddenPostsList.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="redlib-hidden-posts-empty">No hidden posts</td></tr>';
+                return;
+            }
+
+// Apply current sort or default to date
+const sortSettings = window.hiddenPostsSort || { column: 'date', direction: 'desc' };
+hiddenPostsList.sort((a, b) => {
+    let valueA, valueB;
+
+    switch(sortSettings.column) {
+        case 'title':
+            valueA = (a[1].title || '').toLowerCase();
+            valueB = (b[1].title || '').toLowerCase();
+            break;
+        case 'subreddit':
+            valueA = (a[1].subreddit || '').toLowerCase();
+            valueB = (b[1].subreddit || '').toLowerCase();
+            break;
+        case 'author':
+            valueA = (a[1].author || '').toLowerCase();
+            valueB = (b[1].author || '').toLowerCase();
+            break;
+        case 'score':
+            valueA = parseInt(a[1].score) || 0;
+            valueB = parseInt(b[1].score) || 0;
+            break;
+        case 'date':
+        default:
+            valueA = a[1].timestamp || 0;
+            valueB = b[1].timestamp || 0;
+    }
+
+    let result;
+    if (typeof valueA === 'string') {
+        result = valueA.localeCompare(valueB);
+    } else {
+        result = valueA - valueB;
+    }
+
+    return sortSettings.direction === 'desc' ? -result : result;
+});
+
+            tableBody.innerHTML = '';
+
+hiddenPostsList.forEach(([postId, post]) => {
+    const row = document.createElement('tr');
+
+    // Check if this is the current post page
+    const urlMatch = window.location.pathname.match(/\/comments\/([^\/]+)/);
+    const currentPostId = urlMatch ? urlMatch[1] : null;
+
+    if (currentPostId === postId) {
+        row.classList.add('current-post-row');
+    }
+
+const title = post.title || 'Unknown Title';
+const subreddit = post.subreddit || 'Unknown';
+const author = post.author || 'Unknown';
+const score = post.score || '0';
+const commentsUrl = post.commentsUrl || '#';
+const dateHidden = post.timestamp ?
+    new Date(post.timestamp).toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: '2-digit'
+    }) : 'Unknown';
+
+// Create full timestamp for tooltip
+const fullTimestamp = post.timestamp ?
+    new Date(post.timestamp).toISOString().replace('T', ' ').substring(0, 19) : 'Unknown';
+
+// Clean the data - remove r/ and u/ prefixes if they exist
+const cleanSubreddit = subreddit.startsWith('r/') ? subreddit.substring(2) : subreddit;
+const cleanAuthor = author.startsWith('u/') ? author.substring(2) : author;
+
+// Clean up score - remove "Upvotes" text and handle different formats
+const cleanScore = score.replace(/\s*Upvotes?/i, '').trim();
+
+// Get current instance URL for links
+const currentHost = window.location.origin;
+
+// Only create links if we have valid data (not "Unknown" or "#") - use cleaned values
+const hasValidTitle = commentsUrl !== '#';
+const hasValidSubreddit = cleanSubreddit !== 'Unknown';
+const hasValidAuthor = cleanAuthor !== 'Unknown';
+
+// Create title cell - link only if we have valid title and URL
+let titleCell;
+if (hasValidTitle) {
+    titleCell = `<a href="${commentsUrl}" class="post-title-link" title="${title}" target="_blank">${title}</a>`;
+} else {
+    // For unknown titles, link to the post ID page so user can visit and extract metadata
+    const postIdUrl = `${currentHost}/comments/${postId}`;
+    titleCell = `<a href="${postIdUrl}" class="post-title-link" title="Visit post to extract metadata" target="_blank">${title}</a>`;
+}
+
+// Create subreddit cell - remove r/ prefix from link text
+let subredditCell;
+if (hasValidSubreddit) {
+    subredditCell = `<a href="${currentHost}/r/${cleanSubreddit}" class="post-subreddit-link" target="_blank">${cleanSubreddit}</a>`;
+} else {
+    subredditCell = `<span>${cleanSubreddit}</span>`;
+}
+
+// Create author cell - remove u/ prefix from link text
+let authorCell;
+if (hasValidAuthor) {
+    authorCell = `<a href="${currentHost}/u/${cleanAuthor}" class="post-author-link" target="_blank">${cleanAuthor}</a>`;
+} else {
+    authorCell = `<span>${cleanAuthor}</span>`;
+}
+
+    row.innerHTML = `
+        <td class="post-title">${titleCell}</td>
+        <td class="post-subreddit">${subredditCell}</td>
+        <td class="post-author">${authorCell}</td>
+        <td class="post-score">${cleanScore}</td>
+        <td class="post-date" title="${fullTimestamp}">${dateHidden}</td>
+        <td class="post-actions">
+            <button class="redlib-hidden-posts-unhide" data-post-id="${postId}" title="Unhide post">×</button>
+        </td>
+    `;
+
+    tableBody.appendChild(row);
+});
+
+            // Add click handlers for unhide buttons
+            document.querySelectorAll('.redlib-hidden-posts-unhide').forEach(button => {
+                button.addEventListener('click', function() {
+                    const postId = this.getAttribute('data-post-id');
+                    unhidePost(postId);
+                });
+            });
+// Set initial sort indicator
+const initialSortSettings = window.hiddenPostsSort || { column: 'date', direction: 'desc' };
+const activeHeader = document.querySelector(`[data-sort="${initialSortSettings.column}"]`);
+if (activeHeader) {
+    // Clear all sort indicators first
+    document.querySelectorAll('.redlib-hidden-posts-table th').forEach(th => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+    });
+    activeHeader.classList.add(initialSortSettings.direction === 'asc' ? 'sorted-asc' : 'sorted-desc');
+}
+        }
+
+        function setupHiddenPostsTableSorting() {
+    // Use event delegation to handle clicks on sortable headers
+    const tableContainer = document.querySelector('.redlib-hidden-posts-table-container');
+    if (!tableContainer) return;
+
+    // Remove any existing event listeners by cloning the container
+    const newContainer = tableContainer.cloneNode(true);
+    tableContainer.parentNode.replaceChild(newContainer, tableContainer);
+
+    // Add single delegated event listener
+    newContainer.addEventListener('click', function(event) {
+        const header = event.target.closest('th.sortable');
+        if (!header) return;
+
+        const sortColumn = header.getAttribute('data-sort');
+        const activeSortSettings = window.hiddenPostsSort || { column: 'date', direction: 'desc' };
+
+        // Toggle direction if same column, otherwise default to ascending
+        let newDirection = 'asc';
+        if (activeSortSettings.column === sortColumn && activeSortSettings.direction === 'asc') {
+            newDirection = 'desc';
+        }
+
+        window.hiddenPostsSort = { column: sortColumn, direction: newDirection };
+
+        // Update header styles
+        newContainer.querySelectorAll('th').forEach(th => {
+            th.classList.remove('sorted-asc', 'sorted-desc');
+        });
+        header.classList.add(newDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+
+        // Re-populate table with new sort
+        populateHiddenPosts();
+
+        // Re-apply sort indicator after repopulation
+        setTimeout(() => {
+            const updatedHeader = newContainer.querySelector(`[data-sort="${sortColumn}"]`);
+            if (updatedHeader) {
+                newContainer.querySelectorAll('th').forEach(th => {
+                    th.classList.remove('sorted-asc', 'sorted-desc');
+                });
+                updatedHeader.classList.add(newDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+            }
+        }, 10);
+    });
+}
+
+function unhidePost(postId) {
+            const hiddenPostsData = GM_getValue('redlib_collapsed_posts', '{}');
+            const hiddenPosts = JSON.parse(hiddenPostsData || '{}');
+
+            if (hiddenPosts[postId]) {
+                // Save the title before deleting the post data
+                const postTitle = hiddenPosts[postId].title || 'Unknown';
+
+                // Remove from storage
+                delete hiddenPosts[postId];
+                GM_setValue('redlib_collapsed_posts', JSON.stringify(hiddenPosts));
+
+                // Find and unhide the post on current page if it exists
+                const postElement = document.getElementById(postId);
+                if (postElement && postElement.classList.contains('redlib-collapsed')) {
+                    // Use the same expand logic as the collapse button
+                    postElement.classList.remove('redlib-collapsed');
+
+                    // Restore thumbnails to full media if on post listing page
+                    const isCommentPage = window.location.pathname.includes('/comments/');
+                    if (!isCommentPage && window.PostCollapser) {
+                        window.PostCollapser.restoreVideoFromThumbnail(postElement);
+                        window.PostCollapser.restoreImageFromThumbnail(postElement);
+                    }
+
+                    // Show all collapsible elements
+                    const collapsibleElements = postElement.querySelectorAll('.redlib-collapsible');
+                    collapsibleElements.forEach(el => {
+                        el.style.display = '';
+                        el.style.height = '';
+                        el.style.overflow = '';
+                    });
+
+                    // Update button
+                    const button = postElement.querySelector('.redlib-collapse-btn');
+                    if (button) {
+                        button.innerHTML = '✕';
+                        button.title = 'Hide post';
+                    }
+                }
+
+                // Refresh the hidden posts table
+                populateHiddenPosts();
+
+                // Show success message without refresh requirement
+//                alert(`Post "${postTitle}" has been unhidden.`);
+            }
+        }
+
+// ============================================================================
+// SAVED POSTS FUNCTIONALITY
+// ============================================================================
+function savePost(postElement) {
+    const postId = extractPostId(postElement);
+    if (!postId) return;
+
+    const savedPostsData = GM_getValue('redlib_saved_posts', '{}');
+    const savedPosts = JSON.parse(savedPostsData || '{}');
+
+    // Extract post metadata
+    const metadata = extractPostMetadata(postElement);
+
+    savedPosts[postId] = {
+        saved: true,
+        timestamp: Date.now(),
+        title: metadata.title,
+        subreddit: metadata.subreddit,
+        author: metadata.author,
+        score: metadata.score,
+        commentsUrl: metadata.commentsUrl
+    };
+
+    GM_setValue('redlib_saved_posts', JSON.stringify(savedPosts));
+
+    // Update UI
+    updatePostSaveState(postElement, true);
+    updateSaveButton(postElement, true);
+
+    console.log(`[SAVED POSTS] Saved post: ${metadata.title}`);
+}
+
+function unsavePost(postId, fromTable = false) {
+    const savedPostsData = GM_getValue('redlib_saved_posts', '{}');
+    const savedPosts = JSON.parse(savedPostsData || '{}');
+
+    const postTitle = savedPosts[postId]?.title || 'Unknown';
+
+    if (savedPosts[postId]) {
+        delete savedPosts[postId];
+        GM_setValue('redlib_saved_posts', JSON.stringify(savedPosts));
+
+        // Update UI for posts on current page
+        const postElements = document.querySelectorAll('.post');
+        postElements.forEach(postElement => {
+            const elementPostId = extractPostId(postElement);
+            if (elementPostId === postId) {
+                updatePostSaveState(postElement, false);
+                updateSaveButton(postElement, false);
+            }
+        });
+
+        if (fromTable) {
+            // Refresh the saved posts table
+            populateSavedPosts();
+        }
+
+        console.log(`[SAVED POSTS] Unsaved post: ${postTitle}`);
+    }
+}
+
+function updatePostSaveState(postElement, isSaved) {
+    if (isSaved) {
+        postElement.classList.add('redlib-saved-post');
+    } else {
+        postElement.classList.remove('redlib-saved-post');
+    }
+}
+
+function updateSaveButton(postElement, isSaved) {
+    const saveButton = postElement.querySelector('.redlib-save-btn');
+    if (saveButton) {
+        if (isSaved) {
+            saveButton.classList.add('saved');
+            saveButton.title = 'Unsave post';
+            saveButton.style.background = 'var(--accent)';
+            saveButton.style.color = 'var(--foreground)';
+            saveButton.innerHTML = '★';
+        } else {
+            saveButton.classList.remove('saved');
+            saveButton.title = 'Save post';
+            saveButton.style.background = 'var(--highlighted)';
+            saveButton.style.color = 'var(--accent)';
+            saveButton.innerHTML = '☆';
+        }
+    }
+}
+
+function populateSavedPosts() {
+    const savedPostsData = GM_getValue('redlib_saved_posts', '{}');
+    const savedPosts = JSON.parse(savedPostsData || '{}');
+
+    // Filter for only saved posts
+    const savedPostsList = Object.entries(savedPosts).filter(([postId, post]) => {
+        return post && post.saved === true;
+    });
+
+    const countElement = document.getElementById('saved-posts-count');
+    const tableBody = document.getElementById('saved-posts-table-body');
+
+    if (countElement) {
+        countElement.textContent = savedPostsList.length;
+    }
+
+    if (!tableBody) return;
+
+    if (savedPostsList.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" class="redlib-saved-posts-empty">No saved posts</td></tr>';
+        return;
+    }
+
+    // Apply current sort or default to date
+    const sortSettings = window.savedPostsSort || { column: 'date', direction: 'desc' };
+    savedPostsList.sort((a, b) => {
+        let valueA, valueB;
+
+        switch(sortSettings.column) {
+            case 'title':
+                valueA = (a[1].title || '').toLowerCase();
+                valueB = (b[1].title || '').toLowerCase();
+                break;
+            case 'subreddit':
+                valueA = (a[1].subreddit || '').toLowerCase();
+                valueB = (b[1].subreddit || '').toLowerCase();
+                break;
+            case 'author':
+                valueA = (a[1].author || '').toLowerCase();
+                valueB = (b[1].author || '').toLowerCase();
+                break;
+            case 'score':
+                valueA = parseInt(a[1].score) || 0;
+                valueB = parseInt(b[1].score) || 0;
+                break;
+            case 'date':
+            default:
+                valueA = a[1].timestamp || 0;
+                valueB = b[1].timestamp || 0;
+        }
+
+        let result;
+        if (typeof valueA === 'string') {
+            result = valueA.localeCompare(valueB);
+        } else {
+            result = valueA - valueB;
+        }
+
+        return sortSettings.direction === 'desc' ? -result : result;
+    });
+
+    tableBody.innerHTML = '';
+
+savedPostsList.forEach(([postId, post]) => {
+    const row = document.createElement('tr');
+
+    // Check if this is the current post page
+    const urlMatch = window.location.pathname.match(/\/comments\/([^\/]+)/);
+    const currentPostId = urlMatch ? urlMatch[1] : null;
+
+    if (currentPostId === postId) {
+        row.classList.add('current-post-row');
+    }
+
+    const title = post.title || 'Unknown Title';
+    const subreddit = post.subreddit || 'Unknown';
+    const author = post.author || 'Unknown';
+    const score = post.score || '0';
+    const commentsUrl = post.commentsUrl || '#';
+const dateSaved = post.timestamp ?
+    new Date(post.timestamp).toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: '2-digit'
+    }) : 'Unknown';
+
+    // Create full timestamp for tooltip
+    const fullTimestamp = post.timestamp ?
+        new Date(post.timestamp).toISOString().replace('T', ' ').substring(0, 19) : 'Unknown';
+
+    // Clean up score - remove "Upvotes" text and handle different formats
+    const cleanScore = score.replace(/\s*Upvotes?/i, '').trim();
+
+    // Get current instance URL for links
+    const currentHost = window.location.origin;
+
+    // Only create links if we have valid data (not "Unknown" or "#")
+    const hasValidTitle = commentsUrl !== '#';
+    const hasValidSubreddit = subreddit !== 'Unknown';
+    const hasValidAuthor = author !== 'Unknown';
+
+    // Create title cell - link only if we have valid title and URL
+    let titleCell;
+    if (hasValidTitle) {
+        titleCell = `<a href="${commentsUrl}" class="post-title-link" title="${title}" target="_blank">${title}</a>`;
+    } else {
+        // For unknown titles, link to the post ID page so user can visit and extract metadata
+        const postIdUrl = `${currentHost}/comments/${postId}`;
+        titleCell = `<a href="${postIdUrl}" class="post-title-link" title="Visit post to extract metadata" target="_blank">${title}</a>`;
+    }
+
+    // Create subreddit cell - remove r/ prefix from link text
+    let subredditCell;
+    if (hasValidSubreddit) {
+        subredditCell = `<a href="${currentHost}/r/${subreddit}" class="post-subreddit-link" target="_blank">${subreddit}</a>`;
+    } else {
+        subredditCell = `<span>${subreddit}</span>`;
+    }
+
+    // Create author cell - remove u/ prefix from link text
+    let authorCell;
+    if (hasValidAuthor) {
+        authorCell = `<a href="${currentHost}/u/${author}" class="post-author-link" target="_blank">${author}</a>`;
+    } else {
+        authorCell = `<span>${author}</span>`;
+    }
+
+    row.innerHTML = `
+        <td class="post-title">${titleCell}</td>
+        <td class="post-subreddit">${subredditCell}</td>
+        <td class="post-author">${authorCell}</td>
+        <td class="post-score">${cleanScore}</td>
+        <td class="post-date" title="${fullTimestamp}">${dateSaved}</td>
+        <td class="post-actions">
+            <button class="redlib-saved-posts-unsave" data-post-id="${postId}" title="Unsave post">★</button>
+        </td>
+    `;
+
+    tableBody.appendChild(row);
+});
+
+// Add click handlers for unsave buttons - MUST be after appendChild
+setTimeout(() => {
+    document.querySelectorAll('.redlib-saved-posts-unsave').forEach(button => {
+        // Remove any existing listeners first
+        button.replaceWith(button.cloneNode(true));
+    });
+
+    // Add fresh event listeners
+    document.querySelectorAll('.redlib-saved-posts-unsave').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const postId = this.getAttribute('data-post-id');
+            unsavePost(postId, true);
+        });
+    });
+}, 10);
+
+    // Set initial sort indicator
+    const initialSortSettings = window.savedPostsSort || { column: 'date', direction: 'desc' };
+    const activeHeader = document.querySelector('.redlib-saved-posts-table th[data-sort="' + initialSortSettings.column + '"]');
+    if (activeHeader) {
+        // Clear all sort indicators first
+        document.querySelectorAll('.redlib-saved-posts-table th').forEach(th => {
+            th.classList.remove('sorted-asc', 'sorted-desc');
+        });
+        activeHeader.classList.add(initialSortSettings.direction === 'asc' ? 'sorted-asc' : 'sorted-desc');
+    }
+}
+
+function setupSavedPostsTableSorting() {
+    // Use event delegation to handle clicks on sortable headers
+    const tableContainer = document.querySelector('.redlib-saved-posts-table-container');
+    if (!tableContainer) return;
+
+    // Remove any existing event listeners by cloning the container
+    const newContainer = tableContainer.cloneNode(true);
+    tableContainer.parentNode.replaceChild(newContainer, tableContainer);
+
+    // Add single delegated event listener
+    newContainer.addEventListener('click', function(event) {
+        const header = event.target.closest('th.sortable');
+        if (!header) return;
+
+        const sortColumn = header.getAttribute('data-sort');
+        const activeSortSettings = window.savedPostsSort || { column: 'date', direction: 'desc' };
+
+        // Toggle direction if same column, otherwise default to ascending
+        let newDirection = 'asc';
+        if (activeSortSettings.column === sortColumn && activeSortSettings.direction === 'asc') {
+            newDirection = 'desc';
+        }
+
+        window.savedPostsSort = { column: sortColumn, direction: newDirection };
+
+        // Update header styles
+        newContainer.querySelectorAll('th').forEach(th => {
+            th.classList.remove('sorted-asc', 'sorted-desc');
+        });
+        header.classList.add(newDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+
+        // Re-populate table with new sort
+        populateSavedPosts();
+
+        // Re-apply sort indicator after repopulation
+        setTimeout(() => {
+            const updatedHeader = newContainer.querySelector(`[data-sort="${sortColumn}"]`);
+            if (updatedHeader) {
+                newContainer.querySelectorAll('th').forEach(th => {
+                    th.classList.remove('sorted-asc', 'sorted-desc');
+                });
+                updatedHeader.classList.add(newDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+            }
+        }, 10);
+    });
+}
+
+function addSaveButtonsToPosts() {
+    // Only run on post listing pages
+    if (window.location.pathname.includes('/comments/')) return;
+
+    const posts = document.querySelectorAll('.post');
+    const savedPostsData = GM_getValue('redlib_saved_posts', '{}');
+    const savedPosts = JSON.parse(savedPostsData || '{}');
+
+    posts.forEach(postElement => {
+        // Skip if save button already exists
+        if (postElement.querySelector('.redlib-save-btn')) return;
+
+        const postId = extractPostId(postElement);
+        if (!postId) return;
+
+        // Use the same approach as PostCollapser and PostExpandButtons
+        const postHeader = postElement.querySelector('.post_header');
+        if (!postHeader) return;
+
+        // Create save button with the same approach as other buttons
+        const saveButton = document.createElement('button');
+        saveButton.className = 'redlib-save-btn';
+        saveButton.title = 'Save post';
+
+        // Apply inline styles like the expand button does
+        saveButton.style.cssText =
+            'background: var(--highlighted);' +
+            'color: var(--accent);' +
+            'border: 1px solid var(--accent);' +
+            'cursor: pointer;' +
+            'font-size: 12px;' +
+            'font-weight: bold;' +
+            'margin-right: 4px;' +
+            'padding: 2px 6px;' +
+            'border-radius: 3px;' +
+            'min-width: 20px;' +
+            'line-height: 1;' +
+            'text-align: center;';
+
+        // Check if post is already saved
+        const isSaved = savedPosts[postId]?.saved === true;
+        if (isSaved) {
+            saveButton.classList.add('saved');
+            saveButton.title = 'Unsave post';
+            saveButton.style.background = 'var(--accent)';
+            saveButton.style.color = 'var(--foreground)';
+            saveButton.innerHTML = '★';
+            updatePostSaveState(postElement, true);
+        } else {
+            saveButton.innerHTML = '☆';
+        }
+
+        // Add hover effects like the expand button
+        saveButton.addEventListener('mouseenter', () => {
+            if (!saveButton.classList.contains('saved')) {
+                saveButton.style.backgroundColor = 'var(--accent)';
+                saveButton.style.color = 'var(--foreground)';
+            }
+        });
+
+        saveButton.addEventListener('mouseleave', () => {
+            if (!saveButton.classList.contains('saved')) {
+                saveButton.style.backgroundColor = 'var(--highlighted)';
+                saveButton.style.color = 'var(--accent)';
+            }
+        });
+
+        // Add click handler
+        saveButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const currentlySaved = this.classList.contains('saved');
+            if (currentlySaved) {
+                unsavePost(postId);
+            } else {
+                savePost(postElement);
+            }
+        });
+
+        // Insert using the EXACT same method as the expand button
+        postHeader.insertBefore(saveButton, postHeader.firstChild);
+    });
+}
+function addSaveButtonToCommentsPage() {
+    // Only run on comment pages
+    if (!window.location.pathname.includes('/comments/')) return;
+
+    const postElement = document.querySelector('.post.highlighted');
+    if (!postElement) return;
+
+    // Skip if save button already exists
+    if (postElement.querySelector('.redlib-save-btn')) return;
+
+    const postId = extractPostId(postElement);
+    if (!postId) return;
+
+    const postHeader = postElement.querySelector('.post_header');
+    if (!postHeader) return;
+
+    // Get saved posts data
+    const savedPostsData = GM_getValue('redlib_saved_posts', '{}');
+    const savedPosts = JSON.parse(savedPostsData || '{}');
+
+    // Create save button with the same styling as post listing pages
+    const saveButton = document.createElement('button');
+    saveButton.className = 'redlib-save-btn';
+    saveButton.title = 'Save post';
+
+    saveButton.style.cssText =
+        'background: var(--highlighted);' +
+        'color: var(--accent);' +
+        'border: 1px solid var(--accent);' +
+        'cursor: pointer;' +
+        'font-size: 12px;' +
+        'font-weight: bold;' +
+        'margin-right: 4px;' +
+        'padding: 2px 6px;' +
+        'border-radius: 3px;' +
+        'min-width: 20px;' +
+        'line-height: 1;' +
+        'text-align: center;';
+
+    // Check if post is already saved
+    const isSaved = savedPosts[postId]?.saved === true;
+    if (isSaved) {
+        saveButton.classList.add('saved');
+        saveButton.title = 'Unsave post';
+        saveButton.style.background = 'var(--accent)';
+        saveButton.style.color = 'var(--foreground)';
+        saveButton.innerHTML = '★';
+        updatePostSaveState(postElement, true);
+    } else {
+        saveButton.innerHTML = '☆';
+    }
+
+    // Add hover effects
+    saveButton.addEventListener('mouseenter', () => {
+        if (!saveButton.classList.contains('saved')) {
+            saveButton.style.backgroundColor = 'var(--accent)';
+            saveButton.style.color = 'var(--foreground)';
+        }
+    });
+
+    saveButton.addEventListener('mouseleave', () => {
+        if (!saveButton.classList.contains('saved')) {
+            saveButton.style.backgroundColor = 'var(--highlighted)';
+            saveButton.style.color = 'var(--accent)';
+        }
+    });
+
+    // Add click handler
+    saveButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentlySaved = this.classList.contains('saved');
+        if (currentlySaved) {
+            unsavePost(postId);
+        } else {
+            savePost(postElement);
+        }
+    });
+
+    // Insert at beginning of post header like on listing pages
+    postHeader.insertBefore(saveButton, postHeader.firstChild);
+}
+function addHideButtonToCommentsPage() {
+    console.log('[DEBUG HIDE BUTTON] addHideButtonToCommentsPage called');
+
+    // Only run on comment pages
+    if (!window.location.pathname.includes('/comments/')) {
+        console.log('[DEBUG HIDE BUTTON] Not a comments page, exiting');
+        return;
+    }
+    console.log('[DEBUG HIDE BUTTON] On comments page');
+
+    const postElement = document.querySelector('.post.highlighted');
+    if (!postElement) {
+        console.log('[DEBUG HIDE BUTTON] No highlighted post found');
+        return;
+    }
+    console.log('[DEBUG HIDE BUTTON] Found highlighted post:', postElement);
+
+    // Clean up any thumbnail artifacts from posts list pages
+    cleanupThumbnailArtifacts(postElement);
+    console.log('[DEBUG HIDE BUTTON] Cleaned up thumbnail artifacts');
+
+    // Skip if hide button already exists
+    if (postElement.querySelector('.redlib-collapse-btn')) {
+        console.log('[DEBUG HIDE BUTTON] Hide button already exists');
+        return;
+    }
+    // ... rest of the function
+    console.log('[DEBUG HIDE BUTTON] No existing hide button found');
+
+    const postId = extractPostId(postElement);
+    if (!postId) {
+        console.log('[DEBUG HIDE BUTTON] No post ID found');
+        return;
+    }
+    console.log('[DEBUG HIDE BUTTON] Post ID:', postId);
+
+    // Mark collapsible elements for the comments page
+    const selectors = ['.post_body', '.post_media_content', '.post_thumbnail', '.gallery'];
+    selectors.forEach(selector => {
+        const elements = postElement.querySelectorAll(selector);
+        console.log(`[DEBUG HIDE BUTTON] Found ${elements.length} elements for selector ${selector}`);
+        elements.forEach(el => {
+            el.classList.add('redlib-collapsible');
+        });
+    });
+
+    console.log('[DEBUG HIDE BUTTON] Creating collapse button');
+    const collapseButton = document.createElement('button');
+    collapseButton.className = 'redlib-collapse-btn';
+    collapseButton.innerHTML = '✕';
+    collapseButton.title = 'Hide post';
+
+    console.log('[DEBUG HIDE BUTTON] Adding click listener');
+    collapseButton.addEventListener('click', (e) => {
+        console.log('[DEBUG CLICK] Hide button clicked!');
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Check if we're in sticky mode and this is the highlighted post
+        const isHighlightedPost = postElement.classList.contains('highlighted');
+        const stickyModeEnabled = SettingsManager.getSetting('postCollapser', 'stickyMode');
+
+        console.log('[DEBUG CLICK] isHighlightedPost:', isHighlightedPost);
+        console.log('[DEBUG CLICK] stickyModeEnabled:', stickyModeEnabled);
+
+if (isHighlightedPost && stickyModeEnabled) {
+        // Use permanent toggle for sticky mode hide button
+        // Check permanent hidden state, not visual state (which is controlled by hover)
+        const hiddenPostsData = GM_getValue('redlib_collapsed_posts', '{}');
+        const hiddenPosts = JSON.parse(hiddenPostsData || '{}');
+        const isCurrentlyHidden = hiddenPosts[postId] && (hiddenPosts[postId] === true || (hiddenPosts[postId].collapsed && hiddenPosts[postId].timestamp));
+
+        permanentTogglePost(postElement, !isCurrentlyHidden);
+    } else {
+            console.log('[DEBUG CLICK] Using regular togglePost path');
+            console.log('[DEBUG CLICK] Calling extractPostMetadata...');
+            const metadata = extractPostMetadata(postElement);
+            console.log('[DEBUG CLICK] Extracted metadata:', metadata);
+        }
+    });
+
+    // Check if post is already hidden and update button accordingly
+    const hiddenPostsData = GM_getValue('redlib_collapsed_posts', '{}');
+    const hiddenPosts = JSON.parse(hiddenPostsData || '{}');
+    const postData = hiddenPosts[postId];
+
+    if (postData && (postData === true || (postData.collapsed && postData.timestamp))) {
+        console.log('[DEBUG HIDE BUTTON] Post is already hidden, updating button');
+        // Post is hidden - show unhide button
+        collapseButton.innerHTML = '↶';
+        collapseButton.title = 'Show post';
+        postElement.classList.add('redlib-collapsed');
+
+        // Hide collapsible elements
+        const collapsibleElements = postElement.querySelectorAll('.redlib-collapsible');
+        collapsibleElements.forEach(el => {
+            el.style.display = 'none';
+            el.style.height = '0';
+            el.style.overflow = 'hidden';
+        });
+    }
+
+    console.log('[DEBUG HIDE BUTTON] Appending button to post element');
+    // Add button to post container
+    postElement.appendChild(collapseButton);
+    console.log('[DEBUG HIDE BUTTON] Button appended successfully');
+}
         return {
             init: init,
             getSetting: getSetting,
             setSetting: setSetting,
             loadSettings: loadSettings,
             addHeaderButtonListeners: addHeaderButtonListeners,
-            updateExportString: updateExportString
+            updateExportString: updateExportString,
+            populateHiddenPosts: populateHiddenPosts,
+            populateSavedPosts: populateSavedPosts,
+            addSaveButtonsToPosts: addSaveButtonsToPosts,
+            addSaveButtonToCommentsPage: addSaveButtonToCommentsPage,
+            addHideButtonToCommentsPage: addHideButtonToCommentsPage
         };
     })();
 
@@ -11221,78 +12997,104 @@ function interceptNativeSettingsForm() {
         let currentTopLevelIndex = 0;
         let topLevelComments = [];
 
-        function createNavigationButtons() {
-            navContainer = document.createElement('div');
-            navContainer.className = 'comment-nav-buttons';
-            navContainer.style.cssText = `
+function createNavigationButtons() {
+    // Add responsive CSS to document head (only once)
+    if (!document.querySelector('#comment-nav-responsive-css')) {
+        const style = document.createElement('style');
+        style.id = 'comment-nav-responsive-css';
+        style.textContent = `
+            .comment-nav-buttons {
                 position: fixed;
-                left: 20px;
-                top: 50%;
-                transform: translateY(-50%);
                 z-index: 1000;
                 display: flex;
-                flex-direction: column;
-                gap: 20px;
-            `;
+            }
 
-            // Up button
-            const upButton = document.createElement('button');
-            upButton.className = 'comment-nav-btn comment-nav-up';
-            upButton.innerHTML = '▲';
-            upButton.title = 'Previous top-level comment';
-            upButton.style.cssText = `
+            .comment-nav-btn {
                 background: var(--background);
-                border: 1px solid var(--highlighted);
                 color: var(--text);
-                width: 50px;
-                height: 50px;
-                border-radius: 4px;
+                border: 2px solid var(--highlighted);
                 cursor: pointer;
-                font-size: 18px;
                 font-weight: bold;
-                display: flex;
-                align-items: center;
-                justify-content: center;
                 transition: all 0.2s ease;
-                touch-action: manipulation;
-            `;
+                user-select: none;
+            }
 
-            // Down button
-            const downButton = document.createElement('button');
-            downButton.className = 'comment-nav-btn comment-nav-down';
-            downButton.innerHTML = '▼';
-            downButton.title = 'Next top-level comment';
-            downButton.style.cssText = upButton.style.cssText;
+            .comment-nav-btn:hover {
+                background: var(--highlighted);
+                border-color: var(--accent);
+            }
 
-            // Hover effects
-            [upButton, downButton].forEach(btn => {
-                btn.addEventListener('mouseenter', () => {
-                    btn.style.background = 'var(--highlighted)';
-                    btn.style.borderColor = 'var(--accent)';
-                });
-                btn.addEventListener('mouseleave', () => {
-                    btn.style.background = 'var(--background)';
-                    btn.style.borderColor = 'var(--highlighted)';
-                });
-            });
+            /* Desktop layout */
+            @media (min-width: 769px) {
+                .comment-nav-buttons {
+                    left: 20px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    flex-direction: column;
+                    gap: 20px;
+                }
 
-            // Event listeners - FIXED: up goes to previous, down goes to next
-            upButton.addEventListener('click', () => navigateToPrevious());
-            downButton.addEventListener('click', () => navigateToNext());
+                .comment-nav-btn {
+                    width: 50px;
+                    height: 50px;
+                    font-size: 16px;
+                    border-radius: 50%;
+                }
+            }
 
-            navContainer.appendChild(upButton);
-            navContainer.appendChild(downButton);
+            /* Mobile layout */
+            @media (max-width: 768px) {
+                .comment-nav-buttons {
+                    bottom: 20px;
+                    left: 10px;
+                    right: 10px;
+                    flex-direction: row;
+                    gap: 10px;
+                }
 
-            return navContainer;
-        }
+                .comment-nav-btn {
+                    flex: 1;
+                    height: 40px;
+                    font-size: 14px;
+                    border-radius: 8px;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    navContainer = document.createElement('div');
+    navContainer.className = 'comment-nav-buttons';
+
+    // Up button
+    const upButton = document.createElement('button');
+    upButton.className = 'comment-nav-btn comment-nav-up';
+    upButton.innerHTML = '▲';
+    upButton.title = 'Previous top-level comment';
+
+    // Down button
+    const downButton = document.createElement('button');
+    downButton.className = 'comment-nav-btn comment-nav-down';
+    downButton.innerHTML = '▼';
+    downButton.title = 'Next top-level comment';
+
+// Add click handlers - FIXED: use correct function names
+upButton.addEventListener('click', () => navigateToPrevious());
+downButton.addEventListener('click', () => navigateToNext());
+
+    navContainer.appendChild(upButton);
+    navContainer.appendChild(downButton);
+
+    return navContainer;
+}
 
         function updateTopLevelComments() {
             // Get all top-level comments in document order
             const newCount = document.querySelectorAll('.thread > .comment').length;
             const oldCount = topLevelComments.length;
-            
+
             topLevelComments = Array.from(document.querySelectorAll('.thread > .comment'));
-            
+
             // Only log if the count actually changed
             if (newCount !== oldCount) {
                 console.log('[Comment Navigator] Updated comment list:', oldCount, '→', newCount, 'comments');
@@ -11307,12 +13109,12 @@ function interceptNativeSettingsForm() {
 
             // Simply increment by 1
             currentTopLevelIndex++;
-            
+
             // Wrap around to beginning if at end
             if (currentTopLevelIndex >= topLevelComments.length) {
                 currentTopLevelIndex = 0;
             }
-            
+
             scrollToComment(currentTopLevelIndex);
             console.log('[Comment Navigator] Navigated to comment', currentTopLevelIndex + 1, 'of', topLevelComments.length);
         }
@@ -11325,12 +13127,12 @@ function interceptNativeSettingsForm() {
 
             // Simply decrement by 1
             currentTopLevelIndex--;
-            
+
             // Wrap around to end if at beginning
             if (currentTopLevelIndex < 0) {
                 currentTopLevelIndex = topLevelComments.length - 1;
             }
-            
+
             scrollToComment(currentTopLevelIndex);
             console.log('[Comment Navigator] Navigated to comment', currentTopLevelIndex + 1, 'of', topLevelComments.length);
         }
@@ -11338,27 +13140,27 @@ function interceptNativeSettingsForm() {
 function scrollToComment(index) {
             if (index >= 0 && index < topLevelComments.length) {
                 const targetComment = topLevelComments[index];
-                
+
                 // Calculate initial offset
                 let offset = 80; // Base offset
-                
+
                 // Check if sticky post mode is enabled
                 const isStickyModeEnabled = SettingsManager.getSetting('postCollapser', 'stickyMode');
-                
+
                 if (isStickyModeEnabled) {
                     // Always assume sticky mode will be active when scrolling to comments
                     // This prevents the timing issue where sticky activates after scroll
                     const nav = document.querySelector('nav');
                     const navHeight = nav ? nav.offsetHeight : (window.innerWidth <= 800 ? 100 : 60);
-                    
+
                     // Estimate sticky post height (it's compact in sticky mode)
                     // Based on the CSS: padding 4px 16px, compact header, no footer
                     const estimatedStickyHeight = window.innerWidth <= 800 ? 80 : 60;
-                    
+
                     offset = navHeight + estimatedStickyHeight + 20;
                     console.log('[Comment Navigator] Using sticky-aware offset:', offset);
                 }
-                
+
                 // First scroll to position
                 const rect = targetComment.getBoundingClientRect();
                 window.scrollTo({
@@ -11388,12 +13190,12 @@ function scrollToComment(index) {
                 z-index: 999;
                 transition: opacity 0.3s ease;
             `;
-            
+
             // Make sure the comment has relative positioning for the overlay
             const originalPosition = comment.style.position;
             comment.style.position = 'relative';
             comment.appendChild(highlightOverlay);
-            
+
             // Fade out and remove
             setTimeout(() => {
                 highlightOverlay.style.opacity = '0';
@@ -11453,7 +13255,7 @@ function scrollToComment(index) {
             // Listen for new comments being added (e.g., via AJAX) - but be more selective
             const observer = new MutationObserver((mutations) => {
                 let shouldUpdate = false;
-                
+
                 mutations.forEach(mutation => {
                     // Only update if we detect actual comment additions
                     mutation.addedNodes.forEach(node => {
@@ -11465,7 +13267,7 @@ function scrollToComment(index) {
                         }
                     });
                 });
-                
+
                 if (shouldUpdate) {
                     setTimeout(() => {
                         console.log('[Comment Navigator] Detected new comments, updating list...');
@@ -11508,7 +13310,16 @@ async function init() {
         PostCollapser.init();
         // Make PostCollapser globally accessible for other modules
         window.PostCollapser = PostCollapser;
+    window.extractPostMetadata = extractPostMetadata;  // Make globally accessible
     }
+
+// Add post actions (hide/save buttons)
+if (!isCommentPage) {
+    SettingsManager.addSaveButtonsToPosts();
+} else {
+    SettingsManager.addSaveButtonToCommentsPage();
+    SettingsManager.addHideButtonToCommentsPage();
+}
 
     // Post expand buttons work independently of post collapser
     if (SettingsManager.getSetting('postCollapser', 'expandButtons')) {
@@ -11526,7 +13337,7 @@ async function init() {
     if (isCommentPage && SettingsManager.getSetting('ajaxCommentLoading', 'enabled')) {
         AjaxCommentLoader.init();
     }
-    
+
     if (isCommentPage && SettingsManager.getSetting('commentNavigator', 'enabled')) {
         CommentNavigator.init();
     }
@@ -11546,7 +13357,7 @@ async function init() {
     if (isCommentPage && SettingsManager.getSetting('parentCommentHover', 'enabled')) {
         ParentCommentHover.init();
     }
-    
+
     // Initialize settings feed collapsers
     if (window.location.pathname.includes('/settings')) {
         SettingsFeedCollapsers.init();
@@ -11554,6 +13365,10 @@ async function init() {
 
     // Initialize auto-recording of native settings
     interceptNativeSettingsForm();
+
+    // Temporary debug - remove after testing
+    // console.log('Hidden posts debug:', GM_getValue('redlib_collapsed_posts', '{}'));
+    // window.tempDebugHiddenPosts = GM_getValue('redlib_collapsed_posts', '{}');
 
     console.log('[Redlib Enhancement Suite] Core modules initialized for ' + (isCommentPage ? 'comment page' : 'post listing page'));
 
